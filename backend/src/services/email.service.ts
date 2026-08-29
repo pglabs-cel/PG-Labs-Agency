@@ -22,7 +22,7 @@ const escapeHtml = (str: string): string => {
 
 export class EmailService {
   /**
-   * Generates the Admin Notification HTML Template in Bulletproof Dark Mode
+   * Generates the Admin Notification HTML Template (Persistent Dark Theme)
    */
   public static getAdminNotificationHtml(data: EmailInquiryData): string {
     const formattedDate = data.createdAt
@@ -41,111 +41,66 @@ export class EmailService {
 
     return `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" style="color-scheme: dark; supported-color-schemes: dark;">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="dark" />
-  <meta name="supported-color-schemes" content="dark" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="supported-color-schemes" content="light dark" />
   <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
   <title>New Inquiry Notification</title>
-  <!--[if mso]>
-  <noscript>
-    <xml>
-      <o:OfficeDocumentSettings>
-        <o:PixelsPerInch>96</o:PixelsPerInch>
-      </o:OfficeDocumentSettings>
-    </xml>
-  </noscript>
-  <![endif]-->
   <style type="text/css">
     :root {
-      color-scheme: dark !important;
-      supported-color-schemes: dark !important;
+      color-scheme: light dark;
+      supported-color-schemes: light dark;
     }
-    body, table, td, p, a, div, span, h1, h2, h3 {
-      color-scheme: dark !important;
+    body, table, td, p, a, div, span, h1, h2, h3, font {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
     }
-    /* Prevents Webkit & Gmail dark mode color inversions */
-    .bg-main {
-      background-color: #09090b !important;
-      background-image: linear-gradient(#09090b, #09090b) !important;
+    @media (prefers-color-scheme: dark) {
+      body, .bg-body {
+        background-color: #09090b !important;
+      }
+      .bg-card {
+        background-color: #121215 !important;
+      }
+      .bg-header, .bg-table, .bg-box {
+        background-color: #18181c !important;
+      }
+      .dark-text-white {
+        color: #ffffff !important;
+      }
     }
-    .bg-card {
-      background-color: #111113 !important;
-      background-image: linear-gradient(#111113, #111113) !important;
-    }
-    .bg-header {
-      background-color: #18181b !important;
-      background-image: linear-gradient(#18181b, #18181b) !important;
-    }
-    .bg-table {
-      background-color: #151518 !important;
-      background-image: linear-gradient(#151518, #151518) !important;
-    }
-    .bg-box {
-      background-color: #18181b !important;
-      background-image: linear-gradient(#18181b, #18181b) !important;
-    }
-    .bg-badge {
-      background-color: #8b5cf6 !important;
-      background-image: linear-gradient(#8b5cf6, #8b5cf6) !important;
-    }
-    .text-title {
-      color: #ffffff !important;
-      -webkit-text-fill-color: #ffffff !important;
-    }
-    .text-body {
-      color: #e4e4e7 !important;
-      -webkit-text-fill-color: #e4e4e7 !important;
-    }
-    .text-secondary {
-      color: #a1a1aa !important;
-      -webkit-text-fill-color: #a1a1aa !important;
-    }
-    .text-muted {
-      color: #71717a !important;
-      -webkit-text-fill-color: #71717a !important;
-    }
-    .text-accent {
-      color: #a78bfa !important;
-      -webkit-text-fill-color: #a78bfa !important;
-    }
-    .text-green {
-      color: #34d399 !important;
-      -webkit-text-fill-color: #34d399 !important;
-    }
-    /* Outlook.com dark mode target */
-    [data-ogsc] .bg-main, [data-ogsb] .bg-main { background-color: #09090b !important; background-image: linear-gradient(#09090b, #09090b) !important; }
-    [data-ogsc] .bg-card, [data-ogsb] .bg-card { background-color: #111113 !important; background-image: linear-gradient(#111113, #111113) !important; }
-    [data-ogsc] .bg-header, [data-ogsb] .bg-header { background-color: #18181b !important; background-image: linear-gradient(#18181b, #18181b) !important; }
-    [data-ogsc] .text-title, [data-ogsb] .text-title { color: #ffffff !important; }
-    [data-ogsc] .text-body, [data-ogsb] .text-body { color: #e4e4e7 !important; }
+    /* Gmail & Webmail Target */
+    u + .body .bg-body { background-color: #09090b !important; }
+    u + .body .bg-card { background-color: #121215 !important; }
+    u + .body .bg-header { background-color: #18181c !important; }
+    u + .body .dark-text-white { color: #ffffff !important; }
   </style>
 </head>
-<body class="bg-main" style="margin: 0; padding: 0; background-color: #09090b; background-image: linear-gradient(#09090b, #09090b); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #fafafa; -webkit-font-smoothing: antialiased;">
-  <table class="bg-main" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #09090b; background-image: linear-gradient(#09090b, #09090b); padding: 32px 12px;">
+<body class="body bg-body" style="margin: 0; padding: 0; background-color: #09090b; background: #09090b; -webkit-font-smoothing: antialiased;">
+  <table class="bg-body" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #09090b; background: #09090b; padding: 24px 10px;">
     <tr>
       <td align="center">
         <!-- Main Card Container -->
-        <table class="bg-card" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #111113; background-image: linear-gradient(#111113, #111113); border: 1px solid #27272a; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.6);">
+        <table class="bg-card" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #121215; background: #121215; border: 1px solid #2d2d33; border-radius: 12px; overflow: hidden;">
           
           <!-- Header Bar -->
           <tr>
-            <td class="bg-header" style="padding: 24px 28px; border-bottom: 1px solid #27272a; background-color: #18181b; background-image: linear-gradient(#18181b, #18181b);">
+            <td class="bg-header" style="padding: 24px 28px; border-bottom: 1px solid #2d2d33; background-color: #18181c; background: #18181c;">
               <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                   <td>
-                    <div class="text-accent" style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #a78bfa; text-transform: uppercase; margin-bottom: 4px;">
-                      PG LABS &bull; INQUIRY ALERT
+                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px;">
+                      <font color="#c084fc">PG LABS &bull; INQUIRY ALERT</font>
                     </div>
-                    <div class="text-title" style="margin: 0; font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: -0.02em;">
-                      New Lead Received
+                    <div class="dark-text-white" style="font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: #ffffff;">
+                      <font color="#ffffff">New Lead Received</font>
                     </div>
                   </td>
                   <td align="right" valign="middle">
-                    <span class="bg-badge" style="display: inline-block; background-color: #8b5cf6; background-image: linear-gradient(#8b5cf6, #8b5cf6); color: #ffffff !important; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 6px; white-space: nowrap;">
-                      ${projectType}
+                    <span style="display: inline-block; background-color: #8b5cf6; background: #8b5cf6; padding: 6px 14px; border-radius: 6px; white-space: nowrap;">
+                      <font color="#ffffff" style="font-size: 12px; font-weight: 700;">${projectType}</font>
                     </span>
                   </td>
                 </tr>
@@ -155,56 +110,88 @@ export class EmailService {
 
           <!-- Main Content -->
           <tr>
-            <td class="bg-card" style="padding: 28px; background-color: #111113; background-image: linear-gradient(#111113, #111113);">
-              <p class="text-secondary" style="margin-top: 0; margin-bottom: 24px; font-size: 14px; color: #a1a1aa; line-height: 1.5;">
-                A new project inquiry has been submitted through the PG Labs website contact portal.
+            <td class="bg-card" style="padding: 28px; background-color: #121215; background: #121215;">
+              <p style="margin-top: 0; margin-bottom: 24px; font-size: 14px; line-height: 1.5;">
+                <font color="#cbd5e1">A new project inquiry has been submitted through the PG Labs website contact portal.</font>
               </p>
 
               <!-- Inquiry Details Table -->
-              <table class="bg-table" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse; margin-bottom: 24px; background-color: #151518; background-image: linear-gradient(#151518, #151518); border: 1px solid #27272a; border-radius: 8px; overflow: hidden;">
+              <table class="bg-table" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse; margin-bottom: 24px; background-color: #18181c; background: #18181c; border: 1px solid #2d2d33; border-radius: 8px; overflow: hidden;">
                 <tr>
-                  <td class="text-muted" style="padding: 12px 16px; border-bottom: 1px solid #27272a; font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.06em; width: 130px; font-weight: 700;">Client Name</td>
-                  <td class="text-title" style="padding: 12px 16px; border-bottom: 1px solid #27272a; font-size: 14px; color: #ffffff; font-weight: 600;">${clientName}</td>
-                </tr>
-                <tr>
-                  <td class="text-muted" style="padding: 12px 16px; border-bottom: 1px solid #27272a; font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">Client Email</td>
-                  <td style="padding: 12px 16px; border-bottom: 1px solid #27272a; font-size: 14px;">
-                    <a href="mailto:${clientEmail}" class="text-accent" style="color: #a78bfa !important; font-weight: 600; text-decoration: none;">${clientEmail}</a>
+                  <td style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; width: 130px; font-weight: 700;">
+                    <font color="#94a3b8">Client Name</font>
+                  </td>
+                  <td class="dark-text-white" style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 14px; font-weight: 700; color: #ffffff;">
+                    <font color="#ffffff">${clientName}</font>
                   </td>
                 </tr>
                 <tr>
-                  <td class="text-muted" style="padding: 12px 16px; border-bottom: 1px solid #27272a; font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">Company</td>
-                  <td class="text-body" style="padding: 12px 16px; border-bottom: 1px solid #27272a; font-size: 14px; color: #e4e4e7;">${clientCompany}</td>
+                  <td style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
+                    <font color="#94a3b8">Client Email</font>
+                  </td>
+                  <td style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 14px;">
+                    <a href="mailto:${clientEmail}" style="text-decoration: none; font-weight: 700; color: #c084fc;">
+                      <font color="#c084fc">${clientEmail}</font>
+                    </a>
+                  </td>
                 </tr>
                 <tr>
-                  <td class="text-muted" style="padding: 12px 16px; border-bottom: 1px solid #27272a; font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">Project Type</td>
-                  <td class="text-title" style="padding: 12px 16px; border-bottom: 1px solid #27272a; font-size: 14px; color: #ffffff; font-weight: 600;">${projectType}</td>
+                  <td style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
+                    <font color="#94a3b8">Company</font>
+                  </td>
+                  <td class="dark-text-white" style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 14px; color: #ffffff;">
+                    <font color="#ffffff">${clientCompany}</font>
+                  </td>
                 </tr>
                 <tr>
-                  <td class="text-muted" style="padding: 12px 16px; border-bottom: 1px solid #27272a; font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">Budget Estimate</td>
-                  <td class="text-green" style="padding: 12px 16px; border-bottom: 1px solid #27272a; font-size: 14px; color: #34d399; font-weight: 600;">${budget}</td>
+                  <td style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
+                    <font color="#94a3b8">Project Type</font>
+                  </td>
+                  <td class="dark-text-white" style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 14px; font-weight: 700; color: #ffffff;">
+                    <font color="#ffffff">${projectType}</font>
+                  </td>
                 </tr>
                 <tr>
-                  <td class="text-muted" style="padding: 12px 16px; font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">Timestamp</td>
-                  <td class="text-secondary" style="padding: 12px 16px; font-size: 12px; color: #a1a1aa; font-family: monospace;">${formattedDate}</td>
+                  <td style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
+                    <font color="#94a3b8">Budget Estimate</font>
+                  </td>
+                  <td style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 14px; font-weight: 700; color: #4ade80;">
+                    <font color="#4ade80">${budget}</font>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 14px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
+                    <font color="#94a3b8">Timestamp</font>
+                  </td>
+                  <td style="padding: 14px 16px; font-size: 12px; font-family: monospace;">
+                    <font color="#cbd5e1">${formattedDate}</font>
+                  </td>
                 </tr>
               </table>
 
               <!-- Project Message Box -->
               <div style="margin-bottom: 28px;">
-                <div class="text-muted" style="font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; margin-bottom: 8px;">
-                  Project Scope & Requirements:
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 8px;">
+                  <font color="#94a3b8">Project Scope & Requirements:</font>
                 </div>
-                <div class="bg-box text-body" style="background-color: #18181b; background-image: linear-gradient(#18181b, #18181b); border: 1px solid #27272a; border-radius: 8px; padding: 16px; font-size: 14px; color: #e4e4e7; line-height: 1.6; white-space: pre-wrap;">${message}</div>
+                <div class="bg-box dark-text-white" style="background-color: #1a1a1f; background: #1a1a1f; border: 1px solid #33333d; border-radius: 8px; padding: 18px; font-size: 14px; line-height: 1.6; color: #f1f5f9;">
+                  <font color="#f1f5f9">${message}</font>
+                </div>
               </div>
 
               <!-- Quick Action Button -->
               <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <a href="${mailtoLink}" class="bg-badge" style="display: inline-block; background-color: #8b5cf6; background-image: linear-gradient(#8b5cf6, #8b5cf6); color: #ffffff !important; font-size: 14px; font-weight: 600; text-decoration: none; padding: 13px 32px; border-radius: 8px; letter-spacing: 0.02em;">
-                      Reply to ${clientName} &rarr;
-                    </a>
+                    <table border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td align="center" style="background-color: #8b5cf6; background: #8b5cf6; border-radius: 8px;">
+                          <a href="${mailtoLink}" style="display: inline-block; padding: 14px 36px; text-decoration: none;">
+                            <font color="#ffffff" style="font-size: 15px; font-weight: 700; letter-spacing: 0.02em;">Reply to ${clientName} &rarr;</font>
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
@@ -213,10 +200,10 @@ export class EmailService {
 
           <!-- Footer -->
           <tr>
-            <td class="bg-header" style="padding: 18px 28px; border-top: 1px solid #27272a; background-color: #18181b; background-image: linear-gradient(#18181b, #18181b); text-align: center;">
-              <p class="text-muted" style="margin: 0; font-size: 12px; color: #71717a;">
+            <td class="bg-header" style="padding: 18px 28px; border-top: 1px solid #2d2d33; background-color: #18181c; background: #18181c; text-align: center;">
+              <font color="#94a3b8" style="font-size: 12px;">
                 PG Labs Automated Notification System &bull; Technology & Digital Product Studio
-              </p>
+              </font>
             </td>
           </tr>
         </table>
@@ -229,103 +216,71 @@ export class EmailService {
   }
 
   /**
-   * Generates the Client Acknowledgment Auto-Reply HTML Template in Bulletproof Dark Mode
+   * Generates the Client Acknowledgment Auto-Reply HTML Template (Persistent Dark Theme)
    */
   public static getClientAutoReplyHtml(data: EmailInquiryData): string {
     const clientName = escapeHtml(data.name);
+    const clientEmail = escapeHtml(data.email);
     const projectType = escapeHtml(data.projectType);
     const company = escapeHtml(data.company || "");
 
     return `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" style="color-scheme: dark; supported-color-schemes: dark;">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="dark" />
-  <meta name="supported-color-schemes" content="dark" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="supported-color-schemes" content="light dark" />
   <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
   <title>Thank you for contacting PG Labs</title>
-  <!--[if mso]>
-  <noscript>
-    <xml>
-      <o:OfficeDocumentSettings>
-        <o:PixelsPerInch>96</o:PixelsPerInch>
-      </o:OfficeDocumentSettings>
-    </xml>
-  </noscript>
-  <![endif]-->
   <style type="text/css">
     :root {
-      color-scheme: dark !important;
-      supported-color-schemes: dark !important;
+      color-scheme: light dark;
+      supported-color-schemes: light dark;
     }
-    body, table, td, p, a, div, span, h1, h2, h3 {
-      color-scheme: dark !important;
+    body, table, td, p, a, div, span, h1, h2, h3, font {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
     }
-    /* Prevents Webkit & Gmail dark mode color inversions */
-    .bg-main {
-      background-color: #09090b !important;
-      background-image: linear-gradient(#09090b, #09090b) !important;
+    @media (prefers-color-scheme: dark) {
+      body, .bg-body {
+        background-color: #09090b !important;
+      }
+      .bg-card {
+        background-color: #121215 !important;
+      }
+      .bg-header, .bg-callout {
+        background-color: #18181c !important;
+      }
+      .dark-text-white {
+        color: #ffffff !important;
+      }
     }
-    .bg-card {
-      background-color: #111113 !important;
-      background-image: linear-gradient(#111113, #111113) !important;
-    }
-    .bg-header {
-      background-color: #18181b !important;
-      background-image: linear-gradient(#18181b, #18181b) !important;
-    }
-    .bg-callout {
-      background-color: #18181b !important;
-      background-image: linear-gradient(#18181b, #18181b) !important;
-    }
-    .text-white {
-      color: #ffffff !important;
-      -webkit-text-fill-color: #ffffff !important;
-    }
-    .text-body {
-      color: #e4e4e7 !important;
-      -webkit-text-fill-color: #e4e4e7 !important;
-    }
-    .text-secondary {
-      color: #a1a1aa !important;
-      -webkit-text-fill-color: #a1a1aa !important;
-    }
-    .text-muted {
-      color: #71717a !important;
-      -webkit-text-fill-color: #71717a !important;
-    }
-    .text-purple {
-      color: #a78bfa !important;
-      -webkit-text-fill-color: #a78bfa !important;
-    }
-    /* Outlook.com dark mode target */
-    [data-ogsc] .bg-main, [data-ogsb] .bg-main { background-color: #09090b !important; background-image: linear-gradient(#09090b, #09090b) !important; }
-    [data-ogsc] .bg-card, [data-ogsb] .bg-card { background-color: #111113 !important; background-image: linear-gradient(#111113, #111113) !important; }
-    [data-ogsc] .bg-header, [data-ogsb] .bg-header { background-color: #18181b !important; background-image: linear-gradient(#18181b, #18181b) !important; }
-    [data-ogsc] .text-white, [data-ogsb] .text-white { color: #ffffff !important; }
-    [data-ogsc] .text-body, [data-ogsb] .text-body { color: #e4e4e7 !important; }
+    /* Gmail & Webmail Target */
+    u + .body .bg-body { background-color: #09090b !important; }
+    u + .body .bg-card { background-color: #121215 !important; }
+    u + .body .bg-header { background-color: #18181c !important; }
+    u + .body .dark-text-white { color: #ffffff !important; }
   </style>
 </head>
-<body class="bg-main" style="margin: 0; padding: 0; background-color: #09090b; background-image: linear-gradient(#09090b, #09090b); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #fafafa; -webkit-font-smoothing: antialiased;">
-  <table class="bg-main" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #09090b; background-image: linear-gradient(#09090b, #09090b); padding: 36px 12px;">
+<body class="body bg-body" style="margin: 0; padding: 0; background-color: #09090b; background: #09090b; -webkit-font-smoothing: antialiased;">
+  <table class="bg-body" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #09090b; background: #09090b; padding: 24px 10px;">
     <tr>
       <td align="center">
         <!-- Main Card Container -->
-        <table class="bg-card" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #111113; background-image: linear-gradient(#111113, #111113); border: 1px solid #27272a; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.6);">
+        <table class="bg-card" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #121215; background: #121215; border: 1px solid #2d2d33; border-radius: 12px; overflow: hidden;">
           
           <!-- Header -->
           <tr>
-            <td class="bg-header" style="padding: 28px 32px; border-bottom: 1px solid #27272a; background-color: #18181b; background-image: linear-gradient(#18181b, #18181b);">
+            <td class="bg-header" style="padding: 28px 32px; border-bottom: 1px solid #2d2d33; background-color: #18181c; background: #18181c;">
               <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                   <td>
-                    <div class="text-white" style="font-size: 17px; font-weight: 800; letter-spacing: 0.15em; color: #ffffff; text-transform: uppercase;">
-                      PG LABS
+                    <div class="dark-text-white" style="font-size: 18px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #ffffff;">
+                      <font color="#ffffff">PG LABS</font>
                     </div>
-                    <div class="text-purple" style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #a78bfa; text-transform: uppercase; margin-top: 3px;">
-                      Digital Product Studio
+                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 3px;">
+                      <font color="#c084fc">Digital Product Studio</font>
                     </div>
                   </td>
                 </tr>
@@ -335,52 +290,64 @@ export class EmailService {
 
           <!-- Body -->
           <tr>
-            <td class="bg-card" style="padding: 32px; background-color: #111113; background-image: linear-gradient(#111113, #111113);">
-              <div class="text-white" style="margin-top: 0; margin-bottom: 18px; font-size: 21px; font-weight: 700; color: #ffffff; letter-spacing: -0.02em; line-height: 1.3;">
-                We've received your inquiry, ${clientName}.
+            <td class="bg-card" style="padding: 32px; background-color: #121215; background: #121215;">
+              <div class="dark-text-white" style="margin-top: 0; margin-bottom: 20px; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.3; color: #ffffff;">
+                <font color="#ffffff">We've received your inquiry, ${clientName}.</font>
               </div>
 
-              <p class="text-body" style="margin-top: 0; margin-bottom: 20px; font-size: 15px; color: #e4e4e7; line-height: 1.6;">
-                Thank you for reaching out to <strong class="text-white" style="color: #ffffff;">PG Labs</strong> regarding your <strong class="text-white" style="color: #ffffff;">${projectType}</strong> project${company ? ` at <strong class="text-white" style="color: #ffffff;">${company}</strong>` : ""}.
+              <p style="margin-top: 0; margin-bottom: 20px; font-size: 15px; line-height: 1.6;">
+                <font color="#e2e8f0">
+                  Thank you for reaching out to <strong><font color="#ffffff">PG Labs</font></strong> regarding your <strong><font color="#ffffff">${projectType}</font></strong> project${company ? ` at <strong><font color="#ffffff">${company}</font></strong>` : ""}.
+                </font>
               </p>
 
-              <p class="text-secondary" style="margin-top: 0; margin-bottom: 24px; font-size: 14px; color: #a1a1aa; line-height: 1.6;">
-                Our engineering and design team is reviewing your project details. We focus on solving business problems with modern web applications, practical AI systems, and robust software architecture.
+              <p style="margin-top: 0; margin-bottom: 24px; font-size: 14px; line-height: 1.6;">
+                <font color="#cbd5e1">
+                  Our engineering and design team is reviewing your project details. We focus on solving business problems with modern web applications, practical AI systems, and robust software architecture.
+                </font>
               </p>
 
               <!-- Callout Highlight Box -->
-              <table class="bg-callout" width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 26px; background-color: #18181b; background-image: linear-gradient(#18181b, #18181b); border: 1px solid #27272a; border-left: 4px solid #8b5cf6; border-radius: 6px;">
+              <table class="bg-callout" width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 26px; background-color: #18181c; background: #18181c; border: 1px solid #2d2d33; border-left: 4px solid #8b5cf6; border-radius: 6px;">
                 <tr>
                   <td style="padding: 16px 20px;">
-                    <div class="text-purple" style="font-size: 11px; font-weight: 700; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
-                      What Happens Next
+                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">
+                      <font color="#c084fc">What Happens Next</font>
                     </div>
-                    <div class="text-body" style="font-size: 14px; color: #e4e4e7; line-height: 1.5;">
-                      A member of our core technical team will evaluate your scope and respond with preliminary technical thoughts and next steps within <strong class="text-white" style="color: #ffffff;">24 business hours</strong>.
+                    <div style="font-size: 14px; line-height: 1.5;">
+                      <font color="#f1f5f9">
+                        A member of our core technical team will evaluate your scope and respond with preliminary technical thoughts and next steps within <strong><font color="#ffffff">24 business hours</font></strong>.
+                      </font>
                     </div>
                   </td>
                 </tr>
               </table>
 
-              <p class="text-secondary" style="margin-top: 0; margin-bottom: 26px; font-size: 14px; color: #a1a1aa; line-height: 1.6;">
-                If you have additional context, wireframes, or documents you would like to share in the meantime, simply reply directly to this email.
+              <p style="margin-top: 0; margin-bottom: 26px; font-size: 14px; line-height: 1.6;">
+                <font color="#cbd5e1">
+                  If you have additional context, wireframes, or documents you would like to share in the meantime, simply reply directly to this email.
+                </font>
               </p>
 
               <!-- Signature -->
-              <div style="border-top: 1px solid #27272a; padding-top: 20px; margin-top: 24px;">
-                <div class="text-white" style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #ffffff;">PG Labs Engineering Team</div>
-                <div class="text-muted" style="margin: 0; font-size: 13px; color: #71717a;">Web Applications &bull; AI Solutions &bull; Custom Software</div>
+              <div style="border-top: 1px solid #2d2d33; padding-top: 20px; margin-top: 24px;">
+                <div class="dark-text-white" style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #ffffff;">
+                  <font color="#ffffff">PG Labs Engineering Team</font>
+                </div>
+                <div style="margin: 0; font-size: 13px;">
+                  <font color="#94a3b8">Web Applications &bull; AI Solutions &bull; Custom Software</font>
+                </div>
               </div>
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td class="bg-header" style="padding: 18px 32px; border-top: 1px solid #27272a; background-color: #18181b; background-image: linear-gradient(#18181b, #18181b); text-align: center;">
-              <p class="text-muted" style="margin: 0; font-size: 12px; color: #71717a; line-height: 1.5;">
+            <td class="bg-header" style="padding: 18px 32px; border-top: 1px solid #2d2d33; background-color: #18181c; background: #18181c; text-align: center;">
+              <font color="#94a3b8" style="font-size: 12px; line-height: 1.5;">
                 &copy; ${new Date().getFullYear()} PG Labs. All rights reserved.<br />
-                This is an automated confirmation sent to ${escapeHtml(data.email)}.
-              </p>
+                This is an automated confirmation sent to ${clientEmail}.
+              </font>
             </td>
           </tr>
         </table>

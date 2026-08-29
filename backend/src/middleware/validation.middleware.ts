@@ -1,4 +1,4 @@
-﻿import { body, validationResult } from "express-validator";
+import { body, validationResult } from "express-validator";
 import { Request, Response, NextFunction } from "express";
 
 export const validateContactInquiry = [
@@ -7,8 +7,7 @@ export const validateContactInquiry = [
     .notEmpty()
     .withMessage("Name is required")
     .isLength({ max: 100 })
-    .withMessage("Name cannot exceed 100 characters")
-    .escape(),
+    .withMessage("Name cannot exceed 100 characters"),
 
   body("email")
     .trim()
@@ -22,8 +21,7 @@ export const validateContactInquiry = [
     .optional()
     .trim()
     .isLength({ max: 100 })
-    .withMessage("Company name cannot exceed 100 characters")
-    .escape(),
+    .withMessage("Company name cannot exceed 100 characters"),
 
   body("projectType")
     .trim()
@@ -44,16 +42,14 @@ export const validateContactInquiry = [
     .optional()
     .trim()
     .isLength({ max: 50 })
-    .withMessage("Budget cannot exceed 50 characters")
-    .escape(),
+    .withMessage("Budget cannot exceed 50 characters"),
 
   body("message")
     .trim()
     .notEmpty()
     .withMessage("Message is required")
     .isLength({ min: 10, max: 3000 })
-    .withMessage("Message must be between 10 and 3000 characters")
-    .escape(),
+    .withMessage("Message must be between 10 and 3000 characters"),
 
   (req: Request, res: Response, next: NextFunction): void => {
     const errors = validationResult(req);
