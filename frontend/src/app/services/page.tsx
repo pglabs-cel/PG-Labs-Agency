@@ -12,6 +12,15 @@ export const metadata: Metadata = {
   title: "Services — Software Engineering & AI Capabilities",
   description:
     "Explore PG Labs capabilities across high-performance web development, machine learning, custom enterprise software, backend APIs, and automation.",
+  alternates: {
+    canonical: "/services",
+  },
+  openGraph: {
+    title: "Services — Software Engineering & AI Capabilities | PG Labs",
+    description:
+      "Explore PG Labs capabilities across high-performance web development, machine learning, custom enterprise software, backend APIs, and automation.",
+    url: "/services",
+  },
 };
 
 export default function ServicesPage() {

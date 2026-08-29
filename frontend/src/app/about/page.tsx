@@ -10,6 +10,15 @@ export const metadata: Metadata = {
   title: "About — A Small Studio With a Builder Mindset",
   description:
     "Learn about PG Labs. Small team, direct engineering access, zero layers, and high-impact digital product development.",
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "About — A Small Studio With a Builder Mindset | PG Labs",
+    description:
+      "Learn about PG Labs. Small team, direct engineering access, zero layers, and high-impact digital product development.",
+    url: "/about",
+  },
 };
 
 const PRINCIPLES = [

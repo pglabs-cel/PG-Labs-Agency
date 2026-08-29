@@ -3,10 +3,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { CtaSection } from "@/components/sections/CtaSection";
+import { ProjectJsonLd } from "@/components/JsonLd";
 import { PROJECTS, ProjectItem } from "@/data/projects";
-import { ArrowLeft, ArrowRight, CheckCircle2, Cpu } from "lucide-react";
+import { SITE_CONFIG } from "@/lib/constants";
+import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 
 interface Props {
   params: {
@@ -27,9 +28,26 @@ export function generateMetadata({ params }: Props): Metadata {
       title: "Project Not Found",
     };
   }
+
+  const url = `${SITE_CONFIG.url}/work/${project.slug}`;
+
   return {
     title: `${project.title} — Case Study`,
     description: project.shortDescription,
+    alternates: {
+      canonical: `/work/${project.slug}`,
+    },
+    openGraph: {
+      title: `${project.title} — Case Study | PG Labs`,
+      description: project.shortDescription,
+      url: url,
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} — Case Study | PG Labs`,
+      description: project.shortDescription,
+    },
   };
 }
 
@@ -45,6 +63,13 @@ export default function CaseStudyPage({ params }: Props) {
 
   return (
     <main className="flex flex-col min-h-screen">
+      <ProjectJsonLd
+        title={project.title}
+        description={project.shortDescription}
+        url={`${SITE_CONFIG.url}/work/${project.slug}`}
+        technologies={project.technologies}
+      />
+
       {/* Project Hero */}
       <section className="pt-16 pb-20 md:pt-24 md:pb-28 bg-tech-grid border-b border-border/60">
         <Container>
@@ -111,10 +136,9 @@ export default function CaseStudyPage({ params }: Props) {
         </Container>
       </section>
 
-      {/* Case Study Details: Challenge, Solution, Outcome */}
+      {/* Case Study Details */}
       <section className="py-16 md:py-24">
         <Container className="max-w-4xl space-y-16">
-          {/* Overview */}
           <div className="space-y-4">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
               Project Overview
@@ -124,7 +148,6 @@ export default function CaseStudyPage({ params }: Props) {
             </p>
           </div>
 
-          {/* Two-column Challenge & Solution */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-border/60">
             <div className="p-8 rounded-xl bg-background-secondary border border-border space-y-4">
               <span className="text-xs font-mono uppercase tracking-widest text-red-400 font-semibold">
@@ -147,7 +170,6 @@ export default function CaseStudyPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Key Features */}
           <div className="space-y-6 pt-6 border-t border-border/60">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
               Key Capabilities Delivered
@@ -165,7 +187,6 @@ export default function CaseStudyPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Qualitative Outcome */}
           {project.outcome && (
             <div className="p-8 rounded-2xl bg-accent/5 border border-accent/20 space-y-3">
               <span className="text-xs font-mono uppercase tracking-widest text-accent font-semibold">
@@ -180,7 +201,6 @@ export default function CaseStudyPage({ params }: Props) {
             </div>
           )}
 
-          {/* Next Project Link */}
           <div className="pt-12 border-t border-border/60 flex items-center justify-between">
             <span className="text-xs font-mono uppercase tracking-wider text-foreground-muted">
               Next Case Study
@@ -196,7 +216,6 @@ export default function CaseStudyPage({ params }: Props) {
         </Container>
       </section>
 
-      {/* CTA */}
       <CtaSection />
     </main>
   );

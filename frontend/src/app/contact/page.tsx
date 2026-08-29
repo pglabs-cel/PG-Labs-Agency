@@ -9,6 +9,15 @@ export const metadata: Metadata = {
   title: "Contact — Start a Project With PG Labs",
   description:
     "Get in touch with PG Labs to discuss your web application, custom software, AI integration, or SaaS development project.",
+  alternates: {
+    canonical: "/contact",
+  },
+  openGraph: {
+    title: "Contact — Start a Project With PG Labs",
+    description:
+      "Get in touch with PG Labs to discuss your web application, custom software, AI integration, or SaaS development project.",
+    url: "/contact",
+  },
 };
 
 const FAQS = [
