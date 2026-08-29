@@ -1,5 +1,6 @@
-﻿import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { ContactService } from "../services/contact.service";
+import { EmailService } from "../services/email.service";
 
 export class ContactController {
   public static async create(
@@ -17,6 +18,19 @@ export class ContactController {
         projectType,
         budget,
         message,
+      });
+
+      // Asynchronously trigger email notifications non-blockingly
+      EmailService.sendInquiryEmails({
+        name: inquiry.name,
+        email: inquiry.email,
+        company: inquiry.company,
+        projectType: inquiry.projectType,
+        budget: inquiry.budget,
+        message: inquiry.message,
+        createdAt: inquiry.createdAt,
+      }).catch((err) => {
+        console.error("[ContactController] Background email dispatch error:", err);
       });
 
       res.status(201).json({

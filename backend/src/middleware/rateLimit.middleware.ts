@@ -1,9 +1,9 @@
-﻿import rateLimit from "express-rate-limit";
+import rateLimit from "express-rate-limit";
 
-// Maximum 5 inquiries per 15 minutes per IP address to safeguard against spam
+// 15 minutes window, generous threshold in development to prevent lockouts during testing
 export const contactRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: process.env.NODE_ENV === "production" ? 15 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
