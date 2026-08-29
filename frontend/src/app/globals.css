@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -57,3 +57,130 @@ body {
 .accent-glow-subtle {
   background: radial-gradient(circle at 50% 30%, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
 }
+
+/* ─── Keyframes ────────────────────────────────────────────── */
+
+/* Gentle vertical float for decorative elements */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+/* Horizontal shimmer sweep — used on CTA buttons */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(250%) skewX(-15deg); }
+}
+
+/* Infinite marquee scroll */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Blinking cursor for terminal effect */
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* Subtle pulse scale for glow orbs */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.08); }
+}
+
+/* Slow rotation for background grid accent */
+@keyframes slow-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Typing bar animation for code lines */
+@keyframes type-grow {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+/* Staggered fade-slide for list items */
+@keyframes fade-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide-in-right for floating cards */
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Utility classes ──────────────────────────────────────── */
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+.animate-float-delay-1 {
+  animation: float 7s ease-in-out 1s infinite;
+}
+.animate-float-delay-2 {
+  animation: float 8s ease-in-out 2s infinite;
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+.animate-blink-cursor {
+  animation: blink-cursor 1s step-end infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Shimmer overlay — used inside button ::after pseudo */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 60%
+  );
+  transform: translateX(-100%) skewX(-15deg);
+  transition: none;
+}
+.btn-shimmer:hover::after {
+  animation: shimmer 0.65s ease-out forwards;
+}
+
+/* Gradient text utility */
+.text-gradient-accent {
+  background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 50%, #C4B5FD 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow border pulse */
+.glow-border {
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.4), 0 0 20px rgba(139, 92, 246, 0.12);
+}
+
+/* Code line animation helpers */
+.code-line {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: type-grow 0.8s ease-out forwards;
+  animation-fill-mode: both;
+}
+.code-line-1 { animation-delay: 0.2s; width: 0; }
+.code-line-2 { animation-delay: 0.8s; width: 0; }
+.code-line-3 { animation-delay: 1.4s; width: 0; }
+.code-line-4 { animation-delay: 2.0s; width: 0; }

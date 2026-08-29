@@ -1,19 +1,9 @@
-﻿import {
-  Globe,
-  Brain,
-  Layers,
-  Layout,
-  Server,
-  Workflow,
-  LucideIcon,
-} from "lucide-react";
-
 export interface ServiceItem {
   number: string;
   title: string;
   description: string;
   features: string[];
-  icon: LucideIcon;
+  icon: string;
 }
 
 export const SERVICES: ServiceItem[] = [
@@ -29,7 +19,7 @@ export const SERVICES: ServiceItem[] = [
       "Admin dashboards",
       "Customer portals",
     ],
-    icon: Globe,
+    icon: "globe",
   },
   {
     number: "02",
@@ -43,7 +33,7 @@ export const SERVICES: ServiceItem[] = [
       "Recommendation systems",
       "Intelligent automation",
     ],
-    icon: Brain,
+    icon: "brain",
   },
   {
     number: "03",
@@ -57,7 +47,7 @@ export const SERVICES: ServiceItem[] = [
       "Workflow platforms",
       "Custom dashboards",
     ],
-    icon: Layers,
+    icon: "layers",
   },
   {
     number: "04",
@@ -71,7 +61,7 @@ export const SERVICES: ServiceItem[] = [
       "Interactive dashboards",
       "Motion design",
     ],
-    icon: Layout,
+    icon: "layout",
   },
   {
     number: "05",
@@ -85,7 +75,7 @@ export const SERVICES: ServiceItem[] = [
       "Integrations",
       "Cloud-ready infrastructure",
     ],
-    icon: Server,
+    icon: "server",
   },
   {
     number: "06",
@@ -99,6 +89,6 @@ export const SERVICES: ServiceItem[] = [
       "AI automation",
       "Third-party integrations",
     ],
-    icon: Workflow,
+    icon: "workflow",
   },
 ];

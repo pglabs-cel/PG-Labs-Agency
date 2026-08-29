@@ -1,9 +1,12 @@
-﻿import React from "react";
+"use client";
+
+import React from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ServiceCard } from "@/components/ui/ServiceCard";
 import { SERVICES } from "@/data/services";
 import { FadeUp } from "@/components/animations/FadeUp";
+
 
 export const ServicesSection: React.FC = () => {
   return (
