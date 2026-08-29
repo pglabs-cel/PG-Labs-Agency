@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ContactService } from "../services/contact.service";
 import { EmailService } from "../services/email.service";
+import { ensureDBConnected } from "../config/db";
 
 export class ContactController {
   public static async create(
@@ -9,6 +10,8 @@ export class ContactController {
     next: NextFunction
   ): Promise<void> {
     try {
+      await ensureDBConnected();
+
       const { name, email, company, projectType, budget, message } = req.body;
 
       const inquiry = await ContactService.createInquiry({
