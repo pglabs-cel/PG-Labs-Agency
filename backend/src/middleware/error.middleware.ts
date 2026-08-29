@@ -1,4 +1,4 @@
-﻿import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 
 export const errorHandler = (
   err: any,
@@ -30,8 +30,8 @@ export const errorHandler = (
     return;
   }
 
-  // Default clean user-facing error response
+  // Default clean error response
   res.status(err.status || 500).json({
-    error: "Something went wrong processing your request. Please try again later.",
+    error: err.message || "Something went wrong processing your request. Please try again later.",
   });
 };

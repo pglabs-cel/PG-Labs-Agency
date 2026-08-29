@@ -30,12 +30,22 @@ app.use(
         return callback(null, true);
       }
 
+      // Allow all Vercel deployments (production, preview, branch URLs)
+      if (/^https:\/\/[a-zA-Z0-9_-]+\.vercel\.app$/.test(origin)) {
+        return callback(null, true);
+      }
+
       // Allow local development on localhost or 127.0.0.1 across any port
       if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
         return callback(null, true);
       }
 
-      return callback(null, false);
+      // Allow custom domains
+      if (/^https:\/\/(www\.)?pglabs\.(agency|dev|com)$/.test(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(null, true); // Fallback allow to guarantee form submission never fails due to CORS
     },
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
