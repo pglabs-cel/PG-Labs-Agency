@@ -47,6 +47,19 @@ app.use(
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
+// Root Index Endpoint
+app.get("/", (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: "ok",
+    service: "PG Labs Backend API",
+    version: "1.0.0",
+    endpoints: {
+      health: "/health",
+      contact: "POST /api/contact",
+    },
+  });
+});
+
 // Health Check Endpoint
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({

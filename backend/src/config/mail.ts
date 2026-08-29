@@ -40,13 +40,17 @@ export const createTransporter = (): Transporter => {
       user: config.user,
       pass: config.pass,
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    family: 4, // Force IPv4 to prevent ENETUNREACH in cloud container environments
     pool: true,
     maxConnections: 5,
     maxMessages: 100,
     connectionTimeout: 10000, // 10s
     greetingTimeout: 10000,
     socketTimeout: 15000,
-  });
+  } as any);
 };
 
 export const mailTransporter = createTransporter();

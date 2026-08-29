@@ -1,6 +1,11 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import dns from "node:dns";
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder("ipv4first");
+}
+
 import app from "./app";
 import { connectDB } from "./config/db";
 import { verifyTransporter } from "./config/mail";
