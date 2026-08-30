@@ -53,13 +53,13 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
 
   return (
     <CardSpotlight
-      radius={260}
-      color="#18181B"
+      radius={280}
+      color="rgba(139, 92, 246, 0.32)"
       className="group relative flex flex-col justify-between overflow-hidden
         rounded-xl bg-background-secondary border border-border p-6 sm:p-8
         transition-all duration-300
-        hover:border-border hover:bg-background-surface/80
-        hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] h-full"
+        hover:border-accent/40 hover:bg-background-surface/80
+        hover:shadow-[0_8px_30px_rgba(139,92,246,0.15)] h-full"
     >
       {/* ── Card body ── */}
       <div>
