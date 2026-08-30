@@ -13,20 +13,29 @@ export interface MailConfig {
 }
 
 export const getMailConfig = (): MailConfig => {
+  const rawPass = process.env.EMAIL_PASS || "";
+  const cleanPass = rawPass.replace(/\s+/g, "").replace(/^["']|["']$/g, "");
+  const cleanUser = (process.env.EMAIL_USER || "pglabs.agency@gmail.com").trim();
+  const cleanAdmin = (
+    process.env.ADMIN_NOTIFICATION_EMAIL ||
+    cleanUser ||
+    "pglabs.agency@gmail.com"
+  ).trim();
+
   return {
-    host: process.env.SMTP_HOST || "smtp.gmail.com",
+    host: (process.env.SMTP_HOST || "smtp.gmail.com").trim(),
     port: parseInt(process.env.SMTP_PORT || "465", 10),
     secure: process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : true,
-    user: process.env.EMAIL_USER || "pglabs.agency@gmail.com",
-    pass: process.env.EMAIL_PASS || "",
-    adminEmail: process.env.ADMIN_NOTIFICATION_EMAIL || "pglabs.agency@gmail.com",
-    senderName: process.env.EMAIL_SENDER_NAME || "PG Labs",
+    user: cleanUser,
+    pass: cleanPass,
+    adminEmail: cleanAdmin,
+    senderName: (process.env.EMAIL_SENDER_NAME || "PG Labs").trim(),
   };
 };
 
 export const isMailConfigured = (): boolean => {
   const config = getMailConfig();
-  return Boolean(config.user && config.pass);
+  return Boolean(config.user && config.pass && config.pass.length >= 8);
 };
 
 export const createTransporter = (): Transporter => {

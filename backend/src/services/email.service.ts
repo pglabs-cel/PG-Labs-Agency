@@ -362,7 +362,7 @@ export class EmailService {
   /**
    * Sends the admin notification email with client lead details
    */
-  public static async sendAdminNotification(data: EmailInquiryData): Promise<void> {
+  public static async sendAdminNotification(data: EmailInquiryData): Promise<any> {
     const config = getMailConfig();
     const mailOptions = {
       from: `"${config.senderName}" <${config.user}>`,
@@ -373,14 +373,15 @@ export class EmailService {
       html: this.getAdminNotificationHtml(data),
     };
 
-    await mailTransporter.sendMail(mailOptions);
-    console.log(`[MailService] ✓ Admin notification sent to ${config.adminEmail}`);
+    const info = await mailTransporter.sendMail(mailOptions);
+    console.log(`[MailService] ✓ Admin notification sent to ${config.adminEmail} (MsgID: ${info.messageId})`);
+    return info;
   }
 
   /**
    * Sends the client confirmation auto-reply email
    */
-  public static async sendClientAutoReply(data: EmailInquiryData): Promise<void> {
+  public static async sendClientAutoReply(data: EmailInquiryData): Promise<any> {
     const config = getMailConfig();
     const mailOptions = {
       from: `"${config.senderName}" <${config.user}>`,
@@ -391,8 +392,9 @@ export class EmailService {
       html: this.getClientAutoReplyHtml(data),
     };
 
-    await mailTransporter.sendMail(mailOptions);
-    console.log(`[MailService] ✓ Auto-reply confirmation sent to ${data.email}`);
+    const info = await mailTransporter.sendMail(mailOptions);
+    console.log(`[MailService] ✓ Auto-reply confirmation sent to ${data.email} (MsgID: ${info.messageId})`);
+    return info;
   }
 
   /**
@@ -400,9 +402,12 @@ export class EmailService {
    * Runs asynchronously and non-blockingly without throwing errors to the caller.
    */
   public static async sendInquiryEmails(data: EmailInquiryData): Promise<void> {
+    const config = getMailConfig();
+    console.log(`[MailService] Processing email dispatch for inquiry from: ${data.email}, admin: ${config.adminEmail}, user: ${config.user}`);
+
     if (!isMailConfigured()) {
       console.warn(
-        `[MailService] ⚠️ SMTP is not configured with EMAIL_PASS. Skipping email dispatch for inquiry from: ${data.email}`
+        `[MailService] ⚠️ SMTP credentials not configured (EMAIL_PASS is empty or invalid). Skipping email dispatch.`
       );
       return;
     }
@@ -416,13 +421,13 @@ export class EmailService {
       results.forEach((result, index) => {
         const type = index === 0 ? "Admin Notification" : "Client Auto-Reply";
         if (result.status === "fulfilled") {
-          console.log(`[MailService] ✓ ${type} dispatched successfully.`);
+          console.log(`[MailService] ✓ ${type} delivered successfully.`);
         } else {
-          console.error(`[MailService] ❌ ${type} dispatch failed:`, result.reason);
+          console.error(`[MailService] ❌ ${type} failed:`, result.reason?.message || result.reason);
         }
       });
-    } catch (error) {
-      console.error("[MailService] ❌ Unexpected error in sendInquiryEmails:", error);
+    } catch (error: any) {
+      console.error("[MailService] ❌ Unexpected error in sendInquiryEmails:", error.message || error);
     }
   }
 }
