@@ -1,9 +1,8 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SITE_CONFIG } from "@/lib/constants";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { SiteShell } from "@/components/layout/SiteShell";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/JsonLd";
 
 const sansFont = Inter({
@@ -89,9 +88,7 @@ export default function RootLayout({
         <WebSiteJsonLd />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased text-foreground selection:bg-accent selection:text-white flex flex-col">
-        <Navbar />
-        <div className="flex-1 flex flex-col pt-[72px]">{children}</div>
-        <Footer />
+        <SiteShell>{children}</SiteShell>
       </body>
     </html>
   );

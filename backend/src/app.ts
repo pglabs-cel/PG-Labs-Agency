@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import contactRoutes from "./routes/contact.routes";
+import adminRoutes from "./routes/admin.routes";
 import { errorHandler } from "./middleware/error.middleware";
 
 const app: Application = express();
@@ -50,7 +51,7 @@ app.use(
 
       return callback(null, true); // Fallback allow to guarantee form submission never fails due to CORS
     },
-    methods: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
@@ -75,6 +76,8 @@ app.get("/", (_req: Request, res: Response) => {
       health: "/health",
       contact: "POST /api/contact",
       testEmail: "GET /api/test-email",
+      adminLogin: "POST /api/admin/login",
+      adminInquiries: "GET /api/admin/inquiries",
     },
   });
 });
@@ -92,6 +95,7 @@ app.get("/health", (_req: Request, res: Response) => {
 
 // API Routes
 app.use("/api", contactRoutes);
+app.use("/api", adminRoutes);
 
 // Centralized Error Middleware
 app.use(errorHandler);
