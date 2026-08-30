@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sendInquiryEmails } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30; // Allow up to 30s for Vercel serverless
 
 interface ContactBody {
   name?: string;
@@ -54,6 +56,15 @@ export async function POST(req: NextRequest) {
         ? projectType
         : "Web Application";
 
+    const sanitizedData = {
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      company: company?.trim() || "",
+      projectType: resolvedProjectType,
+      budget: budget?.trim() || "",
+      message: message.trim(),
+    };
+
     // Determine Backend API endpoint
     let backendApi =
       process.env.BACKEND_API_URL ||
@@ -70,7 +81,10 @@ export async function POST(req: NextRequest) {
       ? `${backendApi}/contact`
       : `${backendApi}/api/contact`;
 
-    // Forward request to Node.js/Express backend
+    // Forward request to Node.js/Express backend (for MongoDB storage)
+    let backendSuccess = false;
+    let backendData: any = {};
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout for cold start
 
@@ -81,65 +95,58 @@ export async function POST(req: NextRequest) {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim().toLowerCase(),
-          company: company?.trim() || "",
-          projectType: resolvedProjectType,
-          budget: budget?.trim() || "",
-          message: message.trim(),
-        }),
+        body: JSON.stringify(sanitizedData),
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
 
-      const data = await response.json().catch(() => ({}));
+      backendData = await response.json().catch(() => ({}));
+      backendSuccess = response.ok;
 
-      if (!response.ok) {
-        return NextResponse.json(
-          {
-            error:
-              data.error ||
-              `Backend returned status ${response.status}. Please try again later.`,
-          },
-          { status: response.status }
+      if (!backendSuccess) {
+        console.error(
+          `[Next.js /api/contact] Backend returned ${response.status}:`,
+          backendData.error || "unknown"
         );
       }
+    } catch (fetchError: any) {
+      clearTimeout(timeoutId);
+      console.error("[Next.js /api/contact] Backend connection error:", fetchError.message);
+      // Don't return error — still try to send emails even if backend is down
+    }
 
+    // Send emails from Vercel (bypasses Render SMTP block)
+    try {
+      await sendInquiryEmails(sanitizedData);
+      console.log("[Next.js /api/contact] Emails dispatched from Vercel");
+    } catch (emailError: any) {
+      console.error("[Next.js /api/contact] Email send error:", emailError.message);
+    }
+
+    // If backend saved successfully, return 201
+    if (backendSuccess) {
       return NextResponse.json(
         {
           success: true,
           message:
-            data.message ||
+            backendData.message ||
             "Inquiry received successfully. We will be in touch within 24 hours.",
-          data: data.data,
+          data: backendData.data,
         },
-        { status: response.status === 201 ? 201 : 200 }
-      );
-    } catch (fetchError: any) {
-      clearTimeout(timeoutId);
-
-      if (fetchError.name === "AbortError") {
-        return NextResponse.json(
-          {
-            error:
-              "The backend server is taking longer than expected to respond (waking up). Please try again in a few seconds.",
-          },
-          { status: 504 }
-        );
-      }
-
-      console.error("[Next.js /api/contact] Backend connection error:", fetchError);
-
-      return NextResponse.json(
-        {
-          error:
-            "Unable to reach the PG Labs backend API service. Please verify your connection or email us directly at pglabs.agency@gmail.com.",
-        },
-        { status: 503 }
+        { status: 201 }
       );
     }
+
+    // Even if backend was down, if we reached here the form was valid and emails were attempted
+    return NextResponse.json(
+      {
+        success: true,
+        message:
+          "Your inquiry has been received. We will get back to you within 24 hours.",
+      },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error("[Next.js /api/contact] Handler error:", error);
     return NextResponse.json(
