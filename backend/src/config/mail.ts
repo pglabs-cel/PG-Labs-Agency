@@ -32,6 +32,23 @@ export const isMailConfigured = (): boolean => {
 export const createTransporter = (): Transporter => {
   const config = getMailConfig();
 
+  const isGmail =
+    config.host.toLowerCase().includes("gmail") ||
+    config.user.toLowerCase().endsWith("@gmail.com");
+
+  if (isGmail) {
+    return nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: config.user,
+        pass: config.pass,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
+  }
+
   return nodemailer.createTransport({
     host: config.host,
     port: config.port,
@@ -43,11 +60,8 @@ export const createTransporter = (): Transporter => {
     tls: {
       rejectUnauthorized: false,
     },
-    family: 4, // Force IPv4 to prevent ENETUNREACH in cloud container environments
-    pool: true,
-    maxConnections: 5,
-    maxMessages: 100,
-    connectionTimeout: 10000, // 10s
+    family: 4,
+    connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 15000,
   } as any);
