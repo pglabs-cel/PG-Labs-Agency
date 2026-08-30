@@ -1,5 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
+import dns from "node:dns";
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder("ipv4first");
+}
 import nodemailer, { Transporter } from "nodemailer";
 
 export interface MailConfig {
@@ -24,8 +28,8 @@ export const getMailConfig = (): MailConfig => {
 
   return {
     host: (process.env.SMTP_HOST || "smtp.gmail.com").trim(),
-    port: parseInt(process.env.SMTP_PORT || "465", 10),
-    secure: process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : true,
+    port: parseInt(process.env.SMTP_PORT || "587", 10),
+    secure: process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : false,
     user: cleanUser,
     pass: cleanPass,
     adminEmail: cleanAdmin,
@@ -45,22 +49,29 @@ export const createTransporter = (): Transporter => {
     config.host.toLowerCase().includes("gmail") ||
     config.user.toLowerCase().endsWith("@gmail.com");
 
+  // Force IPv4 lookup function to avoid ENETUNREACH in cloud container environments
+  const ipv4Lookup = (hostname: string, _options: any, callback: any) => {
+    dns.lookup(hostname, { family: 4 }, callback);
+  };
+
   if (isGmail) {
     return nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
-      secure: false, // STARTTLS: cloud standard on Render/AWS/Railway
+      secure: false, // STARTTLS
       auth: {
         user: config.user,
         pass: config.pass,
       },
+      family: 4, // Force IPv4
+      lookup: ipv4Lookup,
       tls: {
         rejectUnauthorized: false,
       },
       connectionTimeout: 15000,
       greetingTimeout: 15000,
       socketTimeout: 20000,
-    });
+    } as any);
   }
 
   return nodemailer.createTransport({
@@ -71,6 +82,8 @@ export const createTransporter = (): Transporter => {
       user: config.user,
       pass: config.pass,
     },
+    family: 4, // Force IPv4
+    lookup: ipv4Lookup,
     tls: {
       rejectUnauthorized: false,
     },
