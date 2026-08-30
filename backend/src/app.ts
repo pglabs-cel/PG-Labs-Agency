@@ -4,6 +4,7 @@ import helmet from "helmet";
 import contactRoutes from "./routes/contact.routes";
 import adminRoutes from "./routes/admin.routes";
 import projectRoutes from "./routes/project.routes";
+import uploadRoutes from "./routes/upload.routes";
 import { errorHandler } from "./middleware/error.middleware";
 
 const app: Application = express();
@@ -52,15 +53,15 @@ app.use(
 
       return callback(null, true); // Fallback allow to guarantee form submission never fails due to CORS
     },
-    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
-// Body Parser with strict payload limit
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+// Body Parser with adequate payload limit for rich project media
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 import { getDBStatus } from "./config/db";
 import { isMailConfigured } from "./config/mail";
@@ -98,6 +99,7 @@ app.get("/health", (_req: Request, res: Response) => {
 app.use("/api", contactRoutes);
 app.use("/api", adminRoutes);
 app.use("/api", projectRoutes);
+app.use("/api", uploadRoutes);
 
 // Centralized Error Middleware
 app.use(errorHandler);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
@@ -13,6 +13,8 @@ import {
   adminCreateProject,
   adminUpdateProject,
   adminDeleteProject,
+  adminUploadMedia,
+  adminDeleteMedia,
   ProjectDTO,
 } from "@/lib/projects.api";
 import {
@@ -28,6 +30,11 @@ import {
   Layers,
   X,
   Code2,
+  Upload,
+  Image as ImageIcon,
+  Video as VideoIcon,
+  Loader2,
+  Film,
 } from "lucide-react";
 
 interface ProjectFormData {
@@ -43,6 +50,9 @@ interface ProjectFormData {
   challenge: string;
   solution: string;
   outcome: string;
+  thumbnail: string;
+  images: string[];
+  videoUrl: string;
 }
 
 const DEFAULT_FORM: ProjectFormData = {
@@ -58,6 +68,9 @@ const DEFAULT_FORM: ProjectFormData = {
   challenge: "",
   solution: "",
   outcome: "",
+  thumbnail: "",
+  images: [],
+  videoUrl: "",
 };
 
 const CATEGORIES = [
@@ -86,6 +99,14 @@ export default function AdminProjectsPage() {
   const [formSaving, setFormSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
+  // Media Upload State
+  const [uploadingTarget, setUploadingTarget] = useState<string | null>(null);
+  const [deletingMedia, setDeletingMedia] = useState<string | null>(null);
+  const [newGalleryUrl, setNewGalleryUrl] = useState("");
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+
   const [toast, setToast] = useState<{
     isOpen: boolean;
     type: "success" | "error";
@@ -98,7 +119,6 @@ export default function AdminProjectsPage() {
     message: "",
   });
 
-  // Check saved session on mount
   useEffect(() => {
     const saved = localStorage.getItem("pglabs_admin_token");
     if (saved) {
@@ -192,16 +212,132 @@ export default function AdminProjectsPage() {
       challenge: proj.challenge,
       solution: proj.solution,
       outcome: proj.outcome || "",
+      thumbnail: proj.thumbnail || "",
+      images: Array.isArray(proj.images) ? proj.images : [],
+      videoUrl: proj.videoUrl || "",
     });
     setFormError("");
     setIsModalOpen(true);
+  };
+
+  const handleMediaUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    target: "thumbnail" | "video" | "gallery"
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+
+    setUploadingTarget(target);
+
+    const res = await adminUploadMedia(token, file);
+    if (res.success && res.url) {
+      if (target === "thumbnail") {
+        setFormData((prev) => ({ ...prev, thumbnail: res.url! }));
+      } else if (target === "video") {
+        setFormData((prev) => ({ ...prev, videoUrl: res.url! }));
+      } else if (target === "gallery") {
+        setFormData((prev) => ({ ...prev, images: [...prev.images, res.url!] }));
+      }
+
+      setToast({
+        isOpen: true,
+        type: "success",
+        title: "Upload Successful",
+        message: `${res.resource_type === "video" ? "Video" : "Image"} uploaded to Cloudinary.`,
+      });
+    } else {
+      setToast({
+        isOpen: true,
+        type: "error",
+        title: "Upload Failed",
+        message: res.error || "Unable to upload to Cloudinary. Check credentials.",
+      });
+    }
+
+    setUploadingTarget(null);
+    // Reset file input so same file can be re-selected if needed
+    e.target.value = "";
+  };
+
+  const handleRemoveMedia = async (
+    target: "thumbnail" | "video" | "gallery",
+    urlToRemove?: string,
+    galleryIndex?: number
+  ) => {
+    const url =
+      target === "thumbnail"
+        ? formData.thumbnail
+        : target === "video"
+        ? formData.videoUrl
+        : urlToRemove;
+
+    if (!url) return;
+
+    const projectId = editingProject?._id || editingProject?.slug;
+    const field =
+      target === "thumbnail"
+        ? "thumbnail"
+        : target === "video"
+        ? "videoUrl"
+        : "galleryImage";
+
+    const deleteKey =
+      target + (galleryIndex !== undefined ? `_${galleryIndex}` : "");
+    setDeletingMedia(deleteKey);
+
+    // Instant optimistic UI cleanup
+    if (target === "thumbnail") {
+      setFormData((prev) => ({ ...prev, thumbnail: "" }));
+    } else if (target === "video") {
+      setFormData((prev) => ({ ...prev, videoUrl: "" }));
+    } else if (target === "gallery" && galleryIndex !== undefined) {
+      setFormData((prev) => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== galleryIndex),
+      }));
+    }
+
+    // Call backend to destroy on Cloudinary and MongoDB
+    if (token) {
+      const res = await adminDeleteMedia(token, url, projectId, field);
+      if (res.success) {
+        setToast({
+          isOpen: true,
+          type: "success",
+          title: "Media Removed",
+          message: `${
+            target === "video" ? "Video" : "Image"
+          } deleted from Cloudinary & project.`,
+        });
+        if (projectId) {
+          loadProjects(token);
+        }
+      } else {
+        setToast({
+          isOpen: true,
+          type: "error",
+          title: "Notice",
+          message: res.error || "Media removed from form.",
+        });
+      }
+    }
+
+    setDeletingMedia(null);
+  };
+
+  const handleAddGalleryUrl = () => {
+    if (!newGalleryUrl.trim()) return;
+    setFormData((prev) => ({
+      ...prev,
+      images: [...prev.images, newGalleryUrl.trim()],
+    }));
+    setNewGalleryUrl("");
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
 
-    // Validate
     if (
       !formData.title.trim() ||
       !formData.shortDescription.trim() ||
@@ -235,16 +371,20 @@ export default function AdminProjectsPage() {
       challenge: formData.challenge.trim(),
       solution: formData.solution.trim(),
       outcome: formData.outcome.trim() || undefined,
+      thumbnail: formData.thumbnail.trim() || undefined,
+      images: formData.images,
+      videoUrl: formData.videoUrl.trim() || undefined,
     };
 
-    if (editingProject && editingProject._id) {
-      const res = await adminUpdateProject(token, editingProject._id, payload);
+    const targetId = editingProject?._id || editingProject?.slug;
+    if (editingProject && targetId) {
+      const res = await adminUpdateProject(token, targetId, payload);
       if (res.success) {
         setToast({
           isOpen: true,
           type: "success",
           title: "Project Updated",
-          message: `"${payload.title}" details saved.`,
+          message: `"${payload.title}" saved successfully.`,
         });
         setIsModalOpen(false);
         loadProjects(token);
@@ -282,7 +422,7 @@ export default function AdminProjectsPage() {
         isOpen: true,
         type: "success",
         title: "Project Deleted",
-        message: `"${title}" has been removed from portfolio.`,
+        message: `"${title}" has been removed.`,
       });
     } else {
       setToast({
@@ -304,7 +444,6 @@ export default function AdminProjectsPage() {
     );
   });
 
-  // Login Gate
   if (!token) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
@@ -461,10 +600,11 @@ export default function AdminProjectsPage() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="border-b border-border/80 bg-background-surface/50 text-foreground-muted font-mono uppercase tracking-wider text-[11px]">
+                    <th className="py-3.5 px-4 font-medium">Visual</th>
                     <th className="py-3.5 px-4 font-medium">Project</th>
                     <th className="py-3.5 px-4 font-medium">Category</th>
                     <th className="py-3.5 px-4 font-medium">Technologies</th>
-                    <th className="py-3.5 px-4 font-medium">Year</th>
+                    <th className="py-3.5 px-4 font-medium">Media</th>
                     <th className="py-3.5 px-4 font-medium">Featured</th>
                     <th className="py-3.5 px-4 font-medium text-right">Actions</th>
                   </tr>
@@ -472,6 +612,21 @@ export default function AdminProjectsPage() {
                 <tbody className="divide-y divide-border/60">
                   {filteredProjects.map((p) => (
                     <tr key={p.slug} className="hover:bg-background-surface/40 transition-colors">
+                      {/* Thumbnail Preview */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <div className="w-12 h-8 rounded bg-background-surface border border-border overflow-hidden flex items-center justify-center">
+                          {p.thumbnail ? (
+                            <img
+                              src={p.thumbnail}
+                              alt={p.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <ImageIcon className="w-4 h-4 text-zinc-600" />
+                          )}
+                        </div>
+                      </td>
+
                       {/* Title & Slug */}
                       <td className="py-4 px-4">
                         <div className="font-semibold text-foreground text-sm flex items-center gap-2">
@@ -480,7 +635,7 @@ export default function AdminProjectsPage() {
                             href={`/work/${p.slug}`}
                             target="_blank"
                             className="text-foreground-muted hover:text-accent transition-colors"
-                            title="Open case study"
+                            title="Open live case study"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                           </Link>
@@ -516,9 +671,28 @@ export default function AdminProjectsPage() {
                         </div>
                       </td>
 
-                      {/* Year */}
-                      <td className="py-4 px-4 whitespace-nowrap text-foreground-secondary font-mono">
-                        {p.year}
+                      {/* Media Badges */}
+                      <td className="py-4 px-4 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5 text-[11px]">
+                          {p.thumbnail && (
+                            <span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono">
+                              IMG
+                            </span>
+                          )}
+                          {p.videoUrl && (
+                            <span className="px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-400 border border-violet-500/20 font-mono flex items-center gap-1">
+                              <Film className="w-3 h-3" /> VIDEO
+                            </span>
+                          )}
+                          {p.images && p.images.length > 0 && (
+                            <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                              +{p.images.length}
+                            </span>
+                          )}
+                          {!p.thumbnail && !p.videoUrl && (!p.images || p.images.length === 0) && (
+                            <span className="text-zinc-600 font-mono">None</span>
+                          )}
+                        </div>
                       </td>
 
                       {/* Featured */}
@@ -544,15 +718,13 @@ export default function AdminProjectsPage() {
                             <span>Edit</span>
                           </button>
 
-                          {p._id && (
-                            <button
-                              onClick={() => handleDelete(p._id!, p.title)}
-                              className="p-1.5 rounded hover:bg-red-500/10 text-foreground-muted hover:text-red-400 transition-colors"
-                              title="Delete Project"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
+                          <button
+                            onClick={() => handleDelete(p._id || p.slug, p.title)}
+                            className="p-1.5 rounded hover:bg-red-500/10 text-foreground-muted hover:text-red-400 transition-colors"
+                            title="Delete Project"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -563,6 +735,29 @@ export default function AdminProjectsPage() {
           )}
         </div>
       </Container>
+
+      {/* Hidden File Inputs for Cloudinary Uploads */}
+      <input
+        ref={thumbnailInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => handleMediaUpload(e, "thumbnail")}
+      />
+      <input
+        ref={videoInputRef}
+        type="file"
+        accept="video/*"
+        className="hidden"
+        onChange={(e) => handleMediaUpload(e, "video")}
+      />
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => handleMediaUpload(e, "gallery")}
+      />
 
       {/* Add / Edit Project Modal */}
       {isModalOpen && (
@@ -591,7 +786,7 @@ export default function AdminProjectsPage() {
               </div>
             )}
 
-            <form onSubmit={handleFormSubmit} className="space-y-4 text-xs">
+            <form onSubmit={handleFormSubmit} className="space-y-5 text-xs">
               {/* Title & Slug */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -667,6 +862,211 @@ export default function AdminProjectsPage() {
                 </div>
               </div>
 
+              {/* ─── MEDIA UPLOAD SECTION ─── */}
+              <div className="p-4 rounded-xl bg-background-surface border border-border/80 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono uppercase tracking-wider text-accent font-semibold flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5" /> Project Images & Demo Video
+                  </span>
+                  <span className="text-[11px] font-mono text-foreground-muted">
+                    Cloudinary Powered
+                  </span>
+                </div>
+
+                {/* 1. Thumbnail Image */}
+                <div>
+                  <label className="block text-foreground-secondary font-mono uppercase mb-1.5">
+                    Thumbnail / Main Banner Image
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="url"
+                      value={formData.thumbnail}
+                      onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
+                      placeholder="Paste image URL (https://res.cloudinary.com/...)"
+                      className="flex-1 px-3 py-2 rounded-lg bg-background-secondary border border-border text-foreground focus:outline-none focus:border-accent text-xs"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={uploadingTarget === "thumbnail"}
+                      onClick={() => thumbnailInputRef.current?.click()}
+                      className="shrink-0 flex items-center gap-1.5 justify-center"
+                    >
+                      {uploadingTarget === "thumbnail" ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-3.5 h-3.5" /> Upload Image
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {formData.thumbnail && (
+                    <div className="mt-2 relative w-32 aspect-video rounded-lg overflow-hidden border border-border group">
+                      <img
+                        src={formData.thumbnail}
+                        alt="Thumbnail preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        disabled={deletingMedia === "thumbnail"}
+                        onClick={() => handleRemoveMedia("thumbnail")}
+                        className="absolute top-1 right-1 p-1 rounded bg-black/80 text-red-400 hover:text-red-300 disabled:opacity-50"
+                        title="Delete thumbnail from Cloudinary & project"
+                      >
+                        {deletingMedia === "thumbnail" ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <X className="w-3 h-3" />
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. Demo Video */}
+                <div>
+                  <label className="block text-foreground-secondary font-mono uppercase mb-1.5">
+                    Demo Video (Cloudinary MP4, WebM, or Video URL)
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="url"
+                      value={formData.videoUrl}
+                      onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                      placeholder="Paste video URL (https://res.cloudinary.com/.../video.mp4)"
+                      className="flex-1 px-3 py-2 rounded-lg bg-background-secondary border border-border text-foreground focus:outline-none focus:border-accent text-xs"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={uploadingTarget === "video"}
+                      onClick={() => videoInputRef.current?.click()}
+                      className="shrink-0 flex items-center gap-1.5 justify-center"
+                    >
+                      {uploadingTarget === "video" ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <VideoIcon className="w-3.5 h-3.5" /> Upload Video
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {formData.videoUrl && (
+                    <div className="mt-2 relative max-w-sm rounded-lg overflow-hidden border border-border">
+                      <video
+                        src={formData.videoUrl}
+                        controls
+                        className="w-full aspect-video object-contain bg-black"
+                      />
+                      <button
+                        type="button"
+                        disabled={deletingMedia === "video"}
+                        onClick={() => handleRemoveMedia("video")}
+                        className="absolute top-2 right-2 p-1 rounded bg-black/80 text-red-400 hover:text-red-300 disabled:opacity-50"
+                        title="Delete video from Cloudinary & project"
+                      >
+                        {deletingMedia === "video" ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <X className="w-3 h-3" />
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Screenshot Gallery */}
+                <div>
+                  <label className="block text-foreground-secondary font-mono uppercase mb-1.5">
+                    Screenshots Gallery ({formData.images.length} added)
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="url"
+                      value={newGalleryUrl}
+                      onChange={(e) => setNewGalleryUrl(e.target.value)}
+                      placeholder="Paste screenshot image URL"
+                      className="flex-1 px-3 py-2 rounded-lg bg-background-secondary border border-border text-foreground focus:outline-none focus:border-accent text-xs"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddGalleryUrl();
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddGalleryUrl}
+                      className="shrink-0"
+                    >
+                      Add URL
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={uploadingTarget === "gallery"}
+                      onClick={() => galleryInputRef.current?.click()}
+                      className="shrink-0 flex items-center gap-1.5"
+                    >
+                      {uploadingTarget === "gallery" ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-3.5 h-3.5" /> Upload Screenshot
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {formData.images.length > 0 && (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-3">
+                      {formData.images.map((img, i) => (
+                        <div
+                          key={i}
+                          className="relative aspect-video rounded-lg overflow-hidden border border-border group bg-background-secondary"
+                        >
+                          <img
+                            src={img}
+                            alt={`Gallery ${i + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            disabled={deletingMedia === `gallery_${i}`}
+                            onClick={() => handleRemoveMedia("gallery", img, i)}
+                            className="absolute top-1 right-1 p-1 rounded bg-black/80 text-red-400 hover:text-red-300 transition-opacity opacity-80 group-hover:opacity-100 disabled:opacity-50"
+                            title="Delete image from Cloudinary & project"
+                          >
+                            {deletingMedia === `gallery_${i}` ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              <X className="w-3 h-3" />
+                            )}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Short Description */}
               <div>
                 <label className="block text-foreground-secondary font-mono uppercase mb-1">
@@ -681,7 +1081,7 @@ export default function AdminProjectsPage() {
                     setFormData({ ...formData, shortDescription: e.target.value })
                   }
                   placeholder="One or two sentences highlighting what the product is and who it helps."
-                  className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent resize-none"
+                  className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent resize-none no-scrollbar"
                 />
               </div>
 
@@ -696,7 +1096,7 @@ export default function AdminProjectsPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="In-depth explanation of the project, user experience, and architecture."
-                  className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent"
+                  className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent no-scrollbar"
                 />
               </div>
 
@@ -726,7 +1126,7 @@ export default function AdminProjectsPage() {
                     value={formData.features}
                     onChange={(e) => setFormData({ ...formData, features: e.target.value })}
                     placeholder={"Real-time inventory sync\nComputer vision parts search\nAutomated invoice alerts"}
-                    className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent"
+                    className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent no-scrollbar"
                   />
                 </div>
               </div>
@@ -743,7 +1143,7 @@ export default function AdminProjectsPage() {
                     value={formData.challenge}
                     onChange={(e) => setFormData({ ...formData, challenge: e.target.value })}
                     placeholder="What bottleneck, technical barrier, or business problem did the client face?"
-                    className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent"
+                    className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent no-scrollbar"
                   />
                 </div>
 
@@ -757,7 +1157,7 @@ export default function AdminProjectsPage() {
                     value={formData.solution}
                     onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
                     placeholder="How did PG Labs design, engineer, and deploy the system?"
-                    className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent"
+                    className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent no-scrollbar"
                   />
                 </div>
               </div>

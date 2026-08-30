@@ -1,4 +1,4 @@
-﻿export interface ProjectItem {
+export interface ProjectItem {
   slug: string;
   title: string;
   category: "AI / Business Software" | "SaaS / EdTech" | "Web Application";
@@ -11,6 +11,9 @@
   outcome?: string;
   year: string;
   featured: boolean;
+  thumbnail?: string;
+  images?: string[];
+  videoUrl?: string;
 }
 
 export const PROJECTS: ProjectItem[] = [

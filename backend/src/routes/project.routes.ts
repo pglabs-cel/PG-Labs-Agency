@@ -11,6 +11,7 @@ router.get("/projects/:slug", ProjectController.getProjectBySlug);
 // Admin-protected routes
 router.post("/admin/projects", requireAdminAuth, ProjectController.createProject);
 router.put("/admin/projects/:id", requireAdminAuth, ProjectController.updateProject);
+router.patch("/admin/projects/:id", requireAdminAuth, ProjectController.updateProject);
 router.delete("/admin/projects/:id", requireAdminAuth, ProjectController.deleteProject);
 
 export default router;

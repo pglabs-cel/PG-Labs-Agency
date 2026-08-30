@@ -12,6 +12,7 @@ export interface ProjectCardProps {
   description: string;
   technologies: string[];
   year?: string;
+  thumbnail?: string;
 }
 
 /* Map categories to a visual identity for the placeholder */
@@ -57,6 +58,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   description,
   technologies,
   year = "2025",
+  thumbnail,
 }) => {
   const theme = CATEGORY_THEME[category] ?? DEFAULT_THEME;
 
@@ -69,12 +71,25 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         hover:border-accent/40 hover:bg-background-surface/80
         hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)]"
     >
-      {/* ── Rich visual placeholder ── */}
-      <div
-        className={`relative aspect-[16/9] w-full overflow-hidden
-          bg-gradient-to-b ${theme.from} ${theme.via} ${theme.to}
-          transition-transform duration-400`}
-      >
+      {/* ── Visual Media Area ── */}
+      {thumbnail ? (
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-background-surface">
+          <img
+            src={thumbnail}
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background-secondary via-transparent to-transparent opacity-50 pointer-events-none" />
+          <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-background/80 backdrop-blur-md border border-border text-[10px] font-mono font-medium text-accent">
+            {category}
+          </div>
+        </div>
+      ) : (
+        <div
+          className={`relative aspect-[16/9] w-full overflow-hidden
+            bg-gradient-to-b ${theme.from} ${theme.via} ${theme.to}
+            transition-transform duration-400`}
+        >
         {/* Subtle grid */}
         <div
           className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none"
@@ -153,6 +168,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           aria-hidden="true"
         />
       </div>
+      )}
 
       {/* ── Card info area ── */}
       <div className="p-6 sm:p-8">

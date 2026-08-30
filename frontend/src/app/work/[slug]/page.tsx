@@ -115,27 +115,51 @@ export default async function CaseStudyPage({ params }: Props) {
         </Container>
       </section>
 
-      {/* Hero Visual Mockup */}
+      {/* Hero Visual Mockup / Video Demo */}
       <section className="py-12 -mt-10">
         <Container>
-          <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary p-6 sm:p-12 flex flex-col justify-between relative overflow-hidden shadow-2xl">
-            <div className="absolute inset-0 bg-tech-grid opacity-30 pointer-events-none" />
-            <div className="relative z-10 flex items-center justify-between text-xs font-mono text-foreground-muted">
-              <span>{project.slug}.architecture</span>
-              <span className="text-emerald-400">STATUS: VERIFIED DEPLOYMENT</span>
+          {project.videoUrl ? (
+            <div className="w-full aspect-video rounded-2xl border border-border bg-black overflow-hidden shadow-2xl relative">
+              <video
+                src={project.videoUrl}
+                controls
+                playsInline
+                poster={project.thumbnail}
+                className="w-full h-full object-contain"
+              />
             </div>
-            <div className="relative z-10 my-auto text-center space-y-2">
-              <p className="text-2xl sm:text-4xl font-bold font-mono text-foreground">
-                {project.title}
-              </p>
-              <p className="text-xs sm:text-sm font-mono uppercase tracking-widest text-foreground-muted">
-                System Interface & Microservices Topology
-              </p>
+          ) : project.thumbnail ? (
+            <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary overflow-hidden shadow-2xl relative">
+              <img
+                src={project.thumbnail}
+                alt={project.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-6 left-6 px-3 py-1 rounded-md bg-background/80 backdrop-blur-md border border-border text-xs font-mono text-accent">
+                {project.category} · {project.year}
+              </div>
             </div>
-            <div className="relative z-10 flex items-center justify-end text-xs font-mono text-accent">
-              <span>PG Labs Build #{project.year}</span>
+          ) : (
+            <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary p-6 sm:p-12 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+              <div className="absolute inset-0 bg-tech-grid opacity-30 pointer-events-none" />
+              <div className="relative z-10 flex items-center justify-between text-xs font-mono text-foreground-muted">
+                <span>{project.slug}.architecture</span>
+                <span className="text-emerald-400">STATUS: VERIFIED DEPLOYMENT</span>
+              </div>
+              <div className="relative z-10 my-auto text-center space-y-2">
+                <p className="text-2xl sm:text-4xl font-bold font-mono text-foreground">
+                  {project.title}
+                </p>
+                <p className="text-xs sm:text-sm font-mono uppercase tracking-widest text-foreground-muted">
+                  System Interface & Microservices Topology
+                </p>
+              </div>
+              <div className="relative z-10 flex items-center justify-end text-xs font-mono text-accent">
+                <span>PG Labs Build #{project.year}</span>
+              </div>
             </div>
-          </div>
+          )}
         </Container>
       </section>
 
@@ -189,6 +213,28 @@ export default async function CaseStudyPage({ params }: Props) {
               ))}
             </div>
           </div>
+
+          {project.images && project.images.length > 0 && (
+            <div className="space-y-6 pt-6 border-t border-border/60">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+                Interface & System Screenshots
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {project.images.map((imgUrl, i) => (
+                  <div
+                    key={i}
+                    className="aspect-video rounded-xl border border-border overflow-hidden bg-background-surface relative shadow-lg group"
+                  >
+                    <img
+                      src={imgUrl}
+                      alt={`${project.title} screenshot ${i + 1}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {project.outcome && (
             <div className="p-8 rounded-2xl bg-accent/5 border border-accent/20 space-y-3">

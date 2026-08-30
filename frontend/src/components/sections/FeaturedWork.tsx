@@ -38,6 +38,7 @@ export const FeaturedWork: React.FC = async () => {
                 description={project.shortDescription}
                 technologies={project.technologies}
                 year={project.year}
+                thumbnail={project.thumbnail}
               />
             </FadeUp>
           ))}

@@ -15,6 +15,9 @@ export interface ProjectDTO {
   year: string;
   featured: boolean;
   order?: number;
+  thumbnail?: string;
+  images?: string[];
+  videoUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -202,6 +205,81 @@ export async function adminDeleteProject(
     return {
       success: false,
       error: err instanceof Error ? err.message : "Network error deleting project.",
+    };
+  }
+}
+
+export async function adminUploadMedia(
+  token: string,
+  file: File
+): Promise<{
+  success: boolean;
+  url?: string;
+  resource_type?: string;
+  error?: string;
+}> {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(`${API_BASE_URL}/admin/upload`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return {
+        success: false,
+        error: data.error || "File upload failed.",
+      };
+    }
+
+    return {
+      success: true,
+      url: data.data?.url,
+      resource_type: data.data?.resource_type,
+    };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Network error during upload.",
+    };
+  }
+}
+
+export async function adminDeleteMedia(
+  token: string,
+  url: string,
+  projectId?: string,
+  field?: "thumbnail" | "videoUrl" | "galleryImage"
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/media/delete`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ url, projectId, field }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return {
+        success: false,
+        error: data.error || "Failed to delete media.",
+      };
+    }
+
+    return { success: true };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Network error deleting media.",
     };
   }
 }

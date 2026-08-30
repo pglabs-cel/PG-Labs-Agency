@@ -89,6 +89,7 @@ export default function WorkPage() {
                   description={project.shortDescription}
                   technologies={project.technologies}
                   year={project.year}
+                  thumbnail={project.thumbnail}
                 />
               </FadeUp>
             ))}

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Project, IProject } from "../models/project.model";
 
 export interface CreateProjectDTO {
@@ -14,6 +15,9 @@ export interface CreateProjectDTO {
   year: string;
   featured?: boolean;
   order?: number;
+  thumbnail?: string;
+  images?: string[];
+  videoUrl?: string;
 }
 
 export const INITIAL_PROJECTS = [
@@ -135,6 +139,9 @@ export class ProjectService {
       features: data.features || [],
       featured: data.featured !== undefined ? data.featured : true,
       order: data.order || 0,
+      thumbnail: data.thumbnail || "",
+      images: data.images || [],
+      videoUrl: data.videoUrl || "",
     });
 
     return await project.save();
@@ -150,14 +157,26 @@ export class ProjectService {
       updateData.slug = this.generateSlug(data.slug);
     }
 
-    return await Project.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true,
-    }).exec();
+    if (mongoose.isValidObjectId(id)) {
+      return await Project.findByIdAndUpdate(id, updateData, {
+        new: true,
+        runValidators: true,
+      }).exec();
+    } else {
+      return await Project.findOneAndUpdate({ slug: id }, updateData, {
+        new: true,
+        runValidators: true,
+      }).exec();
+    }
   }
 
   public static async deleteProject(id: string): Promise<boolean> {
-    const result = await Project.findByIdAndDelete(id).exec();
+    let result: IProject | null = null;
+    if (mongoose.isValidObjectId(id)) {
+      result = await Project.findByIdAndDelete(id).exec();
+    } else {
+      result = await Project.findOneAndDelete({ slug: id }).exec();
+    }
     return result !== null;
   }
 

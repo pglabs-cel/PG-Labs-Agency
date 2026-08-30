@@ -66,6 +66,9 @@ export class ProjectController {
         year,
         featured,
         order,
+        thumbnail,
+        images,
+        videoUrl,
       } = req.body;
 
       if (!title || !category || !shortDescription || !description || !challenge || !solution) {
@@ -90,6 +93,9 @@ export class ProjectController {
         year: year || new Date().getFullYear().toString(),
         featured: featured !== undefined ? Boolean(featured) : true,
         order: Number(order) || 0,
+        thumbnail: typeof thumbnail === "string" ? thumbnail : "",
+        images: Array.isArray(images) ? images : [],
+        videoUrl: typeof videoUrl === "string" ? videoUrl : "",
       });
 
       res.status(201).json({

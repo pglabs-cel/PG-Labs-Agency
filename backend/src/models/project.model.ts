@@ -14,6 +14,9 @@ export interface IProject extends Document {
   year: string;
   featured: boolean;
   order: number;
+  thumbnail?: string;
+  images?: string[];
+  videoUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -87,6 +90,20 @@ const ProjectSchema: Schema = new Schema<IProject>(
     order: {
       type: Number,
       default: 0,
+    },
+    thumbnail: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    images: {
+      type: [String],
+      default: [],
+    },
+    videoUrl: {
+      type: String,
+      trim: true,
+      default: "",
     },
   },
   {
