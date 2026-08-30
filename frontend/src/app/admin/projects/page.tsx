@@ -692,7 +692,8 @@ export default function AdminProjectsPage() {
             <Button
               type="submit"
               variant="primary"
-              className="w-full justify-center py-3"
+              size="md"
+              fullWidth
               disabled={authLoading}
             >
               {authLoading ? "Verifying..." : "Access Projects →"}

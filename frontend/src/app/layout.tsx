@@ -4,6 +4,7 @@ import "./globals.css";
 import { SITE_CONFIG } from "@/lib/constants";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/JsonLd";
+import { Analytics } from "@vercel/analytics/react";
 
 const sansFont = Inter({
   subsets: ["latin"],
@@ -103,6 +104,7 @@ export default function RootLayout({
         <OrganizationJsonLd />
         <WebSiteJsonLd />
         <SiteShell>{children}</SiteShell>
+        <Analytics />
       </body>
     </html>
   );
