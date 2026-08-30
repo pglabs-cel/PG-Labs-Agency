@@ -9,7 +9,7 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
-} from "motion/react";
+} from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type LinkPreviewProps = {
@@ -141,6 +141,8 @@ export const LinkPreview = ({
       {childElement}
 
       {isMounted &&
+        typeof document !== "undefined" &&
+        document.body &&
         createPortal(
           <AnimatePresence>
             {isOpen && (

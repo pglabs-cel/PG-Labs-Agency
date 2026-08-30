@@ -28,12 +28,18 @@ export default function Error({
           An unexpected error occurred. Please try again or return to the homepage.
         </p>
         <div className="flex justify-center gap-4">
-          <Button onClick={() => reset()} size="md">
+          <button
+            onClick={() => reset()}
+            className="px-6 py-2.5 rounded-xl bg-accent text-white font-medium text-sm hover:bg-accent-hover transition-colors cursor-pointer"
+          >
             Try Again
-          </Button>
-          <Button href="/" variant="outline" size="md">
+          </button>
+          <a
+            href="/"
+            className="px-6 py-2.5 rounded-xl border border-border bg-background-surface text-foreground font-medium text-sm hover:bg-background-surface/80 transition-colors"
+          >
             Go Home
-          </Button>
+          </a>
         </div>
       </Container>
     </main>

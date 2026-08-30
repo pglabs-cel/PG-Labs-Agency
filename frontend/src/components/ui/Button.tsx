@@ -78,8 +78,6 @@ export const Button: React.FC<ButtonProps> = ({
           style: {
             borderRadius,
             transform: "translateZ(0)",
-            WebkitMaskImage: "-webkit-radial-gradient(white, black)",
-            maskImage: "radial-gradient(white, black)",
           },
         }
       : {
@@ -92,8 +90,6 @@ export const Button: React.FC<ButtonProps> = ({
           style: {
             borderRadius,
             transform: "translateZ(0)",
-            WebkitMaskImage: "-webkit-radial-gradient(white, black)",
-            maskImage: "radial-gradient(white, black)",
           },
         };
 
@@ -105,8 +101,6 @@ export const Button: React.FC<ButtonProps> = ({
           style={{
             borderRadius,
             transform: "translateZ(0)",
-            WebkitMaskImage: "-webkit-radial-gradient(white, black)",
-            maskImage: "radial-gradient(white, black)",
           }}
         >
           <MovingBorder duration={duration} rx={svgRadius} ry={svgRadius}>

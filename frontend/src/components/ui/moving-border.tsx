@@ -6,7 +6,7 @@ import {
   useMotionTemplate,
   useMotionValue,
   useTransform,
-} from "motion/react";
+} from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export function Button({
@@ -32,13 +32,11 @@ export function Button({
     <Component
       className={cn(
         "relative h-14 w-auto min-w-[140px] overflow-hidden bg-transparent p-[1px] text-base group select-none cursor-pointer",
-        containerClassName,
+        containerClassName
       )}
       style={{
-        borderRadius: borderRadius,
+        borderRadius,
         transform: "translateZ(0)",
-        WebkitMaskImage: "-webkit-radial-gradient(white, black)",
-        maskImage: "radial-gradient(white, black)",
       }}
       {...otherProps}
     >
@@ -47,15 +45,13 @@ export function Button({
         style={{
           borderRadius,
           transform: "translateZ(0)",
-          WebkitMaskImage: "-webkit-radial-gradient(white, black)",
-          maskImage: "radial-gradient(white, black)",
         }}
       >
         <MovingBorder duration={duration} rx="16" ry="16">
           <div
             className={cn(
               "h-20 w-20 bg-[radial-gradient(#8B5CF6_40%,#A78BFA_60%,transparent_75%)] opacity-[0.9]",
-              borderClassName,
+              borderClassName
             )}
           />
         </MovingBorder>
@@ -64,7 +60,7 @@ export function Button({
       <div
         className={cn(
           "relative flex h-full w-full items-center justify-center border border-border bg-[#111113] text-sm font-medium text-foreground antialiased backdrop-blur-xl px-6 py-2.5 transition-colors group-hover:bg-[#18181B] group-hover:text-white group-hover:border-accent/40",
-          className,
+          className
         )}
         style={{
           borderRadius: `calc(${borderRadius} - 1px)`,
@@ -92,22 +88,74 @@ export const MovingBorder = ({
   const pathRef = useRef<any>(null);
   const progress = useMotionValue<number>(0);
 
+  // Cross-browser calculation of element perimeter and point coordinates
+  const getDimensions = () => {
+    const el = pathRef.current;
+    if (!el) return { w: 140, h: 44 };
+    const w =
+      el.ownerSVGElement?.clientWidth ||
+      el.clientWidth ||
+      el.parentElement?.clientWidth ||
+      140;
+    const h =
+      el.ownerSVGElement?.clientHeight ||
+      el.clientHeight ||
+      el.parentElement?.clientHeight ||
+      44;
+    return { w, h };
+  };
+
   useAnimationFrame((time) => {
-    const length = pathRef.current?.getTotalLength();
-    if (length) {
+    let length = 0;
+    if (pathRef.current && typeof pathRef.current.getTotalLength === "function") {
+      try {
+        length = pathRef.current.getTotalLength();
+      } catch {}
+    }
+    if (!length) {
+      const { w, h } = getDimensions();
+      length = 2 * (w + h);
+    }
+    if (length > 0) {
       const pxPerMillisecond = length / duration;
       progress.set((time * pxPerMillisecond) % length);
     }
   });
 
-  const x = useTransform(
-    progress,
-    (val) => pathRef.current?.getPointAtLength(val).x,
-  );
-  const y = useTransform(
-    progress,
-    (val) => pathRef.current?.getPointAtLength(val).y,
-  );
+  const getPoint = (val: number): { x: number; y: number } => {
+    // 1. Try standard SVG getPointAtLength if supported (Blink/Chromium/Firefox)
+    if (pathRef.current && typeof pathRef.current.getPointAtLength === "function") {
+      try {
+        const pt = pathRef.current.getPointAtLength(val);
+        if (pt && typeof pt.x === "number" && typeof pt.y === "number") {
+          return { x: pt.x, y: pt.y };
+        }
+      } catch {}
+    }
+
+    // 2. Safe mathematical perimeter calculation for WebKit / Safari on iOS / macOS
+    const { w, h } = getDimensions();
+    const perimeter = 2 * (w + h);
+    if (perimeter <= 0) return { x: 0, y: 0 };
+
+    const d = ((val % perimeter) + perimeter) % perimeter;
+    if (d < w) {
+      // Top edge: moving left to right
+      return { x: d, y: 0 };
+    } else if (d < w + h) {
+      // Right edge: moving top to bottom
+      return { x: w, y: d - w };
+    } else if (d < 2 * w + h) {
+      // Bottom edge: moving right to left
+      return { x: w - (d - (w + h)), y: h };
+    } else {
+      // Left edge: moving bottom to top
+      return { x: 0, y: h - (d - (2 * w + h)) };
+    }
+  };
+
+  const x = useTransform(progress, (val) => getPoint(val).x);
+  const y = useTransform(progress, (val) => getPoint(val).y);
 
   const transform = useMotionTemplate`translateX(${x}px) translateY(${y}px) translateX(-50%) translateY(-50%)`;
 

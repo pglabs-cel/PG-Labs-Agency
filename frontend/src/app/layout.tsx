@@ -83,11 +83,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${sansFont.variable} ${monoFont.variable} dark scroll-smooth`}>
-      <head>
+      <body className="min-h-screen bg-background font-sans antialiased text-foreground selection:bg-accent selection:text-white flex flex-col">
         <OrganizationJsonLd />
         <WebSiteJsonLd />
-      </head>
-      <body className="min-h-screen bg-background font-sans antialiased text-foreground selection:bg-accent selection:text-white flex flex-col">
         <SiteShell>{children}</SiteShell>
       </body>
     </html>

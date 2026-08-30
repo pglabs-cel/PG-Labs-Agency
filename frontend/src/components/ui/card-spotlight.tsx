@@ -1,14 +1,13 @@
 "use client";
 
-import { useMotionValue, motion, useMotionTemplate } from "motion/react";
-import React, { MouseEvent as ReactMouseEvent, useState } from "react";
-import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect";
+import { useMotionValue, motion, useMotionTemplate } from "framer-motion";
+import React, { MouseEvent as ReactMouseEvent } from "react";
 import { cn } from "@/lib/utils";
 
 export const CardSpotlight = ({
   children,
   radius = 350,
-  color = "#18181B",
+  color = "rgba(139, 92, 246, 0.12)",
   className,
   ...props
 }: {
@@ -29,10 +28,6 @@ export const CardSpotlight = ({
     mouseY.set(clientY - top);
   }
 
-  const [isHovering, setIsHovering] = useState(false);
-  const handleMouseEnter = () => setIsHovering(true);
-  const handleMouseLeave = () => setIsHovering(false);
-
   return (
     <div
       className={cn(
@@ -40,43 +35,21 @@ export const CardSpotlight = ({
         className
       )}
       onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       {...props}
     >
+      {/* Desktop-only subtle spotlight glow */}
       <motion.div
-        className="pointer-events-none absolute z-0 -inset-px rounded-xl opacity-0 transition duration-300 group-hover/spotlight:opacity-100"
+        className="pointer-events-none absolute z-0 -inset-px rounded-xl opacity-0 transition duration-300 group-hover/spotlight:opacity-100 hidden sm:block"
         style={{
-          backgroundColor: color,
-          maskImage: useMotionTemplate`
+          background: useMotionTemplate`
             radial-gradient(
               ${radius}px circle at ${mouseX}px ${mouseY}px,
-              white,
-              transparent 80%
-            )
-          `,
-          WebkitMaskImage: useMotionTemplate`
-            radial-gradient(
-              ${radius}px circle at ${mouseX}px ${mouseY}px,
-              white,
+              ${color},
               transparent 80%
             )
           `,
         }}
-      >
-        {isHovering && (
-          <CanvasRevealEffect
-            animationSpeed={3}
-            containerClassName="bg-transparent absolute inset-0 pointer-events-none"
-            colors={[
-              [139, 92, 246],
-              [167, 139, 250],
-            ]}
-            dotSize={2.5}
-            showGradient={false}
-          />
-        )}
-      </motion.div>
+      />
       <div className="relative z-10 flex flex-col justify-between h-full">{children}</div>
     </div>
   );
