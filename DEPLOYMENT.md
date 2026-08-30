@@ -60,12 +60,13 @@ This guide provides end-to-end instructions for deploying the **PG Labs Frontend
    - **Root Directory**: Click `Edit` and choose `frontend`.
 5. Under **Environment Variables**, add:
    ```env
+   BACKEND_API_URL=https://pg-labs-backend.onrender.com/api
    NEXT_PUBLIC_API_URL=https://pg-labs-backend.onrender.com/api
    NEXT_PUBLIC_SITE_URL=https://pglabs.agency
    ```
    *(Replace with your actual backend URL and production domain)*
-6. Click **Deploy**.
-7. Vercel will build all static pages and deploy the site to a `*.vercel.app` domain with automatic HTTPS and global edge CDN.
+6. Click **Deploy** (or **Redeploy** if already created).
+7. Vercel will build the frontend with the server-side proxy route `/api/contact` and deploy the site to a `*.vercel.app` domain with automatic HTTPS and edge CDN.
 
 ---
 

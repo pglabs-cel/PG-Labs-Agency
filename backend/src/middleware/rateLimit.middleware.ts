@@ -6,6 +6,7 @@ export const contactRateLimiter = rateLimit({
   max: process.env.NODE_ENV === "production" ? 15 : 100,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
   message: {
     error: "Too many project inquiries submitted from this IP. Please wait 15 minutes before trying again or email us directly.",
   },

@@ -12,13 +12,19 @@ import { verifyTransporter } from "./config/mail";
 
 const PORT = process.env.PORT || 5000;
 
-const startServer = async () => {
-  await connectDB();
-  await verifyTransporter();
-
-  app.listen(PORT, () => {
-    console.log(`🚀 PG Labs Backend running on port ${PORT}`);
+const server = app.listen(PORT, () => {
+  console.log(`🚀 PG Labs Backend running on port ${PORT}`);
+  
+  // Connect to database and verify email transporter asynchronously
+  connectDB().then((connected) => {
+    if (connected) {
+      console.log("[Server] Database readiness verified.");
+    }
   });
-};
 
-startServer();
+  verifyTransporter().catch((err) => {
+    console.warn("[Server] SMTP check warning:", err.message || err);
+  });
+});
+
+export default server;
