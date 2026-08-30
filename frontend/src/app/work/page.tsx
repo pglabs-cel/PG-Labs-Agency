@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProjectCard } from "@/components/ui/ProjectCard";
-import { PROJECTS } from "@/data/projects";
+import { PROJECTS, ProjectItem } from "@/data/projects";
+import { fetchPublicProjects } from "@/lib/projects.api";
 import { FadeUp } from "@/components/animations/FadeUp";
 import { cn } from "@/lib/utils";
 
@@ -12,9 +13,18 @@ const FILTERS = ["All", "Web", "SaaS", "AI", "Business Software"] as const;
 type FilterType = (typeof FILTERS)[number];
 
 export default function WorkPage() {
+  const [projectsList, setProjectsList] = useState<ProjectItem[]>(PROJECTS);
   const [activeFilter, setActiveFilter] = useState<FilterType>("All");
 
-  const filteredProjects = PROJECTS.filter((project) => {
+  useEffect(() => {
+    fetchPublicProjects().then((data) => {
+      if (data && data.length > 0) {
+        setProjectsList(data);
+      }
+    });
+  }, []);
+
+  const filteredProjects = projectsList.filter((project) => {
     if (activeFilter === "All") return true;
     if (activeFilter === "Web") return project.category.includes("Web");
     if (activeFilter === "SaaS") return project.category.includes("SaaS");

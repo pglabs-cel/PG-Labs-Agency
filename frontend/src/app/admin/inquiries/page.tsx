@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import {
   adminLogin,
   fetchAdminInquiries,
@@ -295,40 +296,12 @@ export default function AdminInquiriesPage() {
   return (
     <main className="min-h-screen bg-background text-foreground pb-20">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/80">
-        <Container className="max-w-7xl h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-bold tracking-tight text-foreground text-lg">
-              PG Labs
-            </span>
-            <span className="text-border">/</span>
-            <span className="text-xs font-mono tracking-widest text-accent uppercase font-medium px-2 py-0.5 rounded bg-accent/10 border border-accent/20">
-              INQUIRIES ADMIN
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => loadInquiries(token, activeTab)}
-              disabled={loading}
-              className="p-2 rounded-lg bg-background-surface border border-border text-foreground-secondary hover:text-foreground hover:border-accent/40 transition-colors flex items-center gap-1.5 text-xs"
-              title="Refresh Inquiries"
-            >
-              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-accent" : ""}`} />
-              <span className="hidden sm:inline">Refresh</span>
-            </button>
-
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-lg bg-background-surface border border-border text-foreground-secondary hover:text-red-400 hover:border-red-500/30 transition-colors flex items-center gap-1.5 text-xs"
-              title="Logout"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Log out</span>
-            </button>
-          </div>
-        </Container>
-      </header>
+      <AdminHeader
+        activeTab="inquiries"
+        onRefresh={() => token && loadInquiries(token, activeTab)}
+        onLogout={handleLogout}
+        loading={loading}
+      />
 
       <Container className="max-w-7xl pt-8 sm:pt-12">
         {/* Metric Cards Row */}
@@ -563,7 +536,7 @@ export default function AdminInquiriesPage() {
       {/* Inquiry Detail Modal */}
       {selectedInquiry && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl rounded-2xl bg-background-secondary border border-border shadow-2xl p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto">
+          <div className="w-full max-w-2xl rounded-2xl bg-background-secondary border border-border shadow-2xl p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto no-scrollbar">
             {/* Close Button */}
             <button
               onClick={() => setSelectedInquiry(null)}

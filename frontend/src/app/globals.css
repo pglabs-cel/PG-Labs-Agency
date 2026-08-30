@@ -45,6 +45,37 @@ body {
   outline-offset: 2px;
 }
 
+/* Custom subtle dark scrollbars across browser */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272A;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3F3F46;
+}
+
+/* Completely hide scrollbars while preserving scroll functionality */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar,
+textarea::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.no-scrollbar,
+.scrollbar-none,
+textarea {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
 /* Technological grid texture */
 .bg-tech-grid {
   background-size: 40px 40px;

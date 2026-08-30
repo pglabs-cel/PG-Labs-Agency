@@ -1,13 +1,13 @@
-﻿import React from "react";
+import React from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { Button } from "@/components/ui/Button";
-import { PROJECTS } from "@/data/projects";
 import { FadeUp } from "@/components/animations/FadeUp";
+import { fetchPublicProjects } from "@/lib/projects.api";
 
-export const FeaturedWork: React.FC = () => {
-  const featured = PROJECTS.filter((p) => p.featured);
+export const FeaturedWork: React.FC = async () => {
+  const featured = await fetchPublicProjects(true);
 
   return (
     <section id="work" className="py-20 md:py-32 border-t border-border/60 bg-background-secondary/30">

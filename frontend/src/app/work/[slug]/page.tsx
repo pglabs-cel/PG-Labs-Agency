@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { CtaSection } from "@/components/sections/CtaSection";
 import { ProjectJsonLd } from "@/components/JsonLd";
 import { PROJECTS, ProjectItem } from "@/data/projects";
+import { fetchPublicProjectBySlug } from "@/lib/projects.api";
 import { SITE_CONFIG } from "@/lib/constants";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 
@@ -21,8 +22,8 @@ export function generateStaticParams() {
   }));
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const project = PROJECTS.find((p) => p.slug === params.slug);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const project = await fetchPublicProjectBySlug(params.slug);
   if (!project) {
     return {
       title: "Project Not Found",
@@ -51,15 +52,17 @@ export function generateMetadata({ params }: Props): Metadata {
   };
 }
 
-export default function CaseStudyPage({ params }: Props) {
-  const projectIndex = PROJECTS.findIndex((p) => p.slug === params.slug);
-  if (projectIndex === -1) {
+export default async function CaseStudyPage({ params }: Props) {
+  const project = await fetchPublicProjectBySlug(params.slug);
+  if (!project) {
     notFound();
   }
 
-  const project = PROJECTS[projectIndex];
+  const projectIndex = PROJECTS.findIndex((p) => p.slug === params.slug);
   const nextProject: ProjectItem =
-    PROJECTS[(projectIndex + 1) % PROJECTS.length];
+    projectIndex !== -1
+      ? PROJECTS[(projectIndex + 1) % PROJECTS.length]
+      : PROJECTS[0];
 
   return (
     <main className="flex flex-col min-h-screen">

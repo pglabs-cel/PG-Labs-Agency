@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import contactRoutes from "./routes/contact.routes";
 import adminRoutes from "./routes/admin.routes";
+import projectRoutes from "./routes/project.routes";
 import { errorHandler } from "./middleware/error.middleware";
 
 const app: Application = express();
@@ -96,6 +97,7 @@ app.get("/health", (_req: Request, res: Response) => {
 // API Routes
 app.use("/api", contactRoutes);
 app.use("/api", adminRoutes);
+app.use("/api", projectRoutes);
 
 // Centralized Error Middleware
 app.use(errorHandler);
