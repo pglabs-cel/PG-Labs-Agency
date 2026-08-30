@@ -5,6 +5,7 @@ export interface ProjectDTO {
   slug: string;
   title: string;
   category: string;
+  categories?: string[];
   shortDescription: string;
   description: string;
   technologies: string[];

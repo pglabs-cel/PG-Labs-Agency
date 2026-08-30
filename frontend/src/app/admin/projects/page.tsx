@@ -36,11 +36,16 @@ import {
   Loader2,
   Film,
   Globe,
+  Tag,
+  ChevronDown,
+  Check,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ProjectFormData {
   title: string;
   slug: string;
+  categories: string[];
   category: string;
   year: string;
   featured: boolean;
@@ -60,6 +65,7 @@ interface ProjectFormData {
 const DEFAULT_FORM: ProjectFormData = {
   title: "",
   slug: "",
+  categories: ["Web Application"],
   category: "Web Application",
   year: new Date().getFullYear().toString(),
   featured: true,
@@ -76,7 +82,7 @@ const DEFAULT_FORM: ProjectFormData = {
   liveUrl: "",
 };
 
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   "Web Application",
   "AI / Business Software",
   "SaaS / EdTech",
@@ -94,6 +100,14 @@ export default function AdminProjectsPage() {
   const [projects, setProjects] = useState<ProjectDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Categories Management State
+  const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("All");
+  const [isCustomCategoryMode, setIsCustomCategoryMode] = useState(false);
+  const [newCategoryInput, setNewCategoryInput] = useState("");
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -193,19 +207,180 @@ export default function AdminProjectsPage() {
     setProjects([]);
   };
 
+  // Load & sync categories with localStorage and existing projects
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("pg_admin_categories");
+      const parsed = saved ? JSON.parse(saved) : [];
+      const projectCats = projects
+        .flatMap((p) =>
+          p.categories && p.categories.length > 0
+            ? p.categories
+            : p.category
+            ? p.category.split(",").map((c) => c.trim())
+            : []
+        )
+        .filter(Boolean);
+      const combined = Array.from(
+        new Set([...DEFAULT_CATEGORIES, ...parsed, ...projectCats])
+      );
+      setCategories(combined);
+    } catch {
+      // Fallback
+    }
+  }, [projects]);
+
+  // Close category dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleToggleCategory = (cat: string) => {
+    const current = formData.categories || [];
+    let updated: string[];
+    if (current.includes(cat)) {
+      if (current.length === 1) {
+        setToast({
+          isOpen: true,
+          type: "error",
+          title: "At Least One Category",
+          message: "A project must belong to at least one category.",
+        });
+        return;
+      }
+      updated = current.filter((c) => c !== cat);
+    } else {
+      updated = [...current, cat];
+    }
+    setFormData((prev) => ({
+      ...prev,
+      categories: updated,
+      category: updated.join(", "),
+    }));
+  };
+
+  const handleAddCategory = (newCat: string, selectInForm = false) => {
+    const trimmed = newCat.trim();
+    if (!trimmed) return;
+    if (!categories.includes(trimmed)) {
+      const updated = [...categories, trimmed];
+      setCategories(updated);
+      try {
+        localStorage.setItem("pg_admin_categories", JSON.stringify(updated));
+      } catch {}
+      setToast({
+        isOpen: true,
+        type: "success",
+        title: "Category Added",
+        message: `"${trimmed}" is now available for projects.`,
+      });
+    }
+    if (selectInForm) {
+      setFormData((prev) => {
+        const curr = prev.categories || [];
+        const nextCats = curr.includes(trimmed) ? curr : [...curr, trimmed];
+        return {
+          ...prev,
+          categories: nextCats,
+          category: nextCats.join(", "),
+        };
+      });
+      setIsCustomCategoryMode(false);
+      setIsCategoryDropdownOpen(false);
+      setNewCategoryInput("");
+    }
+  };
+
+  const handleDeleteCategory = (catToDelete: string) => {
+    const inUseCount = projects.filter((p) => {
+      const cats =
+        p.categories && p.categories.length > 0
+          ? p.categories
+          : p.category
+          ? p.category.split(",").map((c) => c.trim())
+          : [];
+      return cats.includes(catToDelete);
+    }).length;
+
+    if (inUseCount > 0) {
+      const confirmDelete = window.confirm(
+        `"${catToDelete}" is currently assigned to ${inUseCount} project(s). Delete this category from options?`
+      );
+      if (!confirmDelete) return;
+    }
+    const updated = categories.filter((c) => c !== catToDelete);
+    setCategories(updated);
+    try {
+      localStorage.setItem("pg_admin_categories", JSON.stringify(updated));
+    } catch {}
+
+    setFormData((prev) => {
+      const curr = prev.categories || [];
+      if (curr.includes(catToDelete)) {
+        const nextCats = curr.filter((c) => c !== catToDelete);
+        const fallback = nextCats.length > 0 ? nextCats : [updated[0] || "Web Application"];
+        return {
+          ...prev,
+          categories: fallback,
+          category: fallback.join(", "),
+        };
+      }
+      return prev;
+    });
+
+    if (selectedCategoryFilter === catToDelete) {
+      setSelectedCategoryFilter("All");
+    }
+    setToast({
+      isOpen: true,
+      type: "success",
+      title: "Category Deleted",
+      message: `"${catToDelete}" has been deleted.`,
+    });
+  };
+
   const openCreateModal = () => {
     setEditingProject(null);
-    setFormData(DEFAULT_FORM);
+    const initialCategory = categories[0] || "Web Application";
+    setFormData({
+      ...DEFAULT_FORM,
+      categories: [initialCategory],
+      category: initialCategory,
+    });
     setFormError("");
+    setIsCustomCategoryMode(false);
+    setIsCategoryDropdownOpen(false);
+    setNewCategoryInput("");
     setIsModalOpen(true);
   };
 
   const openEditModal = (proj: ProjectDTO) => {
     setEditingProject(proj);
+    setIsCustomCategoryMode(false);
+    setIsCategoryDropdownOpen(false);
+    setNewCategoryInput("");
+
+    const projectCats =
+      Array.isArray(proj.categories) && proj.categories.length > 0
+        ? proj.categories
+        : proj.category
+        ? proj.category.split(",").map((c) => c.trim()).filter(Boolean)
+        : ["Web Application"];
+
     setFormData({
       title: proj.title,
       slug: proj.slug,
-      category: proj.category,
+      categories: projectCats,
+      category: projectCats.join(", "),
       year: proj.year,
       featured: proj.featured,
       shortDescription: proj.shortDescription,
@@ -356,10 +531,18 @@ export default function AdminProjectsPage() {
     setFormSaving(true);
     setFormError("");
 
+    const selectedCats =
+      formData.categories && formData.categories.length > 0
+        ? formData.categories
+        : formData.category
+        ? formData.category.split(",").map((c) => c.trim()).filter(Boolean)
+        : ["Web Application"];
+
     const payload = {
       title: formData.title.trim(),
       slug: formData.slug.trim() || undefined,
-      category: formData.category.trim(),
+      category: selectedCats.join(", "),
+      categories: selectedCats,
       year: formData.year.trim() || new Date().getFullYear().toString(),
       featured: formData.featured,
       shortDescription: formData.shortDescription.trim(),
@@ -440,13 +623,26 @@ export default function AdminProjectsPage() {
   };
 
   const filteredProjects = projects.filter((p) => {
-    if (!searchQuery.trim()) return true;
+    const pCats =
+      p.categories && p.categories.length > 0
+        ? p.categories
+        : p.category
+        ? p.category.split(",").map((c) => c.trim()).filter(Boolean)
+        : [];
+
+    const matchesCategory =
+      selectedCategoryFilter === "All" ||
+      pCats.includes(selectedCategoryFilter) ||
+      p.category.includes(selectedCategoryFilter);
+
+    if (!searchQuery.trim()) return matchesCategory;
     const q = searchQuery.toLowerCase();
-    return (
+    const matchesSearch =
       p.title.toLowerCase().includes(q) ||
       p.category.toLowerCase().includes(q) ||
-      (p.technologies || []).some((t) => t.toLowerCase().includes(q))
-    );
+      pCats.some((c) => c.toLowerCase().includes(q)) ||
+      (p.technologies || []).some((t) => t.toLowerCase().includes(q));
+    return matchesCategory && matchesSearch;
   });
 
   if (!token) {
@@ -548,32 +744,65 @@ export default function AdminProjectsPage() {
           <div className="p-4 rounded-xl bg-background-secondary border border-border col-span-2 sm:col-span-1">
             <div className="flex items-center justify-between text-zinc-400 mb-2">
               <span className="text-xs font-mono uppercase">Categories</span>
-              <Layers className="w-4 h-4 text-zinc-400" />
+              <Tag className="w-4 h-4 text-zinc-400" />
             </div>
             <p className="text-2xl sm:text-3xl font-bold text-foreground">
-              {new Set(projects.map((p) => p.category)).size}
+              {categories.length}
             </p>
           </div>
         </div>
 
-        {/* Top Controls: Search + Add Button */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div className="relative min-w-[280px]">
-            <Search className="w-4 h-4 text-foreground-muted absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search projects by title, category, or tech..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-background-secondary border border-border text-foreground placeholder:text-foreground-muted/60 focus:outline-none focus:border-accent"
-            />
+        {/* Top Controls: Search + Single Category Dropdown Filter + Add Project Button */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
+            {/* Search Input */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="w-4 h-4 text-foreground-muted absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search projects by title, category, or tech..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-background-secondary border border-border text-foreground placeholder:text-foreground-muted/60 focus:outline-none focus:border-accent min-h-[38px]"
+              />
+            </div>
+
+            {/* Single Clean Category Filter Dropdown */}
+            <div className="relative min-w-[190px]">
+              <select
+                value={selectedCategoryFilter}
+                onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+                className="w-full appearance-none pl-3 pr-8 py-2 text-xs rounded-lg bg-background-secondary border border-border text-foreground focus:outline-none focus:border-accent cursor-pointer min-h-[38px]"
+              >
+                <option value="All" className="bg-zinc-900">
+                  All Categories ({projects.length})
+                </option>
+                {categories.map((cat) => {
+                  const count = projects.filter((p) => {
+                    const pCats =
+                      p.categories && p.categories.length > 0
+                        ? p.categories
+                        : p.category
+                        ? p.category.split(",").map((c) => c.trim()).filter(Boolean)
+                        : [];
+                    return pCats.includes(cat);
+                  }).length;
+                  return (
+                    <option key={cat} value={cat} className="bg-zinc-900">
+                      {cat} ({count})
+                    </option>
+                  );
+                })}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-foreground-muted absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
 
           <Button
             onClick={openCreateModal}
             variant="primary"
             size="sm"
-            className="flex items-center gap-1.5 whitespace-nowrap shrink-0"
+            className="flex items-center gap-1.5 whitespace-nowrap shrink-0 min-h-[38px]"
           >
             <Plus className="w-4 h-4 shrink-0" />
             <span className="whitespace-nowrap font-medium">Add New Project</span>
@@ -651,10 +880,19 @@ export default function AdminProjectsPage() {
                       </td>
 
                       {/* Category */}
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        <Badge variant="default" size="sm">
-                          {p.category}
-                        </Badge>
+                      <td className="py-4 px-4">
+                        <div className="flex flex-wrap gap-1 max-w-[200px]">
+                          {(p.categories && p.categories.length > 0
+                            ? p.categories
+                            : p.category
+                            ? p.category.split(",").map((c) => c.trim()).filter(Boolean)
+                            : ["Web Application"]
+                          ).map((cat) => (
+                            <Badge key={cat} variant="default" size="sm">
+                              {cat}
+                            </Badge>
+                          ))}
+                        </div>
                       </td>
 
                       {/* Technologies */}
@@ -834,22 +1072,171 @@ export default function AdminProjectsPage() {
               </div>
 
               {/* Category, Year, Featured */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-                <div>
-                  <label className="block text-foreground-secondary font-mono uppercase mb-1">
-                    Category *
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent"
-                  >
-                    {CATEGORIES.map((c) => (
-                      <option key={c} value={c} className="bg-zinc-900">
-                        {c}
-                      </option>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+                <div className="relative" ref={categoryDropdownRef}>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-foreground-secondary font-mono uppercase text-xs">
+                      Categories *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCustomCategoryMode(!isCustomCategoryMode);
+                        setIsCategoryDropdownOpen(false);
+                      }}
+                      className="text-[10px] font-mono text-accent hover:underline flex items-center gap-0.5 cursor-pointer"
+                    >
+                      {isCustomCategoryMode ? "← Pick existing" : "+ New Category"}
+                    </button>
+                  </div>
+
+                  {/* Selected Category Tags */}
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {(formData.categories || []).map((cat) => (
+                      <span
+                        key={cat}
+                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-mono bg-accent/15 text-accent border border-accent/30"
+                      >
+                        <span>{cat}</span>
+                        <button
+                          type="button"
+                          title={`Remove ${cat}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleCategory(cat);
+                          }}
+                          className="hover:text-red-400 p-0.5 rounded transition-colors cursor-pointer"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
                     ))}
-                  </select>
+                    {(formData.categories || []).length === 0 && (
+                      <span className="text-zinc-500 text-xs italic">No category selected</span>
+                    )}
+                  </div>
+
+                  {isCustomCategoryMode ? (
+                    <div className="space-y-1.5">
+                      <div className="flex gap-1.5">
+                        <input
+                          type="text"
+                          value={newCategoryInput}
+                          onChange={(e) => setNewCategoryInput(e.target.value)}
+                          placeholder="e.g. Fintech, Cloud..."
+                          className="w-full px-3 py-2 text-xs rounded-lg bg-background-surface border border-accent/60 text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              if (newCategoryInput.trim()) {
+                                handleAddCategory(newCategoryInput, true);
+                              }
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleAddCategory(newCategoryInput, true)}
+                          disabled={!newCategoryInput.trim()}
+                          className="px-2.5 py-1.5 text-xs rounded-lg bg-accent text-white font-medium disabled:opacity-40 hover:bg-accent-hover transition-colors shrink-0 cursor-pointer"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      {/* Multi-Category Dropdown Trigger */}
+                      <button
+                        type="button"
+                        onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground hover:border-border/80 focus:outline-none focus:border-accent text-xs cursor-pointer transition-colors text-left"
+                      >
+                        <span className="font-medium text-foreground truncate">
+                          {(formData.categories || []).length > 0
+                            ? `Choose / toggle categories (${formData.categories.length} selected)`
+                            : "Select categories..."}
+                        </span>
+                        <ChevronDown
+                          className={cn(
+                            "w-3.5 h-3.5 text-foreground-muted transition-transform duration-200 shrink-0 ml-2",
+                            isCategoryDropdownOpen && "rotate-180 text-accent"
+                          )}
+                        />
+                      </button>
+
+                      {/* Dropdown Menu with Checkboxes and Delete Button for each Category */}
+                      {isCategoryDropdownOpen && (
+                        <div className="absolute top-full left-0 mt-1 w-full min-w-[280px] bg-background-secondary border border-border rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                          <div className="p-2 border-b border-border/60 bg-background-surface/30">
+                            <p className="text-[11px] font-mono text-foreground-muted">
+                              Click to select / unselect categories:
+                            </p>
+                          </div>
+                          <div className="max-h-56 overflow-y-auto p-1.5 space-y-0.5">
+                            {categories.map((cat) => {
+                              const isSelected = (formData.categories || []).includes(cat);
+                              return (
+                                <div
+                                  key={cat}
+                                  className={cn(
+                                    "flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors group cursor-pointer",
+                                    isSelected
+                                      ? "bg-accent/15 text-accent font-semibold"
+                                      : "text-foreground hover:bg-background-surface"
+                                  )}
+                                  onClick={() => handleToggleCategory(cat)}
+                                >
+                                  <div className="flex items-center gap-2 truncate mr-2">
+                                    <div
+                                      className={cn(
+                                        "w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 transition-colors",
+                                        isSelected
+                                          ? "bg-accent border-accent text-white"
+                                          : "border-border bg-background-surface text-transparent"
+                                      )}
+                                    >
+                                      <Check className="w-2.5 h-2.5 stroke-[3]" />
+                                    </div>
+                                    <span className="truncate">{cat}</span>
+                                  </div>
+
+                                  {/* Delete Button right next to each category */}
+                                  <button
+                                    type="button"
+                                    title={`Delete category "${cat}" from system`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteCategory(cat);
+                                    }}
+                                    className="p-1 rounded hover:bg-red-500/20 text-foreground-muted hover:text-red-400 transition-all shrink-0 cursor-pointer"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* + Add New Category button inside dropdown */}
+                          <div className="p-1.5 border-t border-border/70 bg-background-surface/40">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsCategoryDropdownOpen(false);
+                                setIsCustomCategoryMode(true);
+                              }}
+                              className="w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-accent font-medium hover:bg-accent/10 transition-colors cursor-pointer"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              <span>+ Add New Category...</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -1225,6 +1612,8 @@ export default function AdminProjectsPage() {
           </div>
         </div>
       )}
+
+
 
       <Toast
         isOpen={toast.isOpen}

@@ -1,7 +1,8 @@
 export interface ProjectItem {
   slug: string;
   title: string;
-  category: "AI / Business Software" | "SaaS / EdTech" | "Web Application";
+  category: string;
+  categories?: string[];
   shortDescription: string;
   description: string;
   technologies: string[];

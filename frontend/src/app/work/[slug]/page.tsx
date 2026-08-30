@@ -9,6 +9,7 @@ import { PROJECTS, ProjectItem } from "@/data/projects";
 import { fetchPublicProjectBySlug } from "@/lib/projects.api";
 import { SITE_CONFIG } from "@/lib/constants";
 import { ArrowLeft, ArrowRight, CheckCircle2, Globe, ExternalLink } from "lucide-react";
+import { LinkPreview } from "@/components/ui/link-preview";
 
 interface Props {
   params: {
@@ -64,6 +65,13 @@ export default async function CaseStudyPage({ params }: Props) {
       ? PROJECTS[(projectIndex + 1) % PROJECTS.length]
       : PROJECTS[0];
 
+  const allCategories =
+    project.categories && project.categories.length > 0
+      ? project.categories
+      : project.category
+      ? project.category.split(",").map((c) => c.trim()).filter(Boolean)
+      : ["Web Application"];
+
   return (
     <main className="flex flex-col min-h-screen">
       <ProjectJsonLd
@@ -73,8 +81,9 @@ export default async function CaseStudyPage({ params }: Props) {
         technologies={project.technologies}
       />
 
-      {/* Project Hero */}
-      <section className="pt-16 pb-20 md:pt-24 md:pb-28 bg-tech-grid border-b border-border/60">
+      {/* Hero Header */}
+      <section className="pt-28 pb-16 md:pt-36 md:pb-24 border-b border-border/40 relative overflow-hidden">
+        <div className="absolute top-1/4 -right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
         <Container>
           <div className="mb-8">
             <Link
@@ -87,11 +96,13 @@ export default async function CaseStudyPage({ params }: Props) {
           </div>
 
           <div className="max-w-4xl space-y-6">
-            <div className="flex flex-wrap items-center gap-3">
-              <Badge variant="accent" size="md">
-                {project.category}
-              </Badge>
-              <span className="font-mono text-xs text-foreground-muted">
+            <div className="flex flex-wrap items-center gap-2">
+              {allCategories.map((cat) => (
+                <Badge key={cat} variant="accent" size="md">
+                  {cat}
+                </Badge>
+              ))}
+              <span className="font-mono text-xs text-foreground-muted ml-1">
                 Shipped {project.year}
               </span>
             </div>
@@ -143,37 +154,99 @@ export default async function CaseStudyPage({ params }: Props) {
                 className="w-full h-full object-contain"
               />
             </div>
-          ) : project.thumbnail ? (
-            <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary overflow-hidden shadow-2xl relative">
-              <img
-                src={project.thumbnail}
-                alt={project.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-6 left-6 px-3 py-1 rounded-md bg-background/80 backdrop-blur-md border border-border text-xs font-mono text-accent">
-                {project.category} · {project.year}
-              </div>
-            </div>
           ) : (
-            <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary p-6 sm:p-12 flex flex-col justify-between relative overflow-hidden shadow-2xl">
-              <div className="absolute inset-0 bg-tech-grid opacity-30 pointer-events-none" />
-              <div className="relative z-10 flex items-center justify-between text-xs font-mono text-foreground-muted">
-                <span>{project.slug}.architecture</span>
-                <span className="text-emerald-400">STATUS: VERIFIED DEPLOYMENT</span>
-              </div>
-              <div className="relative z-10 my-auto text-center space-y-2">
-                <p className="text-2xl sm:text-4xl font-bold font-mono text-foreground">
-                  {project.title}
-                </p>
-                <p className="text-xs sm:text-sm font-mono uppercase tracking-widest text-foreground-muted">
-                  System Interface & Microservices Topology
-                </p>
-              </div>
-              <div className="relative z-10 flex items-center justify-end text-xs font-mono text-accent">
-                <span>PG Labs Build #{project.year}</span>
-              </div>
-            </div>
+            <LinkPreview
+              url={project.liveUrl || (project.thumbnail ? project.thumbnail : "")}
+              isStatic={!project.liveUrl && Boolean(project.thumbnail)}
+              imageSrc={project.thumbnail || ""}
+              width={280}
+              height={160}
+              asChild
+            >
+              {project.liveUrl ? (
+                <a
+                  href={project.liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full cursor-pointer group"
+                >
+                  {project.thumbnail ? (
+                    <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary overflow-hidden shadow-2xl relative group-hover:border-accent/50 transition-colors">
+                      <img
+                        src={project.thumbnail}
+                        alt={project.title}
+                        className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute bottom-6 left-6 px-3 py-1 rounded-md bg-background/80 backdrop-blur-md border border-border text-xs font-mono text-accent">
+                        {allCategories.join(" · ")} · {project.year}
+                      </div>
+                      <div className="absolute top-6 right-6 px-3 py-1.5 rounded-lg bg-emerald-500/20 backdrop-blur-md border border-emerald-500/40 text-xs font-mono text-emerald-400 font-semibold flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>LIVE PREVIEW ↗</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary p-6 sm:p-12 flex flex-col justify-between relative overflow-hidden shadow-2xl group-hover:border-accent/50 transition-colors">
+                      <div className="absolute inset-0 bg-tech-grid opacity-30 pointer-events-none" />
+                      <div className="relative z-10 flex items-center justify-between text-xs font-mono text-foreground-muted">
+                        <span>{project.slug}.architecture</span>
+                        <span className="text-emerald-400 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                          STATUS: VERIFIED DEPLOYMENT · PREVIEW LIVE SITE ↗
+                        </span>
+                      </div>
+                      <div className="relative z-10 my-auto text-center space-y-2">
+                        <p className="text-2xl sm:text-4xl font-bold font-mono text-foreground">
+                          {project.title}
+                        </p>
+                        <p className="text-xs sm:text-sm font-mono uppercase tracking-widest text-foreground-muted">
+                          System Interface & Microservices Topology
+                        </p>
+                      </div>
+                      <div className="relative z-10 flex items-center justify-end text-xs font-mono text-accent">
+                        <span>PG Labs Build #{project.year}</span>
+                      </div>
+                    </div>
+                  )}
+                </a>
+              ) : (
+                <div className="block w-full">
+                  {project.thumbnail ? (
+                    <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary overflow-hidden shadow-2xl relative">
+                      <img
+                        src={project.thumbnail}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute bottom-6 left-6 px-3 py-1 rounded-md bg-background/80 backdrop-blur-md border border-border text-xs font-mono text-accent">
+                        {allCategories.join(" · ")} · {project.year}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary p-6 sm:p-12 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+                      <div className="absolute inset-0 bg-tech-grid opacity-30 pointer-events-none" />
+                      <div className="relative z-10 flex items-center justify-between text-xs font-mono text-foreground-muted">
+                        <span>{project.slug}.architecture</span>
+                        <span className="text-emerald-400">STATUS: VERIFIED DEPLOYMENT</span>
+                      </div>
+                      <div className="relative z-10 my-auto text-center space-y-2">
+                        <p className="text-2xl sm:text-4xl font-bold font-mono text-foreground">
+                          {project.title}
+                        </p>
+                        <p className="text-xs sm:text-sm font-mono uppercase tracking-widest text-foreground-muted">
+                          System Interface & Microservices Topology
+                        </p>
+                      </div>
+                      <div className="relative z-10 flex items-center justify-end text-xs font-mono text-accent">
+                        <span>PG Labs Build #{project.year}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </LinkPreview>
           )}
         </Container>
       </section>

@@ -56,6 +56,7 @@ export class ProjectController {
         title,
         slug,
         category,
+        categories,
         shortDescription,
         description,
         technologies,
@@ -71,10 +72,20 @@ export class ProjectController {
         videoUrl,
       } = req.body;
 
-      if (!title || !category || !shortDescription || !description || !challenge || !solution) {
+      const categoryArr: string[] = Array.isArray(categories) && categories.length > 0
+        ? categories
+        : typeof category === "string" && category.trim()
+        ? category.split(",").map((c: string) => c.trim()).filter(Boolean)
+        : [];
+
+      const primaryCategory = categoryArr.length > 0
+        ? categoryArr.join(", ")
+        : (typeof category === "string" && category.trim() ? category.trim() : "Web Application");
+
+      if (!title || (!primaryCategory && categoryArr.length === 0) || !shortDescription || !description || !challenge || !solution) {
         res.status(400).json({
           success: false,
-          error: "Missing required fields (title, category, shortDescription, description, challenge, solution).",
+          error: "Missing required fields (title, category/categories, shortDescription, description, challenge, solution).",
         });
         return;
       }
@@ -82,7 +93,8 @@ export class ProjectController {
       const project = await ProjectService.createProject({
         title,
         slug,
-        category,
+        category: primaryCategory,
+        categories: categoryArr,
         shortDescription,
         description,
         technologies: Array.isArray(technologies) ? technologies : [],
@@ -115,7 +127,22 @@ export class ProjectController {
   ): Promise<void> {
     try {
       const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const updated = await ProjectService.updateProject(id, req.body);
+      const updatePayload = { ...req.body };
+
+      if (Array.isArray(updatePayload.categories) && updatePayload.categories.length > 0) {
+        if (!updatePayload.category) {
+          updatePayload.category = updatePayload.categories.join(", ");
+        }
+      } else if (typeof updatePayload.category === "string" && updatePayload.category.trim()) {
+        if (!updatePayload.categories || updatePayload.categories.length === 0) {
+          updatePayload.categories = updatePayload.category
+            .split(",")
+            .map((c: string) => c.trim())
+            .filter(Boolean);
+        }
+      }
+
+      const updated = await ProjectService.updateProject(id, updatePayload);
 
       if (!updated) {
         res.status(404).json({

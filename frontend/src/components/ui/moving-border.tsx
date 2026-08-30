@@ -36,17 +36,25 @@ export function Button({
       )}
       style={{
         borderRadius: borderRadius,
+        transform: "translateZ(0)",
+        WebkitMaskImage: "-webkit-radial-gradient(white, black)",
+        maskImage: "radial-gradient(white, black)",
       }}
       {...otherProps}
     >
       <div
-        className="absolute inset-0"
-        style={{ borderRadius: `calc(${borderRadius} * 0.96)` }}
+        className="absolute inset-0 overflow-hidden"
+        style={{
+          borderRadius,
+          transform: "translateZ(0)",
+          WebkitMaskImage: "-webkit-radial-gradient(white, black)",
+          maskImage: "radial-gradient(white, black)",
+        }}
       >
-        <MovingBorder duration={duration} rx="30%" ry="30%">
+        <MovingBorder duration={duration} rx="16" ry="16">
           <div
             className={cn(
-              "h-20 w-20 bg-[radial-gradient(#8B5CF6_40%,transparent_60%)] opacity-[0.9]",
+              "h-20 w-20 bg-[radial-gradient(#8B5CF6_40%,#A78BFA_60%,transparent_75%)] opacity-[0.9]",
               borderClassName,
             )}
           />
@@ -55,11 +63,11 @@ export function Button({
 
       <div
         className={cn(
-          "relative flex h-full w-full items-center justify-center border border-border bg-background-surface/90 text-sm font-medium text-foreground antialiased backdrop-blur-xl px-6 py-2.5 transition-colors group-hover:bg-background-surface group-hover:text-white group-hover:border-accent/40",
+          "relative flex h-full w-full items-center justify-center border border-border bg-[#111113] text-sm font-medium text-foreground antialiased backdrop-blur-xl px-6 py-2.5 transition-colors group-hover:bg-[#18181B] group-hover:text-white group-hover:border-accent/40",
           className,
         )}
         style={{
-          borderRadius: `calc(${borderRadius} * 0.96)`,
+          borderRadius: `calc(${borderRadius} - 1px)`,
         }}
       >
         {children}
@@ -71,8 +79,8 @@ export function Button({
 export const MovingBorder = ({
   children,
   duration = 3000,
-  rx,
-  ry,
+  rx = "12",
+  ry = "12",
   ...otherProps
 }: {
   children: React.ReactNode;

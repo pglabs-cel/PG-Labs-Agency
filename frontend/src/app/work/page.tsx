@@ -9,12 +9,9 @@ import { fetchPublicProjects } from "@/lib/projects.api";
 import { FadeUp } from "@/components/animations/FadeUp";
 import { cn } from "@/lib/utils";
 
-const FILTERS = ["All", "Web", "SaaS", "AI", "Business Software"] as const;
-type FilterType = (typeof FILTERS)[number];
-
 export default function WorkPage() {
   const [projectsList, setProjectsList] = useState<ProjectItem[]>(PROJECTS);
-  const [activeFilter, setActiveFilter] = useState<FilterType>("All");
+  const [activeFilter, setActiveFilter] = useState<string>("All");
 
   useEffect(() => {
     fetchPublicProjects().then((data) => {
@@ -24,13 +21,28 @@ export default function WorkPage() {
     });
   }, []);
 
+  const availableCategories = React.useMemo(() => {
+    const all = projectsList
+      .flatMap((p) =>
+        p.categories && p.categories.length > 0
+          ? p.categories
+          : p.category
+          ? p.category.split(",").map((c) => c.trim())
+          : []
+      )
+      .filter(Boolean);
+    return ["All", ...Array.from(new Set(all))];
+  }, [projectsList]);
+
   const filteredProjects = projectsList.filter((project) => {
     if (activeFilter === "All") return true;
-    if (activeFilter === "Web") return project.category.includes("Web");
-    if (activeFilter === "SaaS") return project.category.includes("SaaS");
-    if (activeFilter === "AI") return project.category.includes("AI");
-    if (activeFilter === "Business Software") return project.category.includes("Business Software");
-    return true;
+    const pCats =
+      project.categories && project.categories.length > 0
+        ? project.categories
+        : project.category
+        ? project.category.split(",").map((c) => c.trim())
+        : [];
+    return pCats.includes(activeFilter) || project.category.includes(activeFilter);
   });
 
   return (
@@ -57,7 +69,7 @@ export default function WorkPage() {
         <Container>
           {/* Accessible Filter Controls */}
           <div className="flex flex-wrap items-center justify-center gap-2.5 mb-14" role="tablist" aria-label="Project Categories">
-            {FILTERS.map((filter) => {
+            {availableCategories.map((filter) => {
               const isSelected = activeFilter === filter;
               return (
                 <button
@@ -86,6 +98,7 @@ export default function WorkPage() {
                   slug={project.slug}
                   title={project.title}
                   category={project.category}
+                  categories={project.categories}
                   description={project.shortDescription}
                   technologies={project.technologies}
                   year={project.year}

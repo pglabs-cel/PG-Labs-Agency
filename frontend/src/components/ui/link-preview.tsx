@@ -37,20 +37,24 @@ export const LinkPreview = ({
   imageSrc = "",
   asChild = false,
 }: LinkPreviewProps) => {
-  let src: string;
+  let src: string = "";
   if (!isStatic) {
-    const params = encode({
-      url,
-      screenshot: true,
-      meta: false,
-      embed: "screenshot.url",
-      colorScheme: "dark",
-      "viewport.isMobile": true,
-      "viewport.deviceScaleFactor": 1,
-      "viewport.width": width * 3,
-      "viewport.height": height * 3,
-    });
-    src = `https://api.microlink.io/?${params}`;
+    if (url && url.startsWith("http")) {
+      const params = encode({
+        url,
+        screenshot: true,
+        meta: false,
+        embed: "screenshot.url",
+        colorScheme: "dark",
+        "viewport.isMobile": true,
+        "viewport.deviceScaleFactor": 1,
+        "viewport.width": width * 3,
+        "viewport.height": height * 3,
+      });
+      src = `https://api.microlink.io/?${params}`;
+    } else if (imageSrc) {
+      src = imageSrc;
+    }
   } else {
     src = imageSrc;
   }
@@ -78,6 +82,7 @@ export const LinkPreview = ({
   });
 
   const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
+    if (!src) return;
     mouseX.set(event.clientX);
     mouseY.set(event.clientY);
     setPlacementBelow(event.clientY < 190);

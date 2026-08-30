@@ -4,12 +4,12 @@ import React from "react";
 import Link from "next/link";
 import { ArrowUpRight, Globe } from "lucide-react";
 import { Badge } from "./Badge";
-import { LinkPreview } from "./link-preview";
 
 export interface ProjectCardProps {
   slug: string;
   title: string;
   category: string;
+  categories?: string[];
   description: string;
   technologies: string[];
   year?: string;
@@ -57,13 +57,21 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   slug,
   title,
   category,
+  categories,
   description,
   technologies,
   year = "2025",
   thumbnail,
   liveUrl,
 }) => {
-  const theme = CATEGORY_THEME[category] ?? DEFAULT_THEME;
+  const allCategories =
+    categories && categories.length > 0
+      ? categories
+      : category
+      ? category.split(",").map((c) => c.trim()).filter(Boolean)
+      : ["Web Application"];
+  const primaryCategory = allCategories[0] || "Web Application";
+  const theme = CATEGORY_THEME[primaryCategory] ?? DEFAULT_THEME;
 
   return (
     <div
@@ -73,17 +81,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         hover:border-accent/40 hover:bg-background-surface/80
         hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] h-full"
     >
-      {/* ── Visual Media / Image Area Only with LinkPreview ── */}
-      <LinkPreview
-        url={liveUrl || `/work/${slug}`}
-        isStatic={Boolean(thumbnail)}
-        imageSrc={thumbnail || ""}
-        asChild
+      {/* ── Visual Media / Image Area ── */}
+      <Link
+        href={`/work/${slug}`}
+        className="relative aspect-[16/9] w-full overflow-hidden shrink-0 block cursor-pointer"
       >
-        <Link
-          href={`/work/${slug}`}
-          className="relative aspect-[16/9] w-full overflow-hidden shrink-0 block cursor-pointer"
-        >
           {thumbnail ? (
             <div className="relative w-full h-full overflow-hidden bg-background-surface">
               <img
@@ -92,11 +94,18 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background-secondary via-transparent to-transparent opacity-50 pointer-events-none" />
-              <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-background/80 backdrop-blur-md border border-border text-[10px] font-mono font-medium text-accent">
-                {category}
+              <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[70%] z-10">
+                {allCategories.map((cat) => (
+                  <span
+                    key={cat}
+                    className="px-2 py-0.5 rounded-md bg-background/85 backdrop-blur-md border border-border text-[10px] font-mono font-medium text-accent"
+                  >
+                    {cat}
+                  </span>
+                ))}
               </div>
               {liveUrl && (
-                <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-emerald-500/20 backdrop-blur-md border border-emerald-500/40 text-[10px] font-mono font-semibold text-emerald-400 flex items-center gap-1">
+                <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-emerald-500/20 backdrop-blur-md border border-emerald-500/40 text-[10px] font-mono font-semibold text-emerald-400 flex items-center gap-1 z-10">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>LIVE</span>
                 </div>
@@ -125,9 +134,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
               {/* Top bar */}
               <div className="relative z-10 flex items-center justify-between p-4 sm:p-5">
-                <Badge variant="mono" size="sm">
-                  {category}
-                </Badge>
+                <div className="flex flex-wrap gap-1 max-w-[70%]">
+                  {allCategories.map((cat) => (
+                    <Badge key={cat} variant="mono" size="sm">
+                      {cat}
+                    </Badge>
+                  ))}
+                </div>
                 <div className="flex items-center gap-2">
                   {liveUrl && (
                     <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-[10px] font-mono text-emerald-400 font-medium">
@@ -195,7 +208,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             </div>
           )}
         </Link>
-      </LinkPreview>
 
       {/* ── Card Info Area (Equal Height Layout) ── */}
       <div className="p-6 sm:p-8 flex flex-col flex-1 justify-between">

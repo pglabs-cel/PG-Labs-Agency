@@ -35,6 +35,7 @@ export const FeaturedWork: React.FC = async () => {
                 slug={project.slug}
                 title={project.title}
                 category={project.category}
+                categories={project.categories}
                 description={project.shortDescription}
                 technologies={project.technologies}
                 year={project.year}

@@ -4,6 +4,7 @@ export interface IProject extends Document {
   slug: string;
   title: string;
   category: string;
+  categories?: string[];
   shortDescription: string;
   description: string;
   technologies: string[];
@@ -43,6 +44,10 @@ const ProjectSchema: Schema = new Schema<IProject>(
       required: [true, "Category is required"],
       trim: true,
       default: "Web Application",
+    },
+    categories: {
+      type: [String],
+      default: [],
     },
     shortDescription: {
       type: String,
