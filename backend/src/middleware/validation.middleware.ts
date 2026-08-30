@@ -38,12 +38,6 @@ export const validateContactInquiry = [
     ])
     .withMessage("Invalid project type selected"),
 
-  body("budget")
-    .optional()
-    .trim()
-    .isLength({ max: 50 })
-    .withMessage("Budget cannot exceed 50 characters"),
-
   body("message")
     .trim()
     .notEmpty()

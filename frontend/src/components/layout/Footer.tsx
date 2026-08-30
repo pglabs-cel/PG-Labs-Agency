@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { SITE_CONFIG, NAV_LINKS } from "@/lib/constants";
@@ -13,10 +13,16 @@ export const Footer: React.FC = () => {
           <div className="md:col-span-6 space-y-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-foreground font-bold tracking-tight text-2xl"
+              className="group inline-flex items-center focus:outline-none focus:ring-2 focus:ring-accent/50 rounded-xl"
+              aria-label="PG Labs Home"
             >
-              <span className="w-3 h-3 rounded-full bg-accent" />
-              <span className="font-mono">{SITE_CONFIG.name}</span>
+              <div className="relative h-12 sm:h-14 w-auto rounded-xl overflow-hidden bg-black border border-border/40 group-hover:border-zinc-500 transition-all duration-200 p-1.5 flex items-center shadow-sm">
+                <img
+                  src="/full-logo.jpg"
+                  alt="PG Labs"
+                  className="h-full w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
+                />
+              </div>
             </Link>
             <p className="text-foreground-secondary text-base max-w-sm leading-relaxed">
               Digital products, AI solutions and custom software engineered for forward-thinking businesses.
@@ -101,10 +107,10 @@ export const Footer: React.FC = () => {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-foreground-muted">
           <p>© {new Date().getFullYear()} PG Labs. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">
+            <Link href="/privacy" prefetch={false} className="hover:text-foreground transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">
+            <Link href="/terms" prefetch={false} className="hover:text-foreground transition-colors">
               Terms
             </Link>
           </div>

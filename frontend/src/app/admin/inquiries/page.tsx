@@ -410,7 +410,6 @@ export default function AdminInquiriesPage() {
                     <th className="py-3.5 px-4 font-medium">Date</th>
                     <th className="py-3.5 px-4 font-medium">Client / Company</th>
                     <th className="py-3.5 px-4 font-medium">Project</th>
-                    <th className="py-3.5 px-4 font-medium">Budget</th>
                     <th className="py-3.5 px-4 font-medium">Status</th>
                     <th className="py-3.5 px-4 font-medium text-right">Actions</th>
                   </tr>
@@ -451,11 +450,6 @@ export default function AdminInquiriesPage() {
                         <Badge variant="default" size="sm">
                           {item.projectType}
                         </Badge>
-                      </td>
-
-                      {/* Budget */}
-                      <td className="py-4 px-4 whitespace-nowrap text-foreground-secondary font-mono">
-                        {item.budget || "Not specified"}
                       </td>
 
                       {/* Status Selector */}
@@ -589,14 +583,16 @@ export default function AdminInquiriesPage() {
                   {selectedInquiry.projectType}
                 </p>
               </div>
-              <div>
-                <span className="text-[11px] font-mono uppercase text-foreground-muted">
-                  Budget
-                </span>
-                <p className="text-xs font-medium text-foreground mt-0.5">
-                  {selectedInquiry.budget || "Not provided"}
-                </p>
-              </div>
+              {selectedInquiry.budget ? (
+                <div>
+                  <span className="text-[11px] font-mono uppercase text-foreground-muted">
+                    Budget
+                  </span>
+                  <p className="text-xs font-medium text-foreground mt-0.5">
+                    {selectedInquiry.budget}
+                  </p>
+                </div>
+              ) : null}
             </div>
 
             {/* Message Body */}

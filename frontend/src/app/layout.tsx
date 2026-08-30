@@ -47,6 +47,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: "/apple-icon.png",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -55,6 +62,14 @@ export const metadata: Metadata = {
     description:
       "PG Labs builds modern web applications, AI-powered solutions and custom software for businesses and startups.",
     siteName: SITE_CONFIG.name,
+    images: [
+      {
+        url: SITE_CONFIG.fullLogoUrl,
+        width: 1200,
+        height: 630,
+        alt: "PG Labs — Digital Product Studio",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -62,6 +77,7 @@ export const metadata: Metadata = {
     description:
       "PG Labs builds modern web applications, AI-powered solutions and custom software for businesses and startups.",
     creator: "@pglabs",
+    images: [SITE_CONFIG.fullLogoUrl],
   },
   robots: {
     index: true,

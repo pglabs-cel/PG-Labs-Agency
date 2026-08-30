@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { TechnologySection } from "@/components/sections/TechnologySection";
@@ -30,7 +30,7 @@ const PRINCIPLES = [
   {
     icon: ShieldCheck,
     title: "No Technical Debt",
-    description: "We write clean, strictly-typed TypeScript and modular architectures that your internal team can easily adopt.",
+    description: "We write clean, production-ready code and modular architectures that your internal team can easily scale and adopt.",
   },
   {
     icon: Zap,

@@ -29,7 +29,7 @@ export const CtaSection: React.FC = () => {
               Start a Project
             </Button>
             <Button
-              href="mailto:contact@pglabs.dev"
+              href="mailto:pglabs.agency@gmail.com"
               variant="outline"
               size="lg"
               fullWidth

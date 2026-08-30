@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { SITE_CONFIG } from "@/lib/constants";
 
 interface OrganizationJsonLdProps {
@@ -14,6 +14,8 @@ export const OrganizationJsonLd: React.FC<OrganizationJsonLdProps> = ({
     name: SITE_CONFIG.name,
     legalName: SITE_CONFIG.legalName,
     url: url,
+    logo: SITE_CONFIG.logoMarkUrl,
+    image: SITE_CONFIG.fullLogoUrl,
     description: SITE_CONFIG.description,
     sameAs: [
       SITE_CONFIG.links.twitter,

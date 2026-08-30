@@ -5,7 +5,6 @@ export interface EmailInquiryData {
   email: string;
   company?: string;
   projectType: string;
-  budget?: string;
   message: string;
   createdAt?: Date | string;
 }
@@ -33,7 +32,6 @@ export class EmailService {
     const clientEmail = escapeHtml(data.email);
     const clientCompany = escapeHtml(data.company || "Not specified");
     const projectType = escapeHtml(data.projectType);
-    const budget = escapeHtml(data.budget || "Not specified");
     const message = escapeHtml(data.message).replace(/\n/g, "<br />");
     const mailtoLink = `mailto:${encodeURIComponent(data.email)}?subject=${encodeURIComponent(
       `Re: Your PG Labs Inquiry — ${data.projectType}`
@@ -90,11 +88,14 @@ export class EmailService {
             <td class="bg-header" style="padding: 24px 28px; border-bottom: 1px solid #2d2d33; background-color: #18181c; background: #18181c;">
               <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td>
-                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px;">
+                  <td width="48" valign="middle" style="padding-right: 14px;">
+                    <img src="https://res.cloudinary.com/y20gw7iu/image/upload/v1788118208/Logo_Only.jpg" alt="PG Labs" width="38" height="38" style="display: block; border-radius: 8px;" />
+                  </td>
+                  <td valign="middle">
+                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 3px;">
                       <font color="#c084fc">PG LABS &bull; INQUIRY ALERT</font>
                     </div>
-                    <div class="dark-text-white" style="font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: #ffffff;">
+                    <div class="dark-text-white" style="font-size: 19px; font-weight: 700; letter-spacing: -0.02em; color: #ffffff;">
                       <font color="#ffffff">New Lead Received</font>
                     </div>
                   </td>
@@ -149,14 +150,6 @@ export class EmailService {
                   </td>
                   <td class="dark-text-white" style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 14px; font-weight: 700; color: #ffffff;">
                     <font color="#ffffff">${projectType}</font>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
-                    <font color="#94a3b8">Budget Estimate</font>
-                  </td>
-                  <td style="padding: 14px 16px; border-bottom: 1px solid #2d2d33; font-size: 14px; font-weight: 700; color: #4ade80;">
-                    <font color="#4ade80">${budget}</font>
                   </td>
                 </tr>
                 <tr>
@@ -275,11 +268,14 @@ export class EmailService {
             <td class="bg-header" style="padding: 28px 32px; border-bottom: 1px solid #2d2d33; background-color: #18181c; background: #18181c;">
               <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td>
+                  <td width="50" valign="middle" style="padding-right: 14px;">
+                    <img src="https://res.cloudinary.com/y20gw7iu/image/upload/v1788118208/Logo_Only.jpg" alt="PG Labs" width="40" height="40" style="display: block; border-radius: 8px;" />
+                  </td>
+                  <td valign="middle">
                     <div class="dark-text-white" style="font-size: 18px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #ffffff;">
                       <font color="#ffffff">PG LABS</font>
                     </div>
-                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 3px;">
+                    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px;">
                       <font color="#c084fc">Digital Product Studio</font>
                     </div>
                   </td>
@@ -369,7 +365,7 @@ export class EmailService {
       to: config.adminEmail,
       replyTo: data.email,
       subject: `[New Inquiry] ${data.name} — ${data.projectType}`,
-      text: `New Inquiry from ${data.name} (${data.email})\nCompany: ${data.company || "N/A"}\nProject: ${data.projectType}\nBudget: ${data.budget || "N/A"}\n\nMessage:\n${data.message}`,
+      text: `New Inquiry from ${data.name} (${data.email})\nCompany: ${data.company || "N/A"}\nProject: ${data.projectType}\n\nMessage:\n${data.message}`,
       html: this.getAdminNotificationHtml(data),
     };
 

@@ -12,14 +12,13 @@ export class ContactController {
     try {
       await ensureDBConnected();
 
-      const { name, email, company, projectType, budget, message } = req.body;
+      const { name, email, company, projectType, message } = req.body;
 
       const inquiry = await ContactService.createInquiry({
         name,
         email,
         company,
         projectType,
-        budget,
         message,
       });
 
@@ -31,7 +30,6 @@ export class ContactController {
             email: inquiry.email,
             company: inquiry.company,
             projectType: inquiry.projectType,
-            budget: inquiry.budget,
             message: inquiry.message,
             createdAt: inquiry.createdAt,
           }),

@@ -9,7 +9,6 @@ interface ContactBody {
   email?: string;
   company?: string;
   projectType?: string;
-  budget?: string;
   message?: string;
 }
 
@@ -27,7 +26,7 @@ export async function POST(req: NextRequest) {
   try {
     const body: ContactBody = await req.json().catch(() => ({}));
 
-    const { name, email, company, projectType, budget, message } = body;
+    const { name, email, company, projectType, message } = body;
 
     // Server-side validation
     if (!name || typeof name !== "string" || !name.trim()) {
@@ -61,7 +60,6 @@ export async function POST(req: NextRequest) {
       email: email.trim().toLowerCase(),
       company: company?.trim() || "",
       projectType: resolvedProjectType,
-      budget: budget?.trim() || "",
       message: message.trim(),
     };
 

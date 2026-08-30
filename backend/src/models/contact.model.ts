@@ -1,11 +1,10 @@
-﻿import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IContact extends Document {
   name: string;
   email: string;
   company?: string;
   projectType: string;
-  budget?: string;
   message: string;
   createdAt: Date;
   status: "new" | "contacted" | "in-progress" | "completed" | "archived";
@@ -45,12 +44,6 @@ const ContactSchema: Schema = new Schema<IContact>(
         "Other",
       ],
       default: "Web Application",
-    },
-    budget: {
-      type: String,
-      trim: true,
-      maxlength: [50, "Budget cannot exceed 50 characters"],
-      default: "",
     },
     message: {
       type: String,

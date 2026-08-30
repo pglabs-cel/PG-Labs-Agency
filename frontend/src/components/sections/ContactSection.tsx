@@ -7,47 +7,25 @@ import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/animations/FadeUp";
 import { Toast } from "@/components/ui/Toast";
 import { submitContactInquiry, ContactPayload } from "@/lib/api";
-import { CheckCircle, AlertCircle, Loader2, ChevronDown } from "lucide-react";
+import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const PROJECT_TYPE_OPTIONS = [
   { value: "Web Application", label: "Web Application" },
   { value: "SaaS", label: "SaaS Platform" },
-  { value: "AI/ML", label: "AI & Machine Learning Solution" },
-  { value: "Custom Software", label: "Custom Software / Internal Tools" },
-  { value: "Website", label: "Website / High-Converting Landing Page" },
-  { value: "Automation", label: "Automation & API Integrations" },
-  { value: "Other", label: "Other / Custom Scope" },
-];
-
-const BUDGET_OPTIONS_INR = [
-  { value: "", label: "Select an estimated budget (optional)" },
-  { value: "Under ₹50,000", label: "Under ₹50,000 (₹50k)" },
-  { value: "₹50,000 – ₹1,50,000", label: "₹50,000 – ₹1,50,000 (₹50k – ₹1.5L)" },
-  { value: "₹1,50,000 – ₹3,00,000", label: "₹1,50,000 – ₹3,00,000 (₹1.5L – ₹3L)" },
-  { value: "₹3,00,000 – ₹5,00,000", label: "₹3,00,000 – ₹5,00,000 (₹3L – ₹5L)" },
-  { value: "₹5,00,000+", label: "₹5,00,000+ (₹5L+)" },
-  { value: "Flexible (INR)", label: "Flexible / Open to discussion" },
-];
-
-const BUDGET_OPTIONS_USD = [
-  { value: "", label: "Select an estimated budget (optional)" },
-  { value: "Under $5,000", label: "Under $5,000" },
-  { value: "$5,000 – $15,000", label: "$5,000 – $15,000" },
-  { value: "$15,000 – $30,000", label: "$15,000 – $30,000" },
-  { value: "$30,000 – $50,000", label: "$30,000 – $50,000" },
-  { value: "$50,000+", label: "$50,000+" },
-  { value: "Flexible (USD)", label: "Flexible / Open to discussion" },
+  { value: "AI/ML", label: "AI & ML" },
+  { value: "Custom Software", label: "Custom Software" },
+  { value: "Website", label: "Website" },
+  { value: "Automation", label: "Automation" },
+  { value: "Other", label: "Other" },
 ];
 
 export const ContactSection: React.FC = () => {
-  const [currency, setCurrency] = useState<"INR" | "USD">("INR");
   const [formData, setFormData] = useState<ContactPayload>({
     name: "",
     email: "",
     company: "",
     projectType: "Web Application",
-    budget: "",
     message: "",
   });
 
@@ -64,8 +42,6 @@ export const ContactSection: React.FC = () => {
     title: "",
     message: "",
   });
-
-  const currentBudgetOptions = currency === "INR" ? BUDGET_OPTIONS_INR : BUDGET_OPTIONS_USD;
 
   const validateClient = (): string | null => {
     if (!formData.name.trim()) return "Please enter your name.";
@@ -112,7 +88,6 @@ export const ContactSection: React.FC = () => {
         email: "",
         company: "",
         projectType: "Web Application",
-        budget: "",
         message: "",
       });
     } catch (err: unknown) {
@@ -211,130 +186,51 @@ export const ContactSection: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Company & Project Type */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="company"
-                      className="block text-xs font-mono uppercase tracking-wider text-foreground-secondary"
-                    >
-                      Company <span className="text-foreground-muted text-[11px] normal-case">(optional)</span>
-                    </label>
-                    <input
-                      id="company"
-                      type="text"
-                      value={formData.company}
-                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      placeholder="Acme Labs"
-                      className="w-full rounded-xl bg-background-surface/80 border border-border/80 px-4 py-3 text-foreground placeholder:text-foreground-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent min-h-[46px] text-sm transition-colors hover:border-border"
-                    />
-                  </div>
-
-                  {/* Project Type Dropdown */}
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="projectType"
-                      className="block text-xs font-mono uppercase tracking-wider text-foreground-secondary"
-                    >
-                      Project Type <span className="text-accent">*</span>
-                    </label>
-                    <div className="relative">
-                      <select
-                        id="projectType"
-                        value={formData.projectType}
-                        onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
-                        className="w-full appearance-none rounded-xl bg-background-surface/80 border border-border/80 px-4 py-3 pr-10 text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent min-h-[46px] text-sm transition-colors hover:border-border cursor-pointer"
-                      >
-                        {PROJECT_TYPE_OPTIONS.map((opt) => (
-                          <option
-                            key={opt.value}
-                            value={opt.value}
-                            className="bg-background-secondary text-foreground py-1"
-                          >
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown
-                        className="w-4 h-4 text-foreground-muted absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  </div>
+                {/* Company */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="company"
+                    className="block text-xs font-mono uppercase tracking-wider text-foreground-secondary"
+                  >
+                    Company <span className="text-foreground-muted text-[11px] normal-case">(optional)</span>
+                  </label>
+                  <input
+                    id="company"
+                    type="text"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    placeholder="Acme Labs / Studio"
+                    className="w-full rounded-xl bg-background-surface/80 border border-border/80 px-4 py-3 text-foreground placeholder:text-foreground-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent min-h-[46px] text-sm transition-colors hover:border-border"
+                  />
                 </div>
 
-                {/* Estimated Budget Dropdown with Dollar ($) & Rupee (₹) Toggle Buttons */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label
-                      htmlFor="budget"
-                      className="block text-xs font-mono uppercase tracking-wider text-foreground-secondary"
-                    >
-                      Estimated Budget <span className="text-foreground-muted text-[11px] normal-case">(optional)</span>
-                    </label>
-
-                    {/* Currency Selector Buttons: Rupee default + Dollar */}
-                    <div className="inline-flex items-center p-0.5 rounded-lg bg-background-surface border border-border">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCurrency("INR");
-                          setFormData((prev) => ({ ...prev, budget: "" }));
-                        }}
-                        className={cn(
-                          "px-2.5 py-1 text-xs font-mono rounded-md transition-all flex items-center gap-1 cursor-pointer",
-                          currency === "INR"
-                            ? "bg-accent text-white font-semibold shadow-sm"
-                            : "text-foreground-secondary hover:text-foreground hover:bg-white/5"
-                        )}
-                        aria-label="Set currency to INR (Rupees)"
-                      >
-                        <span className="font-sans font-bold">₹</span>
-                        <span>Rupee</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCurrency("USD");
-                          setFormData((prev) => ({ ...prev, budget: "" }));
-                        }}
-                        className={cn(
-                          "px-2.5 py-1 text-xs font-mono rounded-md transition-all flex items-center gap-1 cursor-pointer",
-                          currency === "USD"
-                            ? "bg-accent text-white font-semibold shadow-sm"
-                            : "text-foreground-secondary hover:text-foreground hover:bg-white/5"
-                        )}
-                        aria-label="Set currency to USD (Dollars)"
-                      >
-                        <span className="font-sans font-bold">$</span>
-                        <span>Dollar</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="relative">
-                    <select
-                      id="budget"
-                      value={formData.budget}
-                      onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                      className="w-full appearance-none rounded-xl bg-background-surface/80 border border-border/80 px-4 py-3 pr-10 text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent min-h-[46px] text-sm transition-colors hover:border-border cursor-pointer"
-                    >
-                      {currentBudgetOptions.map((opt) => (
-                        <option
+                {/* Project Type - Clickable Chips (No Dropdown) */}
+                <div className="space-y-2.5">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-foreground-secondary">
+                    Project Type <span className="text-accent">*</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {PROJECT_TYPE_OPTIONS.map((opt) => {
+                      const isSelected = formData.projectType === opt.value;
+                      return (
+                        <button
                           key={opt.value}
-                          value={opt.value}
-                          className="bg-background-secondary text-foreground py-1"
+                          type="button"
+                          onClick={() => setFormData({ ...formData, projectType: opt.value })}
+                          className={cn(
+                            "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border cursor-pointer select-none active:scale-[0.98]",
+                            isSelected
+                              ? "bg-accent text-white border-accent shadow-[0_2px_12px_rgba(139,92,246,0.35)] font-semibold"
+                              : "bg-background-surface/60 border-border/80 text-foreground-secondary hover:text-foreground hover:border-accent/40 hover:bg-background-surface"
+                          )}
                         >
                           {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown
-                      className="w-4 h-4 text-foreground-muted absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-                      aria-hidden="true"
-                    />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
+
 
                 {/* Message */}
                 <div className="space-y-2">

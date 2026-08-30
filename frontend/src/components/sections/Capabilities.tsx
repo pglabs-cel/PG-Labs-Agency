@@ -14,7 +14,7 @@ const CAPABILITIES = [
   "PostgreSQL",
   "Docker",
   "AI/ML",
-  "TypeScript",
+  "REST APIs",
   "Express",
   "Framer Motion",
 ];

@@ -168,6 +168,18 @@ export const TechIcon: React.FC<TechIconProps> = ({ name, className = "w-4 h-4" 
         </svg>
       );
 
+    case "restapis":
+    case "api":
+    case "apis":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none">
+          <circle cx="6" cy="12" r="3" stroke="#8B5CF6" strokeWidth="1.5" />
+          <circle cx="18" cy="6" r="3" stroke="#10B981" strokeWidth="1.5" />
+          <circle cx="18" cy="18" r="3" stroke="#06B6D4" strokeWidth="1.5" />
+          <path d="M8.5 10.5L15.5 7.5M8.5 13.5L15.5 16.5" stroke="#71717A" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      );
+
     case "aiml":
     case "ai":
     case "ml":
@@ -179,6 +191,27 @@ export const TechIcon: React.FC<TechIconProps> = ({ name, className = "w-4 h-4" 
           <circle cx="12" cy="15" r="1.5" fill="#A78BFA" />
           <path d="M9 9L12 15L15 9" stroke="#A78BFA" strokeWidth="1.2" />
           <path d="M12 1V4M12 20V23M1 12H4M20 12H23" stroke="#8B5CF6" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      );
+
+    case "modernjavascript":
+    case "javascript":
+    case "js":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="20" height="20" rx="3" fill="#F7DF1E" />
+          <path
+            d="M8 15C8.5 16.2 9.5 17 10.5 17C11.5 17 12 16.3 12 15V9"
+            stroke="#000000"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+          <path
+            d="M14 15.5C14.5 16.5 15.5 17 17 17C18.5 17 19.5 16.2 19.5 15C19.5 13.5 18.5 13 16.5 12.5C14.5 12 13.5 11.2 13.5 9.8C13.5 8.5 14.8 7.5 16.5 7.5C18 7.5 19 8.2 19.5 9.2"
+            stroke="#000000"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
         </svg>
       );
 

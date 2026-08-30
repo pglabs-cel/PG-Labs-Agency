@@ -171,41 +171,42 @@ export default async function CaseStudyPage({ params }: Props) {
                   className="block w-full cursor-pointer group"
                 >
                   {project.thumbnail ? (
-                    <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary overflow-hidden shadow-2xl relative group-hover:border-accent/50 transition-colors">
+                    <div className="w-full min-h-[240px] sm:min-h-[300px] md:min-h-0 md:aspect-[21/9] rounded-2xl border border-border bg-background-secondary overflow-hidden shadow-2xl relative group-hover:border-accent/50 transition-colors">
                       <img
                         src={project.thumbnail}
                         alt={project.title}
                         className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-500"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
-                      <div className="absolute bottom-6 left-6 px-3 py-1 rounded-md bg-background/80 backdrop-blur-md border border-border text-xs font-mono text-accent">
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 px-2.5 py-1 sm:px-3 sm:py-1 rounded-md bg-background/85 backdrop-blur-md border border-border text-[10px] sm:text-xs font-mono text-accent">
                         {allCategories.join(" · ")} · {project.year}
                       </div>
-                      <div className="absolute top-6 right-6 px-3 py-1.5 rounded-lg bg-emerald-500/20 backdrop-blur-md border border-emerald-500/40 text-xs font-mono text-emerald-400 font-semibold flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <div className="absolute top-3 right-3 sm:top-6 sm:right-6 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-500/20 backdrop-blur-md border border-emerald-500/40 text-[10px] sm:text-xs font-mono text-emerald-400 font-semibold flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                         <span>LIVE PREVIEW ↗</span>
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary p-6 sm:p-12 flex flex-col justify-between relative overflow-hidden shadow-2xl group-hover:border-accent/50 transition-colors">
+                    <div className="w-full min-h-[250px] sm:min-h-[300px] md:min-h-0 md:aspect-[21/9] rounded-2xl border border-border bg-background-secondary p-5 sm:p-8 md:p-12 flex flex-col justify-between relative overflow-hidden shadow-2xl group-hover:border-accent/50 transition-colors">
                       <div className="absolute inset-0 bg-tech-grid opacity-30 pointer-events-none" />
-                      <div className="relative z-10 flex items-center justify-between text-xs font-mono text-foreground-muted">
-                        <span>{project.slug}.architecture</span>
-                        <span className="text-emerald-400 flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-[10px] sm:text-xs font-mono text-foreground-muted">
+                        <span className="truncate max-w-[240px] sm:max-w-none">{project.slug}.architecture</span>
+                        <span className="text-emerald-400 flex items-center gap-1.5 font-semibold shrink-0">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                           STATUS: VERIFIED DEPLOYMENT · PREVIEW LIVE SITE ↗
                         </span>
                       </div>
-                      <div className="relative z-10 my-auto text-center space-y-2">
-                        <p className="text-2xl sm:text-4xl font-bold font-mono text-foreground">
+                      <div className="relative z-10 my-auto py-4 text-center space-y-1.5 sm:space-y-2">
+                        <p className="text-xl sm:text-3xl md:text-4xl font-bold font-mono text-foreground tracking-tight leading-snug">
                           {project.title}
                         </p>
-                        <p className="text-xs sm:text-sm font-mono uppercase tracking-widest text-foreground-muted">
-                          System Interface & Microservices Topology
+                        <p className="text-[10px] sm:text-xs md:text-sm font-mono uppercase tracking-wider sm:tracking-widest text-foreground-muted">
+                          System Interface &amp; Microservices Topology
                         </p>
                       </div>
-                      <div className="relative z-10 flex items-center justify-end text-xs font-mono text-accent">
-                        <span>PG Labs Build #{project.year}</span>
+                      <div className="relative z-10 flex items-center justify-between text-[10px] sm:text-xs font-mono text-accent pt-1">
+                        <span className="text-foreground-muted/70 text-[10px] sm:text-xs">PG Labs Verified Architecture</span>
+                        <span>Build #{project.year}</span>
                       </div>
                     </div>
                   )}
@@ -213,34 +214,38 @@ export default async function CaseStudyPage({ params }: Props) {
               ) : (
                 <div className="block w-full">
                   {project.thumbnail ? (
-                    <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary overflow-hidden shadow-2xl relative">
+                    <div className="w-full min-h-[240px] sm:min-h-[300px] md:min-h-0 md:aspect-[21/9] rounded-2xl border border-border bg-background-secondary overflow-hidden shadow-2xl relative">
                       <img
                         src={project.thumbnail}
                         alt={project.title}
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
-                      <div className="absolute bottom-6 left-6 px-3 py-1 rounded-md bg-background/80 backdrop-blur-md border border-border text-xs font-mono text-accent">
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 px-2.5 py-1 sm:px-3 sm:py-1 rounded-md bg-background/85 backdrop-blur-md border border-border text-[10px] sm:text-xs font-mono text-accent">
                         {allCategories.join(" · ")} · {project.year}
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full aspect-[21/9] rounded-2xl border border-border bg-background-secondary p-6 sm:p-12 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+                    <div className="w-full min-h-[250px] sm:min-h-[300px] md:min-h-0 md:aspect-[21/9] rounded-2xl border border-border bg-background-secondary p-5 sm:p-8 md:p-12 flex flex-col justify-between relative overflow-hidden shadow-2xl">
                       <div className="absolute inset-0 bg-tech-grid opacity-30 pointer-events-none" />
-                      <div className="relative z-10 flex items-center justify-between text-xs font-mono text-foreground-muted">
-                        <span>{project.slug}.architecture</span>
-                        <span className="text-emerald-400">STATUS: VERIFIED DEPLOYMENT</span>
+                      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-[10px] sm:text-xs font-mono text-foreground-muted">
+                        <span className="truncate max-w-[240px] sm:max-w-none">{project.slug}.architecture</span>
+                        <span className="text-emerald-400 flex items-center gap-1.5 font-semibold shrink-0">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          STATUS: VERIFIED DEPLOYMENT
+                        </span>
                       </div>
-                      <div className="relative z-10 my-auto text-center space-y-2">
-                        <p className="text-2xl sm:text-4xl font-bold font-mono text-foreground">
+                      <div className="relative z-10 my-auto py-4 text-center space-y-1.5 sm:space-y-2">
+                        <p className="text-xl sm:text-3xl md:text-4xl font-bold font-mono text-foreground tracking-tight leading-snug">
                           {project.title}
                         </p>
-                        <p className="text-xs sm:text-sm font-mono uppercase tracking-widest text-foreground-muted">
-                          System Interface & Microservices Topology
+                        <p className="text-[10px] sm:text-xs md:text-sm font-mono uppercase tracking-wider sm:tracking-widest text-foreground-muted">
+                          System Interface &amp; Microservices Topology
                         </p>
                       </div>
-                      <div className="relative z-10 flex items-center justify-end text-xs font-mono text-accent">
-                        <span>PG Labs Build #{project.year}</span>
+                      <div className="relative z-10 flex items-center justify-between text-[10px] sm:text-xs font-mono text-accent pt-1">
+                        <span className="text-foreground-muted/70 text-[10px] sm:text-xs">PG Labs Verified Architecture</span>
+                        <span>Build #{project.year}</span>
                       </div>
                     </div>
                   )}

@@ -5,7 +5,6 @@ export interface CreateContactDTO {
   email: string;
   company?: string;
   projectType: string;
-  budget?: string;
   message: string;
 }
 
@@ -16,7 +15,6 @@ export class ContactService {
       email: data.email,
       company: data.company || "",
       projectType: data.projectType,
-      budget: data.budget || "",
       message: data.message,
       status: "new",
     });

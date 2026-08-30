@@ -30,6 +30,24 @@ export const CardSpotlight = ({
   const [isHovering, setIsHovering] = useState(false);
   const [enable3D, setEnable3D] = useState(false);
 
+  // Top-level hooks (MUST NOT be called inside JSX or conditional blocks)
+  const spotlightBg = useMotionTemplate`
+    radial-gradient(
+      ${radius}px circle at ${mouseX}px ${mouseY}px,
+      ${color},
+      rgba(167, 139, 250, 0.12) 40%,
+      transparent 75%
+    )
+  `;
+
+  const maskImage = useMotionTemplate`
+    radial-gradient(
+      ${radius}px circle at ${mouseX}px ${mouseY}px,
+      white,
+      transparent 80%
+    )
+  `;
+
   useEffect(() => {
     try {
       // Only enable 3D Aceternity canvas on capable desktop browsers with real mice, NOT Safari or mobile
@@ -82,14 +100,7 @@ export const CardSpotlight = ({
       <motion.div
         className="pointer-events-none absolute z-0 -inset-px rounded-xl opacity-0 transition duration-300 group-hover/spotlight:opacity-100 hidden sm:block"
         style={{
-          background: useMotionTemplate`
-            radial-gradient(
-              ${radius}px circle at ${mouseX}px ${mouseY}px,
-              ${color},
-              rgba(167, 139, 250, 0.12) 40%,
-              transparent 75%
-            )
-          `,
+          background: spotlightBg,
         }}
       />
 
@@ -98,20 +109,8 @@ export const CardSpotlight = ({
         <motion.div
           className="pointer-events-none absolute z-0 inset-0 rounded-xl opacity-0 transition duration-300 group-hover/spotlight:opacity-100 hidden md:block overflow-hidden"
           style={{
-            maskImage: useMotionTemplate`
-              radial-gradient(
-                ${radius}px circle at ${mouseX}px ${mouseY}px,
-                white,
-                transparent 80%
-              )
-            `,
-            WebkitMaskImage: useMotionTemplate`
-              radial-gradient(
-                ${radius}px circle at ${mouseX}px ${mouseY}px,
-                white,
-                transparent 80%
-              )
-            `,
+            maskImage,
+            WebkitMaskImage: maskImage,
           }}
         >
           <CanvasRevealEffect
