@@ -47,7 +47,9 @@ export const createTransporter = (): Transporter => {
 
   if (isGmail) {
     return nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // STARTTLS: cloud standard on Render/AWS/Railway
       auth: {
         user: config.user,
         pass: config.pass,
@@ -55,6 +57,9 @@ export const createTransporter = (): Transporter => {
       tls: {
         rejectUnauthorized: false,
       },
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
     });
   }
 
@@ -69,10 +74,9 @@ export const createTransporter = (): Transporter => {
     tls: {
       rejectUnauthorized: false,
     },
-    family: 4,
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000,
   } as any);
 };
 

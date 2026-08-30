@@ -61,6 +61,7 @@ app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 import { getDBStatus } from "./config/db";
+import { isMailConfigured } from "./config/mail";
 
 // Root Index Endpoint
 app.get("/", (_req: Request, res: Response) => {
@@ -69,9 +70,11 @@ app.get("/", (_req: Request, res: Response) => {
     service: "PG Labs Backend API",
     version: "1.0.0",
     database: getDBStatus(),
+    mailConfigured: isMailConfigured(),
     endpoints: {
       health: "/health",
       contact: "POST /api/contact",
+      testEmail: "GET /api/test-email",
     },
   });
 });
@@ -82,6 +85,7 @@ app.get("/health", (_req: Request, res: Response) => {
     status: "ok",
     service: "PG Labs API",
     database: getDBStatus(),
+    mailConfigured: isMailConfigured(),
     timestamp: new Date().toISOString(),
   });
 });
