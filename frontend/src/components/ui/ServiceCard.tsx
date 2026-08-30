@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React from "react";
 import {
   ArrowUpRight,
   Globe,
@@ -12,6 +12,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "./Badge";
+import { CardSpotlight } from "./card-spotlight";
 
 const ICON_MAP: Record<string, LucideIcon> = {
   globe: Globe,
@@ -43,10 +44,6 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   features,
   icon,
 }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
-  const [isHovered, setIsHovered] = useState(false);
-
   const Icon: LucideIcon =
     typeof icon === "function"
       ? icon
@@ -54,54 +51,23 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
       ? ICON_MAP[icon.toLowerCase()] || Globe
       : ICON_MAP[number] || Globe;
 
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setGlowPos({ x, y });
-  };
-
   return (
-    <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <CardSpotlight
+      radius={260}
+      color="#18181B"
       className="group relative flex flex-col justify-between overflow-hidden
         rounded-xl bg-background-secondary border border-border p-6 sm:p-8
         transition-all duration-300
-        hover:border-accent/40 hover:bg-background-surface/80
-        hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
+        hover:border-border hover:bg-background-surface/80
+        hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] h-full"
     >
-      {/* ── Mouse-tracking radial glow ── */}
-      <div
-        className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100
-          transition-opacity duration-500"
-        style={{
-          background: isHovered
-            ? `radial-gradient(280px circle at ${glowPos.x}% ${glowPos.y}%, rgba(139,92,246,0.08) 0%, transparent 70%)`
-            : "none",
-        }}
-        aria-hidden="true"
-      />
-
-      {/* ── Top gradient accent line on hover ── */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px
-          bg-gradient-to-r from-transparent via-accent/60 to-transparent
-          opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        aria-hidden="true"
-      />
-
       {/* ── Card body ── */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <div
             className="flex items-center justify-center w-12 h-12 rounded-lg
               bg-background-surface border border-border
-              group-hover:border-accent/50 group-hover:bg-accent/5
+              group-hover:border-accent/40 group-hover:bg-accent/10
               group-hover:shadow-[0_0_16px_rgba(139,92,246,0.15)]
               transition-all duration-300 text-foreground group-hover:text-accent"
           >
@@ -132,8 +98,8 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
         </p>
       </div>
 
-      {/* ── Feature list ── */}
-      <div className="pt-4 border-t border-border/60">
+      {/* ── Feature list (no dividing border line) ── */}
+      <div className="pt-4">
         <p className="text-xs font-mono uppercase tracking-wider text-foreground-muted mb-3">
           Capabilities
         </p>
@@ -145,6 +111,6 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
           ))}
         </div>
       </div>
-    </div>
+    </CardSpotlight>
   );
 };

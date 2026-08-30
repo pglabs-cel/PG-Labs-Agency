@@ -14,6 +14,7 @@ export interface ProjectItem {
   thumbnail?: string;
   images?: string[];
   videoUrl?: string;
+  liveUrl?: string;
 }
 
 export const PROJECTS: ProjectItem[] = [

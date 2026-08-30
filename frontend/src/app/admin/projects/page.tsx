@@ -35,6 +35,7 @@ import {
   Video as VideoIcon,
   Loader2,
   Film,
+  Globe,
 } from "lucide-react";
 
 interface ProjectFormData {
@@ -53,6 +54,7 @@ interface ProjectFormData {
   thumbnail: string;
   images: string[];
   videoUrl: string;
+  liveUrl: string;
 }
 
 const DEFAULT_FORM: ProjectFormData = {
@@ -71,6 +73,7 @@ const DEFAULT_FORM: ProjectFormData = {
   thumbnail: "",
   images: [],
   videoUrl: "",
+  liveUrl: "",
 };
 
 const CATEGORIES = [
@@ -215,6 +218,7 @@ export default function AdminProjectsPage() {
       thumbnail: proj.thumbnail || "",
       images: Array.isArray(proj.images) ? proj.images : [],
       videoUrl: proj.videoUrl || "",
+      liveUrl: proj.liveUrl || "",
     });
     setFormError("");
     setIsModalOpen(true);
@@ -374,6 +378,7 @@ export default function AdminProjectsPage() {
       thumbnail: formData.thumbnail.trim() || undefined,
       images: formData.images,
       videoUrl: formData.videoUrl.trim() || undefined,
+      liveUrl: formData.liveUrl.trim() || undefined,
     };
 
     const targetId = editingProject?._id || editingProject?.slug;
@@ -568,10 +573,10 @@ export default function AdminProjectsPage() {
             onClick={openCreateModal}
             variant="primary"
             size="sm"
-            className="flex items-center gap-2"
+            className="flex items-center gap-1.5 whitespace-nowrap shrink-0"
           >
-            <Plus className="w-4 h-4" />
-            <span>Add New Project</span>
+            <Plus className="w-4 h-4 shrink-0" />
+            <span className="whitespace-nowrap font-medium">Add New Project</span>
           </Button>
         </div>
 
@@ -684,12 +689,23 @@ export default function AdminProjectsPage() {
                               <Film className="w-3 h-3" /> VIDEO
                             </span>
                           )}
+                          {p.liveUrl && (
+                            <a
+                              href={p.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono flex items-center gap-1 hover:border-emerald-500/50"
+                              title={`Open live site: ${p.liveUrl}`}
+                            >
+                              <Globe className="w-3 h-3" /> LIVE
+                            </a>
+                          )}
                           {p.images && p.images.length > 0 && (
                             <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                               +{p.images.length}
                             </span>
                           )}
-                          {!p.thumbnail && !p.videoUrl && (!p.images || p.images.length === 0) && (
+                          {!p.thumbnail && !p.videoUrl && !p.liveUrl && (!p.images || p.images.length === 0) && (
                             <span className="text-zinc-600 font-mono">None</span>
                           )}
                         </div>
@@ -862,6 +878,25 @@ export default function AdminProjectsPage() {
                 </div>
               </div>
 
+              {/* Live Project Link / Demo URL */}
+              <div>
+                <label className="block text-foreground-secondary font-mono uppercase mb-1 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-xs">
+                    <Globe className="w-3.5 h-3.5 text-accent" /> Live Project Link / Demo URL
+                  </span>
+                  <span className="text-[11px] text-accent font-normal normal-case">Associated with project cards & live demo preview</span>
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    type="url"
+                    value={formData.liveUrl}
+                    onChange={(e) => setFormData({ ...formData, liveUrl: e.target.value })}
+                    placeholder="https://example.com or https://clientproject.app"
+                    className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent text-sm font-mono"
+                  />
+                </div>
+              </div>
+
               {/* ─── MEDIA UPLOAD SECTION ─── */}
               <div className="p-4 rounded-xl bg-background-surface border border-border/80 space-y-4">
                 <div className="flex items-center justify-between">
@@ -878,32 +913,27 @@ export default function AdminProjectsPage() {
                   <label className="block text-foreground-secondary font-mono uppercase mb-1.5">
                     Thumbnail / Main Banner Image
                   </label>
-                  <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex items-center gap-2">
                     <input
                       type="url"
                       value={formData.thumbnail}
                       onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
                       placeholder="Paste image URL (https://res.cloudinary.com/...)"
-                      className="flex-1 px-3 py-2 rounded-lg bg-background-secondary border border-border text-foreground focus:outline-none focus:border-accent text-xs"
+                      className="flex-1 h-10 px-3 py-2 rounded-lg bg-background-secondary border border-border text-foreground focus:outline-none focus:border-accent text-xs"
                     />
-                    <Button
+                    <button
                       type="button"
-                      variant="outline"
-                      size="sm"
                       disabled={uploadingTarget === "thumbnail"}
                       onClick={() => thumbnailInputRef.current?.click()}
-                      className="shrink-0 flex items-center gap-1.5 justify-center"
+                      className="w-10 h-10 rounded-lg bg-background-secondary hover:bg-background-surface border border-border hover:border-accent/60 text-foreground transition-all duration-200 flex items-center justify-center shrink-0 disabled:opacity-50"
+                      title="Upload Image"
                     >
                       {uploadingTarget === "thumbnail" ? (
-                        <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading...
-                        </>
+                        <Loader2 className="w-4 h-4 animate-spin text-accent" />
                       ) : (
-                        <>
-                          <Upload className="w-3.5 h-3.5" /> Upload Image
-                        </>
+                        <Upload className="w-4 h-4 text-foreground-secondary hover:text-foreground" />
                       )}
-                    </Button>
+                    </button>
                   </div>
 
                   {formData.thumbnail && (
@@ -935,32 +965,27 @@ export default function AdminProjectsPage() {
                   <label className="block text-foreground-secondary font-mono uppercase mb-1.5">
                     Demo Video (Cloudinary MP4, WebM, or Video URL)
                   </label>
-                  <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex items-center gap-2">
                     <input
                       type="url"
                       value={formData.videoUrl}
                       onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
                       placeholder="Paste video URL (https://res.cloudinary.com/.../video.mp4)"
-                      className="flex-1 px-3 py-2 rounded-lg bg-background-secondary border border-border text-foreground focus:outline-none focus:border-accent text-xs"
+                      className="flex-1 h-10 px-3 py-2 rounded-lg bg-background-secondary border border-border text-foreground focus:outline-none focus:border-accent text-xs"
                     />
-                    <Button
+                    <button
                       type="button"
-                      variant="outline"
-                      size="sm"
                       disabled={uploadingTarget === "video"}
                       onClick={() => videoInputRef.current?.click()}
-                      className="shrink-0 flex items-center gap-1.5 justify-center"
+                      className="w-10 h-10 rounded-lg bg-background-secondary hover:bg-background-surface border border-border hover:border-accent/60 text-foreground transition-all duration-200 flex items-center justify-center shrink-0 disabled:opacity-50"
+                      title="Upload Video"
                     >
                       {uploadingTarget === "video" ? (
-                        <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading...
-                        </>
+                        <Loader2 className="w-4 h-4 animate-spin text-accent" />
                       ) : (
-                        <>
-                          <VideoIcon className="w-3.5 h-3.5" /> Upload Video
-                        </>
+                        <VideoIcon className="w-4 h-4 text-foreground-secondary hover:text-foreground" />
                       )}
-                    </Button>
+                    </button>
                   </div>
 
                   {formData.videoUrl && (
@@ -992,13 +1017,13 @@ export default function AdminProjectsPage() {
                   <label className="block text-foreground-secondary font-mono uppercase mb-1.5">
                     Screenshots Gallery ({formData.images.length} added)
                   </label>
-                  <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex items-center gap-2">
                     <input
                       type="url"
                       value={newGalleryUrl}
                       onChange={(e) => setNewGalleryUrl(e.target.value)}
                       placeholder="Paste screenshot image URL"
-                      className="flex-1 px-3 py-2 rounded-lg bg-background-secondary border border-border text-foreground focus:outline-none focus:border-accent text-xs"
+                      className="flex-1 h-10 px-3 py-2 rounded-lg bg-background-secondary border border-border text-foreground focus:outline-none focus:border-accent text-xs"
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
@@ -1011,28 +1036,23 @@ export default function AdminProjectsPage() {
                       variant="outline"
                       size="sm"
                       onClick={handleAddGalleryUrl}
-                      className="shrink-0"
+                      className="shrink-0 h-10 px-3 text-xs whitespace-nowrap"
                     >
                       Add URL
                     </Button>
-                    <Button
+                    <button
                       type="button"
-                      variant="outline"
-                      size="sm"
                       disabled={uploadingTarget === "gallery"}
                       onClick={() => galleryInputRef.current?.click()}
-                      className="shrink-0 flex items-center gap-1.5"
+                      className="w-10 h-10 rounded-lg bg-background-secondary hover:bg-background-surface border border-border hover:border-accent/60 text-foreground transition-all duration-200 flex items-center justify-center shrink-0 disabled:opacity-50"
+                      title="Upload Screenshot"
                     >
                       {uploadingTarget === "gallery" ? (
-                        <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading...
-                        </>
+                        <Loader2 className="w-4 h-4 animate-spin text-accent" />
                       ) : (
-                        <>
-                          <Upload className="w-3.5 h-3.5" /> Upload Screenshot
-                        </>
+                        <Upload className="w-4 h-4 text-foreground-secondary hover:text-foreground" />
                       )}
-                    </Button>
+                    </button>
                   </div>
 
                   {formData.images.length > 0 && (

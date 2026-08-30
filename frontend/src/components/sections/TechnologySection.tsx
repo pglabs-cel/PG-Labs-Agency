@@ -1,8 +1,9 @@
-﻿import React from "react";
+import React from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { TECHNOLOGIES } from "@/data/technologies";
 import { FadeUp } from "@/components/animations/FadeUp";
+import { TechIcon } from "@/components/ui/TechIcon";
 
 export const TechnologySection: React.FC = () => {
   return (
@@ -27,10 +28,10 @@ export const TechnologySection: React.FC = () => {
                   {group.items.map((item) => (
                     <li
                       key={item}
-                      className="text-foreground-secondary flex items-center gap-2"
+                      className="text-foreground-secondary flex items-center gap-2.5"
                     >
-                      <span className="w-1 h-1 rounded-full bg-accent/60" aria-hidden="true" />
-                      <span className="font-medium text-foreground">{item}</span>
+                      <TechIcon name={item} className="w-3.5 h-3.5 shrink-0" />
+                      <span className="font-medium text-foreground text-xs font-mono">{item}</span>
                     </li>
                   ))}
                 </ul>

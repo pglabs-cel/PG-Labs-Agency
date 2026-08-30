@@ -18,6 +18,7 @@ export interface ProjectDTO {
   thumbnail?: string;
   images?: string[];
   videoUrl?: string;
+  liveUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 }

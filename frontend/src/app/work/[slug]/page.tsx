@@ -8,7 +8,7 @@ import { ProjectJsonLd } from "@/components/JsonLd";
 import { PROJECTS, ProjectItem } from "@/data/projects";
 import { fetchPublicProjectBySlug } from "@/lib/projects.api";
 import { SITE_CONFIG } from "@/lib/constants";
-import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Globe, ExternalLink } from "lucide-react";
 
 interface Props {
   params: {
@@ -111,6 +111,21 @@ export default async function CaseStudyPage({ params }: Props) {
                 </Badge>
               ))}
             </div>
+
+            {project.liveUrl && (
+              <div className="pt-2">
+                <a
+                  href={project.liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-500/60 font-medium text-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.15)]"
+                >
+                  <Globe className="w-4 h-4 text-emerald-400" />
+                  <span>Visit Live Project</span>
+                  <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+                </a>
+              </div>
+            )}
           </div>
         </Container>
       </section>

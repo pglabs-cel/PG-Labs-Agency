@@ -17,6 +17,7 @@ export interface IProject extends Document {
   thumbnail?: string;
   images?: string[];
   videoUrl?: string;
+  liveUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -101,6 +102,11 @@ const ProjectSchema: Schema = new Schema<IProject>(
       default: [],
     },
     videoUrl: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    liveUrl: {
       type: String,
       trim: true,
       default: "",

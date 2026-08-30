@@ -28,9 +28,9 @@ export const FeaturedWork: React.FC = async () => {
           </FadeUp>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
           {featured.map((project, idx) => (
-            <FadeUp key={project.slug} delay={idx * 0.1}>
+            <FadeUp key={project.slug} delay={idx * 0.1} className="h-full flex flex-col">
               <ProjectCard
                 slug={project.slug}
                 title={project.title}
@@ -39,6 +39,7 @@ export const FeaturedWork: React.FC = async () => {
                 technologies={project.technologies}
                 year={project.year}
                 thumbnail={project.thumbnail}
+                liveUrl={project.liveUrl}
               />
             </FadeUp>
           ))}

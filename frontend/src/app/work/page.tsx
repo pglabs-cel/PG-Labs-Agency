@@ -56,7 +56,7 @@ export default function WorkPage() {
       <section className="py-16 md:py-24">
         <Container>
           {/* Accessible Filter Controls */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-14" role="tablist" aria-label="Project Categories">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 mb-14" role="tablist" aria-label="Project Categories">
             {FILTERS.map((filter) => {
               const isSelected = activeFilter === filter;
               return (
@@ -66,10 +66,10 @@ export default function WorkPage() {
                   aria-selected={isSelected}
                   onClick={() => setActiveFilter(filter)}
                   className={cn(
-                    "text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition-all min-h-[44px] focus:outline-none focus:ring-2 focus:ring-accent/50",
+                    "text-xs sm:text-sm font-medium px-5 py-2.5 rounded-lg transition-all duration-200 min-h-[42px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent/50",
                     isSelected
-                      ? "bg-accent text-white shadow-[0_0_15px_rgba(139,92,246,0.3)] font-semibold"
-                      : "bg-background-surface text-foreground-secondary hover:text-foreground border border-border"
+                      ? "border border-accent bg-accent/10 text-white shadow-[0_0_20px_rgba(139,92,246,0.2)] font-semibold"
+                      : "border border-border bg-transparent text-foreground-secondary hover:border-accent/50 hover:text-white hover:bg-white/[0.02]"
                   )}
                 >
                   {filter}
@@ -79,9 +79,9 @@ export default function WorkPage() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
             {filteredProjects.map((project, idx) => (
-              <FadeUp key={project.slug} delay={idx * 0.08}>
+              <FadeUp key={project.slug} delay={idx * 0.08} className="h-full flex flex-col">
                 <ProjectCard
                   slug={project.slug}
                   title={project.title}
@@ -90,6 +90,7 @@ export default function WorkPage() {
                   technologies={project.technologies}
                   year={project.year}
                   thumbnail={project.thumbnail}
+                  liveUrl={project.liveUrl}
                 />
               </FadeUp>
             ))}

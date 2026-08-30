@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Container } from "@/components/ui/Container";
+import { TechIcon } from "@/components/ui/TechIcon";
 
 const CAPABILITIES = [
   "React",
@@ -28,7 +29,7 @@ export const Capabilities: React.FC = () => {
       aria-label="Technology capabilities"
     >
       <Container className="mb-6">
-        <p className="text-sm sm:text-base text-foreground-muted font-mono text-center tracking-wider uppercase">
+        <p className="text-xs sm:text-sm text-foreground-muted font-mono text-center tracking-widest uppercase">
           From idea to production — we build the technology behind ambitious products.
         </p>
       </Container>
@@ -38,31 +39,28 @@ export const Capabilities: React.FC = () => {
         {/* Edge fades */}
         <div
           className="pointer-events-none absolute left-0 top-0 h-full w-16 sm:w-32
-            bg-gradient-to-r from-background-secondary/80 to-transparent z-10"
+            bg-gradient-to-r from-background-secondary/90 to-transparent z-10"
           aria-hidden="true"
         />
         <div
           className="pointer-events-none absolute right-0 top-0 h-full w-16 sm:w-32
-            bg-gradient-to-l from-background-secondary/80 to-transparent z-10"
+            bg-gradient-to-l from-background-secondary/90 to-transparent z-10"
           aria-hidden="true"
         />
 
         {/* Scrolling track — pauses on hover */}
-        <div className="flex animate-marquee hover:[animation-play-state:paused] whitespace-nowrap">
+        <div className="flex animate-marquee hover:[animation-play-state:paused] whitespace-nowrap py-1">
           {DOUBLED.map((tech, idx) => (
             <span
               key={idx}
-              className="inline-flex items-center gap-2 mx-3 px-4 py-2 rounded-full
-                border border-border/60 bg-background-surface/60 backdrop-blur-sm
-                text-sm font-mono text-foreground-secondary
-                hover:border-accent/40 hover:text-foreground
-                transition-colors duration-200 cursor-default select-none"
+              className="inline-flex items-center gap-2.5 mx-2.5 px-4 py-2 rounded-full
+                border border-border/70 bg-background-surface/80 backdrop-blur-md
+                text-xs sm:text-sm font-medium text-foreground
+                hover:border-accent/60 hover:text-white hover:bg-background-surface
+                transition-all duration-200 cursor-default select-none shadow-sm"
             >
-              <span
-                className="w-1.5 h-1.5 rounded-full bg-accent/50 flex-shrink-0"
-                aria-hidden="true"
-              />
-              {tech}
+              <TechIcon name={tech} className="w-4 h-4 shrink-0" />
+              <span className="font-mono text-xs text-foreground/90">{tech}</span>
             </span>
           ))}
         </div>
