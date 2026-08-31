@@ -50,7 +50,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   const content = (
     <>
-      <span>{children}</span>
+      {children}
       {showArrow && (
         <ArrowRight
           className="w-4 h-4 transition-transform duration-200 ease-out group-hover:translate-x-1 text-accent shrink-0"

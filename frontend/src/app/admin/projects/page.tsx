@@ -827,7 +827,7 @@ export default function AdminProjectsPage() {
                   : "No projects have been added yet."}
               </p>
               <Button onClick={openCreateModal} variant="outline" size="sm" className="mt-2">
-                <Plus className="w-4 h-4 mr-1" /> Create Your First Project
+                <Plus className="w-4 h-4 shrink-0" /> Create Your First Project
               </Button>
             </div>
           ) : (
@@ -1053,7 +1053,7 @@ export default function AdminProjectsPage() {
                     required
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="e.g. Gaba Traders Inventory"
+                    placeholder="Project Name"
                     className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent"
                   />
                 </div>
@@ -1066,7 +1066,7 @@ export default function AdminProjectsPage() {
                     type="text"
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    placeholder="e.g. gaba-traders-inventory"
+                    placeholder="project-name"
                     className="w-full px-3 py-2 rounded-lg bg-background-surface border border-border text-foreground focus:outline-none focus:border-accent"
                   />
                 </div>
