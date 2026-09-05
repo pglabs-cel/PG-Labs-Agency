@@ -20,7 +20,7 @@ export const SiteShell: React.FC<SiteShellProps> = ({ children }) => {
   return (
     <>
       <Navbar />
-      <div className="flex-1 flex flex-col pt-[72px]">{children}</div>
+      <div className="flex-1 flex flex-col pt-[64px] sm:pt-[72px]">{children}</div>
       <Footer />
     </>
   );
