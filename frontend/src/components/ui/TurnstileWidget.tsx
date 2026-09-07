@@ -192,10 +192,10 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileWidgetProps>(
     return (
       <div
         ref={wrapperRef}
-        className={`w-full flex justify-center sm:justify-start select-none ${className}`}
+        className={`w-full flex justify-center select-none ${className}`}
       >
         <div
-          className="relative overflow-visible flex items-center justify-center sm:justify-start max-w-full"
+          className="relative overflow-visible flex items-center justify-center max-w-full"
           style={{
             minHeight: 65,
             width: scale < 1 ? `${Math.round(300 * scale)}px` : "300px",
@@ -215,7 +215,7 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileWidgetProps>(
 
           {/* Scalable widget container */}
           <div
-            className="flex justify-center sm:justify-start transition-transform duration-150 origin-center sm:origin-left"
+            className="flex justify-center transition-transform duration-150 origin-center"
             style={{
               transform: scale < 1 ? `scale(${scale})` : undefined,
               width: 300,
@@ -224,7 +224,7 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileWidgetProps>(
           >
             <div
               ref={containerRef}
-              className="cf-turnstile w-full flex justify-center sm:justify-start [&>iframe]:!mx-auto sm:[&>iframe]:!mx-0"
+              className="cf-turnstile w-full flex justify-center [&>iframe]:!mx-auto"
             />
           </div>
         </div>

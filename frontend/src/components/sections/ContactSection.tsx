@@ -274,8 +274,8 @@ export const ContactSection: React.FC = () => {
                   />
                 </div>
 
-                {/* Cloudflare Turnstile Bot Verification (Mobile Centered) */}
-                <div className="pt-2 pb-1 w-full flex justify-center sm:justify-start">
+                {/* Cloudflare Turnstile Bot Verification (Centered) */}
+                <div className="pt-2 pb-1 w-full flex justify-center">
                   <TurnstileWidget
                     ref={turnstileRef}
                     siteKey={
