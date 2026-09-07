@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/animations/FadeUp";
 import { Toast } from "@/components/ui/Toast";
+import { TurnstileWidget, TurnstileRef } from "@/components/ui/TurnstileWidget";
 import { submitContactInquiry, ContactPayload } from "@/lib/api";
 import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,9 @@ export const ContactSection: React.FC = () => {
     message: "",
   });
 
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
+  const turnstileRef = useRef<TurnstileRef>(null);
+
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [toast, setToast] = useState<{
@@ -51,6 +55,9 @@ export const ContactSection: React.FC = () => {
     if (!formData.message.trim() || formData.message.trim().length < 10) {
       return "Please provide a brief message of at least 10 characters.";
     }
+    if (!turnstileToken) {
+      return "Please complete the security verification challenge.";
+    }
     return null;
   };
 
@@ -64,7 +71,7 @@ export const ContactSection: React.FC = () => {
       setToast({
         isOpen: true,
         type: "error",
-        title: "Validation Error",
+        title: "Verification Required",
         message: clientValidationError,
       });
       return;
@@ -74,7 +81,11 @@ export const ContactSection: React.FC = () => {
     setErrorMessage("");
 
     try {
-      const response = await submitContactInquiry(formData);
+      const response = await submitContactInquiry({
+        ...formData,
+        turnstileToken,
+        "cf-turnstile-response": turnstileToken,
+      });
       setStatus("success");
       setToast({
         isOpen: true,
@@ -90,6 +101,10 @@ export const ContactSection: React.FC = () => {
         projectType: "Web Application",
         message: "",
       });
+
+      // Token lifecycle: single-use token consumed, reset widget for fresh token
+      setTurnstileToken("");
+      turnstileRef.current?.reset();
     } catch (err: unknown) {
       setStatus("error");
       const msg =
@@ -103,6 +118,10 @@ export const ContactSection: React.FC = () => {
         title: "Submission Issue",
         message: msg,
       });
+
+      // Token lifecycle: single-use token consumed or expired, reset widget for retry
+      setTurnstileToken("");
+      turnstileRef.current?.reset();
     }
   };
 
@@ -119,7 +138,7 @@ export const ContactSection: React.FC = () => {
         </FadeUp>
 
         <FadeUp delay={0.1}>
-          <div className="bg-background-secondary/80 border border-border/80 rounded-2xl p-6 sm:p-10 shadow-2xl backdrop-blur-sm">
+          <div className="bg-background-secondary/80 border border-border/80 rounded-2xl p-5 sm:p-10 shadow-2xl backdrop-blur-sm">
             {status === "success" ? (
               <div className="py-12 text-center space-y-4">
                 <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
@@ -132,7 +151,11 @@ export const ContactSection: React.FC = () => {
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={() => setStatus("idle")}
+                  onClick={() => {
+                    setStatus("idle");
+                    setTurnstileToken("");
+                    turnstileRef.current?.reset();
+                  }}
                   className="mt-4"
                 >
                   Send another inquiry
@@ -248,6 +271,26 @@ export const ContactSection: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Provide an overview of what you want to build, current challenges, or timeline..."
                     className="w-full rounded-xl bg-background-surface/80 border border-border/80 px-4 py-3 text-foreground placeholder:text-foreground-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent text-sm resize-y transition-colors hover:border-border min-h-[120px]"
+                  />
+                </div>
+
+                {/* Cloudflare Turnstile Bot Verification (Mobile Centered) */}
+                <div className="pt-2 pb-1 w-full flex justify-center sm:justify-start">
+                  <TurnstileWidget
+                    ref={turnstileRef}
+                    siteKey={
+                      process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ||
+                      "0x4AAAAAAErHia0FCATonsTD"
+                    }
+                    action="contact"
+                    onSuccess={(token) => {
+                      setTurnstileToken(token);
+                      if (status === "error" && errorMessage.includes("verification")) {
+                        setErrorMessage("");
+                      }
+                    }}
+                    onExpire={() => setTurnstileToken("")}
+                    onError={() => setTurnstileToken("")}
                   />
                 </div>
 

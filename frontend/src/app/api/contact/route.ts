@@ -28,7 +28,98 @@ export async function POST(req: NextRequest) {
 
     const { name, email, company, projectType, message } = body;
 
-    // Server-side validation
+    // Cloudflare Turnstile Server-Side Verification
+    const turnstileSecret =
+      process.env.TURNSTILE_SECRET || process.env.CLOUDFAIR_SECRET_KEY;
+
+    if (turnstileSecret) {
+      const token =
+        (body as any)["cf-turnstile-response"] || (body as any).turnstileToken;
+      const expectedAction = "contact";
+      const expectedHostnames = new Set(
+        (
+          process.env.TURNSTILE_HOSTNAMES ??
+          "localhost,127.0.0.1,pglabs.agency,www.pglabs.agency,pg-labs-agency.vercel.app"
+        )
+          .split(",")
+          .map((h) => h.trim())
+          .filter(Boolean)
+      );
+
+      if (
+        typeof token !== "string" ||
+        token.length === 0 ||
+        token.length > 2048
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Security verification failed. Please complete the captcha challenge.",
+          },
+          { status: 403 }
+        );
+      }
+
+      const clientIp =
+        req.headers.get("cf-connecting-ip") ||
+        req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        req.headers.get("x-real-ip");
+
+      try {
+        const verifyRes = await fetch(
+          "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            signal: AbortSignal.timeout(10000),
+            body: new URLSearchParams({
+              secret: turnstileSecret,
+              response: token,
+              ...(clientIp ? { remoteip: clientIp } : {}),
+            }),
+          }
+        );
+
+        if (!verifyRes.ok) {
+          throw new Error(`siteverify returned status ${verifyRes.status}`);
+        }
+
+        const verifyData = (await verifyRes.json()) as {
+          success: boolean;
+          action?: string;
+          hostname?: string;
+          "error-codes"?: string[];
+        };
+
+        if (
+          !verifyData.success ||
+          (verifyData.action && verifyData.action !== expectedAction) ||
+          (expectedHostnames.size > 0 &&
+            verifyData.hostname &&
+            !expectedHostnames.has(verifyData.hostname))
+        ) {
+          console.warn("[Turnstile siteverify rejected]:", verifyData);
+          return NextResponse.json(
+            {
+              error:
+                "Verification challenge failed. Please reload and try again.",
+            },
+            { status: 403 }
+          );
+        }
+      } catch (err: any) {
+        console.error("[Turnstile siteverify error]:", err);
+        return NextResponse.json(
+          {
+            error:
+              "Verification service temporarily unavailable. Please try again.",
+          },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Server-side field validation
     if (!name || typeof name !== "string" || !name.trim()) {
       return NextResponse.json(
         { error: "Name is required." },
@@ -92,6 +183,7 @@ export async function POST(req: NextRequest) {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
+          ...(turnstileSecret ? { "x-verified-turnstile": turnstileSecret } : {}),
         },
         body: JSON.stringify(sanitizedData),
         signal: controller.signal,

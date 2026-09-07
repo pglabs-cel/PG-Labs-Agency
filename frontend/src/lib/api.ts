@@ -4,6 +4,8 @@ export interface ContactPayload {
   company?: string;
   projectType: string;
   message: string;
+  turnstileToken?: string;
+  "cf-turnstile-response"?: string;
 }
 
 export interface ContactResponse {
