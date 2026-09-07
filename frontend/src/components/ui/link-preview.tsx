@@ -1,7 +1,7 @@
 "use client";
 
-import { encode } from "qss";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { createPortal } from "react-dom";
 import {
   AnimatePresence,
@@ -11,6 +11,8 @@ import {
   useTransform,
 } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { getCloudinaryUrl } from "@/lib/cloudinary";
+import { encode } from "qss";
 
 type LinkPreviewProps = {
   children: React.ReactNode;
@@ -53,10 +55,10 @@ export const LinkPreview = ({
       });
       src = `https://api.microlink.io/?${params}`;
     } else if (imageSrc) {
-      src = imageSrc;
+      src = getCloudinaryUrl(imageSrc, { width: width * 2, quality: "good" });
     }
   } else {
-    src = imageSrc;
+    src = getCloudinaryUrl(imageSrc, { width: width * 2, quality: "good" });
   }
 
   const [isOpen, setOpen] = useState(false);
@@ -134,7 +136,13 @@ export const LinkPreview = ({
     <>
       {isMounted && src ? (
         <div className="hidden">
-          <img src={src} width={width} height={height} alt="hidden preview preload" />
+          <Image
+            src={src}
+            width={width}
+            height={height}
+            unoptimized={src.includes("microlink.io")}
+            alt="hidden preview preload"
+          />
         </div>
       ) : null}
 
@@ -175,10 +183,11 @@ export const LinkPreview = ({
                   style={{ fontSize: 0 }}
                 >
                   {src ? (
-                    <img
+                    <Image
                       src={src}
                       width={width}
                       height={height}
+                      unoptimized={src.includes("microlink.io")}
                       className="rounded-lg object-cover w-full h-auto max-h-[165px]"
                       alt="Project live preview"
                     />

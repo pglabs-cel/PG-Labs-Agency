@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { SITE_CONFIG, NAV_LINKS } from "@/lib/constants";
 import { ArrowUpRight } from "lucide-react";
@@ -17,9 +18,11 @@ export const Footer: React.FC = () => {
               aria-label="PG Labs Home"
             >
               <div className="relative h-12 sm:h-14 w-auto rounded-xl overflow-hidden bg-black border border-border/40 group-hover:border-zinc-500 transition-all duration-200 p-1.5 flex items-center shadow-sm">
-                <img
+                <Image
                   src="/full-logo.jpg"
                   alt="PG Labs"
+                  width={180}
+                  height={56}
                   className="h-full w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
                 />
               </div>

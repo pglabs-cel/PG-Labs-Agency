@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
-import { cloudinary } from "../config/cloudinary";
-import { UploadApiResponse } from "cloudinary";
 import { Project } from "../models/project.model";
+import { MediaAsset } from "../models/mediaAsset.model";
+import { verifyFileSignature } from "../utils/fileSignature";
+import { ImageProcessingService } from "../services/imageProcessing.service";
+import { CloudinaryService } from "../services/cloudinary.service";
 
 export function parseCloudinaryUrl(url: string): {
   publicId: string;
@@ -40,49 +42,68 @@ export class UploadController {
         return;
       }
 
-      if (
-        !process.env.CLOUDINARY_CLOUD_NAME ||
-        !process.env.CLOUDINARY_API_KEY ||
-        !process.env.CLOUDINARY_API_SECRET
-      ) {
-        res.status(500).json({
+      const rawBuffer = req.file.buffer;
+
+      // 1. Magic-Byte Verification (Requirement 3 & 6)
+      const signatureCheck = verifyFileSignature(rawBuffer);
+      if (!signatureCheck.isValid) {
+        res.status(400).json({
           success: false,
-          error: "Cloudinary is not configured on server. Please check .env settings.",
+          error: signatureCheck.error || "Invalid file binary signature.",
         });
         return;
       }
 
-      const isVideo = req.file.mimetype.startsWith("video/");
-      const resourceType: "video" | "image" = isVideo ? "video" : "image";
+      const resourceType = signatureCheck.resourceType || "image";
 
-      const uploadPromise = new Promise<UploadApiResponse>((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          {
-            folder: "pglabs/projects",
-            resource_type: resourceType,
-          },
-          (error, result) => {
-            if (error || !result) {
-              reject(error || new Error("Cloudinary upload failed"));
-            } else {
-              resolve(result);
-            }
-          }
-        );
-        stream.end(req.file!.buffer);
+      let finalBuffer = rawBuffer;
+      let width: number | undefined;
+      let height: number | undefined;
+      let format = signatureCheck.detectedExt || "bin";
+
+      // 2. Image Decompression Bomb Protection & EXIF/GPS Stripping (Requirement 4 & 5)
+      if (resourceType === "image") {
+        try {
+          const processed = await ImageProcessingService.processAndSanitizeImage(rawBuffer);
+          finalBuffer = processed.buffer;
+          width = processed.width;
+          height = processed.height;
+          format = processed.format;
+        } catch (imgError: any) {
+          res.status(400).json({
+            success: false,
+            error: imgError.message || "Failed to process and sanitize image.",
+          });
+          return;
+        }
+      } else if (resourceType === "video") {
+        // Video validation (Requirement 7): max 50MB check already handled by Multer
+        format = signatureCheck.detectedExt || "mp4";
+      }
+
+      // 3. Upload via CloudinaryService (Dedup, Retries, Local Fallback) (Requirement 8, 12, 14, 15)
+      const uploadResult = await CloudinaryService.uploadMedia(finalBuffer, {
+        resourceType,
+        format,
+        width,
+        height,
       });
-
-      const result = await uploadPromise;
 
       res.status(200).json({
         success: true,
-        message: `${isVideo ? "Video" : "Image"} uploaded successfully.`,
+        message: `${resourceType === "video" ? "Video" : "Image"} uploaded successfully.${
+          uploadResult.isDeduplicated ? " (Deduplicated)" : ""
+        }`,
         data: {
-          url: result.secure_url,
-          public_id: result.public_id,
-          resource_type: result.resource_type,
-          format: result.format,
-          bytes: result.bytes,
+          url: uploadResult.url,
+          public_id: uploadResult.publicId,
+          resource_type: uploadResult.resourceType,
+          format: uploadResult.format,
+          bytes: uploadResult.bytes,
+          width: uploadResult.width,
+          height: uploadResult.height,
+          isDeduplicated: uploadResult.isDeduplicated || false,
+          isLocal: uploadResult.isLocal || false,
         },
       });
     } catch (error) {
@@ -106,23 +127,7 @@ export class UploadController {
         return;
       }
 
-      // 1. Delete from Cloudinary if it's a Cloudinary asset
-      const parsed = parseCloudinaryUrl(url);
-      if (parsed) {
-        try {
-          await cloudinary.uploader.destroy(parsed.publicId, {
-            resource_type: parsed.resourceType,
-          });
-        } catch (cloudinaryErr) {
-          console.warn(
-            "[Cloudinary] Warning destroying asset:",
-            parsed.publicId,
-            cloudinaryErr
-          );
-        }
-      }
-
-      // 2. If an existing project is referenced, update MongoDB directly
+      // 1. If an existing project is referenced, update MongoDB directly
       if (projectId && field) {
         const query = mongoose.isValidObjectId(projectId)
           ? { _id: projectId }
@@ -142,9 +147,40 @@ export class UploadController {
         }
       }
 
+      // 2. Reference-Counted Safe Deletion (Requirement 9 & 10)
+      // Check whether ANY other project is still referencing this URL!
+      const activeReferences = await Project.countDocuments({
+        $or: [
+          { thumbnail: url },
+          { videoUrl: url },
+          { images: url },
+        ],
+      });
+
+      if (activeReferences > 0) {
+        // Asset is still actively used by another project; do NOT destroy from Cloudinary!
+        await MediaAsset.updateOne(
+          { url },
+          { $set: { referenceCount: activeReferences, status: "active" } }
+        );
+
+        res.status(200).json({
+          success: true,
+          message: "Media unlinked from project. Asset retained in storage because other records reference it.",
+        });
+        return;
+      }
+
+      // Zero remaining references: safe to purge from Cloudinary/local disk
+      const parsed = parseCloudinaryUrl(url);
+      const publicIdOrUrl = parsed ? parsed.publicId : url;
+      const resourceType = parsed ? parsed.resourceType : "image";
+
+      await CloudinaryService.safeDeleteMedia(publicIdOrUrl, resourceType);
+
       res.status(200).json({
         success: true,
-        message: "Media deleted successfully from Cloudinary and database.",
+        message: "Media deleted safely from storage and database.",
       });
     } catch (error) {
       next(error);

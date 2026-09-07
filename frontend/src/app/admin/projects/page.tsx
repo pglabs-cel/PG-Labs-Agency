@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { getCloudinaryUrl } from "@/lib/cloudinary";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -123,6 +125,38 @@ export default function AdminProjectsPage() {
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  // Session tracking for uncommitted media uploads (Requirement 11: Zombie Asset Cleanup)
+  const uncommittedMediaRef = useRef<Set<string>>(new Set());
+
+  const handleCloseModal = useCallback(() => {
+    if (uncommittedMediaRef.current.size > 0 && token) {
+      uncommittedMediaRef.current.forEach((url) => {
+        adminDeleteMedia(token, url).catch(() => {});
+      });
+      uncommittedMediaRef.current.clear();
+    }
+    setIsModalOpen(false);
+  }, [token]);
+
+  useEffect(() => {
+    const handlePageHide = () => {
+      if (uncommittedMediaRef.current.size > 0 && token) {
+        uncommittedMediaRef.current.forEach((url) => {
+          const payload = JSON.stringify({ url });
+          if (navigator.sendBeacon) {
+            const blob = new Blob([payload], { type: "application/json" });
+            navigator.sendBeacon(
+              `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/admin/media/delete`,
+              blob
+            );
+          }
+        });
+      }
+    };
+    window.addEventListener("pagehide", handlePageHide);
+    return () => window.removeEventListener("pagehide", handlePageHide);
+  }, [token]);
 
   const [toast, setToast] = useState<{
     isOpen: boolean;
@@ -410,6 +444,7 @@ export default function AdminProjectsPage() {
 
     const res = await adminUploadMedia(token, file);
     if (res.success && res.url) {
+      uncommittedMediaRef.current.add(res.url);
       if (target === "thumbnail") {
         setFormData((prev) => ({ ...prev, thumbnail: res.url! }));
       } else if (target === "video") {
@@ -568,6 +603,7 @@ export default function AdminProjectsPage() {
     if (editingProject && targetId) {
       const res = await adminUpdateProject(token, targetId, payload);
       if (res.success) {
+        uncommittedMediaRef.current.clear();
         setToast({
           isOpen: true,
           type: "success",
@@ -582,6 +618,7 @@ export default function AdminProjectsPage() {
     } else {
       const res = await adminCreateProject(token, payload as unknown as ProjectDTO);
       if (res.success) {
+        uncommittedMediaRef.current.clear();
         setToast({
           isOpen: true,
           type: "success",
@@ -849,11 +886,13 @@ export default function AdminProjectsPage() {
                     <tr key={p.slug} className="hover:bg-background-surface/40 transition-colors">
                       {/* Thumbnail Preview */}
                       <td className="py-3 px-4 whitespace-nowrap">
-                        <div className="w-12 h-8 rounded bg-background-surface border border-border overflow-hidden flex items-center justify-center">
+                        <div className="w-12 h-8 rounded bg-background-surface border border-border overflow-hidden flex items-center justify-center relative">
                           {p.thumbnail ? (
-                            <img
-                              src={p.thumbnail}
+                            <Image
+                              src={getCloudinaryUrl(p.thumbnail, { width: 120, quality: "good" })}
                               alt={p.title}
+                              width={48}
+                              height={32}
                               className="w-full h-full object-cover"
                             />
                           ) : (
@@ -1020,7 +1059,7 @@ export default function AdminProjectsPage() {
           <div className="w-full max-w-3xl rounded-2xl bg-background-secondary border border-border shadow-2xl p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto no-scrollbar">
             {/* Close Button */}
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={handleCloseModal}
               className="absolute top-6 right-6 p-1.5 rounded-lg text-foreground-muted hover:text-foreground hover:bg-background-surface transition-colors"
             >
               <X className="w-5 h-5" />
@@ -1326,9 +1365,11 @@ export default function AdminProjectsPage() {
 
                   {formData.thumbnail && (
                     <div className="mt-2 relative w-32 aspect-video rounded-lg overflow-hidden border border-border group">
-                      <img
-                        src={formData.thumbnail}
+                      <Image
+                        src={getCloudinaryUrl(formData.thumbnail, { width: 300, quality: "good" })}
                         alt="Thumbnail preview"
+                        fill
+                        sizes="128px"
                         className="w-full h-full object-cover"
                       />
                       <button
@@ -1450,9 +1491,11 @@ export default function AdminProjectsPage() {
                           key={i}
                           className="relative aspect-video rounded-lg overflow-hidden border border-border group bg-background-secondary"
                         >
-                          <img
-                            src={img}
+                          <Image
+                            src={getCloudinaryUrl(img, { width: 300, quality: "good" })}
                             alt={`Gallery ${i + 1}`}
+                            fill
+                            sizes="120px"
                             className="w-full h-full object-cover"
                           />
                           <button
@@ -1590,7 +1633,7 @@ export default function AdminProjectsPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={handleCloseModal}
                 >
                   Cancel
                 </Button>

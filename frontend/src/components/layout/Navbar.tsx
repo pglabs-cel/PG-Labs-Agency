@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X, ArrowUpRight, Mail } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -120,9 +121,12 @@ export const Navbar: React.FC = () => {
             aria-label="PG Labs Home"
           >
             <div className="relative h-10 sm:h-11 md:h-12 w-auto rounded-xl overflow-hidden bg-black border border-border/40 group-hover:border-zinc-500 transition-all duration-200 p-1.5 flex items-center shadow-sm">
-              <img
+              <Image
                 src="/full-logo.jpg"
                 alt="PG Labs"
+                width={160}
+                height={48}
+                priority
                 className="h-full w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
               />
             </div>
@@ -194,9 +198,12 @@ export const Navbar: React.FC = () => {
                     aria-label="PG Labs Home"
                   >
                     <div className="relative h-10 w-auto rounded-xl overflow-hidden bg-black border border-border/40 group-hover:border-zinc-500 transition-all duration-200 p-1.5 flex items-center shadow-sm">
-                      <img
+                      <Image
                         src="/full-logo.jpg"
                         alt="PG Labs"
+                        width={140}
+                        height={40}
+                        priority
                         className="h-full w-auto object-contain"
                       />
                     </div>

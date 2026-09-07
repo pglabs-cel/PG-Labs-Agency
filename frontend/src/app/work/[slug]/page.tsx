@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { CtaSection } from "@/components/sections/CtaSection";
@@ -10,6 +11,7 @@ import { fetchPublicProjectBySlug } from "@/lib/projects.api";
 import { SITE_CONFIG } from "@/lib/constants";
 import { ArrowLeft, ArrowRight, CheckCircle2, Globe, ExternalLink } from "lucide-react";
 import { LinkPreview } from "@/components/ui/link-preview";
+import { getCloudinaryUrl, getCloudinaryVideoPoster } from "@/lib/cloudinary";
 
 interface Props {
   params: {
@@ -150,7 +152,11 @@ export default async function CaseStudyPage({ params }: Props) {
                 src={project.videoUrl}
                 controls
                 playsInline
-                poster={project.thumbnail}
+                preload="metadata"
+                poster={
+                  getCloudinaryVideoPoster(project.videoUrl) ||
+                  getCloudinaryUrl(project.thumbnail, { width: 1400, quality: "good" })
+                }
                 className="w-full h-full object-contain"
               />
             </div>
@@ -172,16 +178,19 @@ export default async function CaseStudyPage({ params }: Props) {
                 >
                   {project.thumbnail ? (
                     <div className="w-full min-h-[240px] sm:min-h-[300px] md:min-h-0 md:aspect-[21/9] rounded-2xl border border-border bg-background-secondary overflow-hidden shadow-2xl relative group-hover:border-accent/50 transition-colors">
-                      <img
-                        src={project.thumbnail}
+                      <Image
+                        src={getCloudinaryUrl(project.thumbnail, { width: 1600, quality: "best" })}
                         alt={project.title}
+                        fill
+                        priority
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px"
                         className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-transparent to-transparent pointer-events-none" />
-                      <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 px-2.5 py-1 sm:px-3 sm:py-1 rounded-md bg-background/85 backdrop-blur-md border border-border text-[10px] sm:text-xs font-mono text-accent">
+                      <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 px-2.5 py-1 sm:px-3 sm:py-1 rounded-md bg-background/85 backdrop-blur-md border border-border text-[10px] sm:text-xs font-mono text-accent z-10">
                         {allCategories.join(" · ")} · {project.year}
                       </div>
-                      <div className="absolute top-3 right-3 sm:top-6 sm:right-6 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-500/20 backdrop-blur-md border border-emerald-500/40 text-[10px] sm:text-xs font-mono text-emerald-400 font-semibold flex items-center gap-1.5">
+                      <div className="absolute top-3 right-3 sm:top-6 sm:right-6 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-500/20 backdrop-blur-md border border-emerald-500/40 text-[10px] sm:text-xs font-mono text-emerald-400 font-semibold flex items-center gap-1.5 z-10">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                         <span>LIVE PREVIEW ↗</span>
                       </div>
@@ -215,13 +224,16 @@ export default async function CaseStudyPage({ params }: Props) {
                 <div className="block w-full">
                   {project.thumbnail ? (
                     <div className="w-full min-h-[240px] sm:min-h-[300px] md:min-h-0 md:aspect-[21/9] rounded-2xl border border-border bg-background-secondary overflow-hidden shadow-2xl relative">
-                      <img
-                        src={project.thumbnail}
+                      <Image
+                        src={getCloudinaryUrl(project.thumbnail, { width: 1600, quality: "best" })}
                         alt={project.title}
+                        fill
+                        priority
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px"
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-transparent to-transparent pointer-events-none" />
-                      <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 px-2.5 py-1 sm:px-3 sm:py-1 rounded-md bg-background/85 backdrop-blur-md border border-border text-[10px] sm:text-xs font-mono text-accent">
+                      <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 px-2.5 py-1 sm:px-3 sm:py-1 rounded-md bg-background/85 backdrop-blur-md border border-border text-[10px] sm:text-xs font-mono text-accent z-10">
                         {allCategories.join(" · ")} · {project.year}
                       </div>
                     </div>
@@ -318,9 +330,11 @@ export default async function CaseStudyPage({ params }: Props) {
                     key={i}
                     className="aspect-video rounded-xl border border-border overflow-hidden bg-background-surface relative shadow-lg group"
                   >
-                    <img
-                      src={imgUrl}
+                    <Image
+                      src={getCloudinaryUrl(imgUrl, { width: 1200, quality: "good" })}
                       alt={`${project.title} screenshot ${i + 1}`}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 50vw"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>

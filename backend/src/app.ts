@@ -63,6 +63,10 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+import path from "path";
+// Serve local uploads folder (Requirement 14: Graceful Local-Disk Fallback)
+app.use("/uploads", express.static(path.resolve(__dirname, "../uploads")));
+
 import { getDBStatus } from "./config/db";
 import { isMailConfigured } from "./config/mail";
 

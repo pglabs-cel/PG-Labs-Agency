@@ -100,6 +100,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${sansFont.variable} ${monoFont.variable} dark scroll-smooth`}>
+      <head>
+        {/* Preconnect to Cloudinary CDN for instant media connection setup & faster LCP */}
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+      </head>
       <body className="min-h-screen bg-background font-sans antialiased text-foreground selection:bg-accent selection:text-white flex flex-col">
         <OrganizationJsonLd />
         <WebSiteJsonLd />

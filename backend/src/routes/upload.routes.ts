@@ -2,6 +2,7 @@ import { Router } from "express";
 import { UploadController } from "../controllers/upload.controller";
 import { uploadMiddleware } from "../config/cloudinary";
 import { requireAdminAuth } from "../middleware/admin.middleware";
+import { uploadRateLimiter } from "../middleware/rateLimit.middleware";
 
 const router: Router = Router();
 
@@ -9,6 +10,7 @@ const router: Router = Router();
 router.post(
   "/admin/upload",
   requireAdminAuth,
+  uploadRateLimiter,
   uploadMiddleware.single("file"),
   UploadController.uploadFile
 );
