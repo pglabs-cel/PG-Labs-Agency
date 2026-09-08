@@ -1,7 +1,4 @@
-import { PROJECTS, ProjectItem } from "@/data/projects";
-
-export interface ProjectDTO {
-  _id?: string;
+export interface ProjectItem {
   slug: string;
   title: string;
   category: string;
@@ -22,6 +19,10 @@ export interface ProjectDTO {
   liveUrl?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface ProjectDTO extends ProjectItem {
+  _id?: string;
 }
 
 function getProjectsApiUrl(path: string): string {
@@ -48,18 +49,18 @@ export async function fetchPublicProjects(featuredOnly = false): Promise<Project
     });
 
     if (!res.ok) {
-      return featuredOnly ? PROJECTS.filter((p) => p.featured) : PROJECTS;
+      return [];
     }
 
     const data = await res.json().catch(() => ({}));
-    if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+    if (data.success && Array.isArray(data.data)) {
       return data.data;
     }
 
-    return featuredOnly ? PROJECTS.filter((p) => p.featured) : PROJECTS;
-  } catch {
-    // Fallback gracefully to static data if backend is offline
-    return featuredOnly ? PROJECTS.filter((p) => p.featured) : PROJECTS;
+    return [];
+  } catch (err) {
+    console.error("[fetchPublicProjects] Error:", err);
+    return [];
   }
 }
 
@@ -72,7 +73,7 @@ export async function fetchPublicProjectBySlug(
     });
 
     if (!res.ok) {
-      return PROJECTS.find((p) => p.slug === slug) || null;
+      return null;
     }
 
     const data = await res.json().catch(() => ({}));
@@ -80,9 +81,10 @@ export async function fetchPublicProjectBySlug(
       return data.data;
     }
 
-    return PROJECTS.find((p) => p.slug === slug) || null;
-  } catch {
-    return PROJECTS.find((p) => p.slug === slug) || null;
+    return null;
+  } catch (err) {
+    console.error(`[fetchPublicProjectBySlug] Error fetching slug ${slug}:`, err);
+    return null;
   }
 }
 

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { Project } from "@/models/Project";
-import { PROJECTS } from "@/data/projects";
 
 export const dynamic = "force-dynamic";
 
@@ -21,21 +20,16 @@ export async function GET(
         { status: 200 }
       );
     }
-  } catch (error: any) {
-    console.warn("[Next.js /api/projects/[slug]] DB fallback to static data:", error.message);
-  }
 
-  // Fallback to static data
-  const staticProject = PROJECTS.find((p) => p.slug === slug);
-  if (staticProject) {
     return NextResponse.json(
-      { success: true, data: staticProject },
-      { status: 200 }
+      { success: false, error: "Project not found." },
+      { status: 404 }
+    );
+  } catch (error: any) {
+    console.error("[Next.js /api/projects/[slug]] Database fetch error:", error.message);
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch project from database." },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json(
-    { success: false, error: "Project not found." },
-    { status: 404 }
-  );
 }

@@ -172,10 +172,31 @@ export async function POST(req: NextRequest) {
       message: message.trim(),
     };
 
-    // Save directly to MongoDB Atlas
+    // Save directly to MongoDB Atlas with Idempotency Protection (Requirement 18)
     let savedInquiry: any = null;
     try {
       await connectToDatabase();
+
+      // Check if identical inquiry was submitted within the last 60 seconds (prevents double-clicks & network retries)
+      const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+      const existingInquiry = await Contact.findOne({
+        email: sanitizedData.email,
+        message: sanitizedData.message,
+        createdAt: { $gte: oneMinuteAgo },
+      });
+
+      if (existingInquiry) {
+        console.log(`[Next.js /api/contact] Idempotent duplicate submission avoided (${existingInquiry._id})`);
+        return NextResponse.json(
+          {
+            success: true,
+            message: "Inquiry received successfully. We will be in touch within 24 hours.",
+            data: { id: existingInquiry._id.toString(), createdAt: existingInquiry.createdAt },
+          },
+          { status: 200 }
+        );
+      }
+
       savedInquiry = await Contact.create({
         ...sanitizedData,
         status: "new",

@@ -4,21 +4,23 @@ import React, { useState, useEffect } from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProjectCard } from "@/components/ui/ProjectCard";
-import { PROJECTS, ProjectItem } from "@/data/projects";
-import { fetchPublicProjects } from "@/lib/projects.api";
+import { fetchPublicProjects, ProjectItem } from "@/lib/projects.api";
 import { FadeUp } from "@/components/animations/FadeUp";
 import { cn } from "@/lib/utils";
 
 export default function WorkPage() {
-  const [projectsList, setProjectsList] = useState<ProjectItem[]>(PROJECTS);
+  const [projectsList, setProjectsList] = useState<ProjectItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string>("All");
 
   useEffect(() => {
-    fetchPublicProjects().then((data) => {
-      if (data && data.length > 0) {
-        setProjectsList(data);
-      }
-    });
+    fetchPublicProjects()
+      .then((data) => {
+        if (data && data.length > 0) {
+          setProjectsList(data);
+        }
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const availableCategories = React.useMemo(() => {

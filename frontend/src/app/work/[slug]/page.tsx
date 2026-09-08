@@ -6,12 +6,14 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { CtaSection } from "@/components/sections/CtaSection";
 import { ProjectJsonLd } from "@/components/JsonLd";
-import { PROJECTS, ProjectItem } from "@/data/projects";
-import { fetchPublicProjectBySlug } from "@/lib/projects.api";
+import { fetchPublicProjects, fetchPublicProjectBySlug, ProjectItem } from "@/lib/projects.api";
 import { SITE_CONFIG } from "@/lib/constants";
 import { ArrowLeft, ArrowRight, CheckCircle2, Globe, ExternalLink } from "lucide-react";
 import { LinkPreview } from "@/components/ui/link-preview";
 import { getCloudinaryUrl, getCloudinaryVideoPoster } from "@/lib/cloudinary";
+
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
 
 interface Props {
   params: {
@@ -19,8 +21,9 @@ interface Props {
   };
 }
 
-export function generateStaticParams() {
-  return PROJECTS.map((project) => ({
+export async function generateStaticParams() {
+  const projects = await fetchPublicProjects();
+  return projects.map((project) => ({
     slug: project.slug,
   }));
 }
@@ -61,11 +64,12 @@ export default async function CaseStudyPage({ params }: Props) {
     notFound();
   }
 
-  const projectIndex = PROJECTS.findIndex((p) => p.slug === params.slug);
+  const allProjects = await fetchPublicProjects();
+  const projectIndex = allProjects.findIndex((p) => p.slug === params.slug);
   const nextProject: ProjectItem =
-    projectIndex !== -1
-      ? PROJECTS[(projectIndex + 1) % PROJECTS.length]
-      : PROJECTS[0];
+    projectIndex !== -1 && allProjects.length > 0
+      ? allProjects[(projectIndex + 1) % allProjects.length]
+      : project;
 
   const allCategories =
     project.categories && project.categories.length > 0

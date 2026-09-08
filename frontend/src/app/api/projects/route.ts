@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { Project } from "@/models/Project";
-import { PROJECTS } from "@/data/projects";
 
 export const dynamic = "force-dynamic";
 
@@ -17,23 +16,15 @@ export async function GET(req: NextRequest) {
       .lean()
       .exec();
 
-    if (dbProjects && dbProjects.length > 0) {
-      return NextResponse.json(
-        { success: true, data: dbProjects },
-        { status: 200 }
-      );
-    }
+    return NextResponse.json(
+      { success: true, data: dbProjects || [] },
+      { status: 200 }
+    );
   } catch (error: any) {
-    console.warn("[Next.js /api/projects] DB fetch fallback to static data:", error.message);
+    console.error("[Next.js /api/projects] Database fetch error:", error.message);
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch projects from database." },
+      { status: 500 }
+    );
   }
-
-  // Fallback gracefully to static data
-  const fallbackData = featuredOnly
-    ? PROJECTS.filter((p) => p.featured)
-    : PROJECTS;
-
-  return NextResponse.json(
-    { success: true, data: fallbackData },
-    { status: 200 }
-  );
 }

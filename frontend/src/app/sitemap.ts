@@ -1,8 +1,8 @@
 import { MetadataRoute } from "next";
 import { SITE_CONFIG } from "@/lib/constants";
-import { PROJECTS } from "@/data/projects";
+import { fetchPublicProjects } from "@/lib/projects.api";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_CONFIG.url;
 
   // Base public pages
@@ -57,8 +57,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // Dynamic Case Study project pages
-  const projectRoutes: MetadataRoute.Sitemap = PROJECTS.map((project) => ({
+  // Dynamic Case Study project pages from MongoDB
+  const projects = await fetchPublicProjects();
+  const projectRoutes: MetadataRoute.Sitemap = projects.map((project) => ({
     url: `${baseUrl}/work/${project.slug}`,
     lastModified: new Date(),
     changeFrequency: "monthly",
