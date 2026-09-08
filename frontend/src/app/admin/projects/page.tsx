@@ -495,6 +495,8 @@ export default function AdminProjectsPage() {
         ? "videoUrl"
         : "galleryImage";
 
+    const resourceType: "image" | "video" = target === "video" ? "video" : "image";
+
     const deleteKey =
       target + (galleryIndex !== undefined ? `_${galleryIndex}` : "");
     setDeletingMedia(deleteKey);
@@ -502,8 +504,10 @@ export default function AdminProjectsPage() {
     // Instant optimistic UI cleanup
     if (target === "thumbnail") {
       setFormData((prev) => ({ ...prev, thumbnail: "" }));
+      if (thumbnailInputRef.current) thumbnailInputRef.current.value = "";
     } else if (target === "video") {
       setFormData((prev) => ({ ...prev, videoUrl: "" }));
+      if (videoInputRef.current) videoInputRef.current.value = "";
     } else if (target === "gallery" && galleryIndex !== undefined) {
       setFormData((prev) => ({
         ...prev,
@@ -511,9 +515,28 @@ export default function AdminProjectsPage() {
       }));
     }
 
+    // Remove from uncommitted media ref if it was tracked during this session
+    if (uncommittedMediaRef.current.has(url)) {
+      uncommittedMediaRef.current.delete(url);
+    }
+
+    // Synchronize editingProject state so subsequent renders retain the cleared state
+    setEditingProject((prev) => {
+      if (!prev) return null;
+      if (target === "thumbnail") return { ...prev, thumbnail: "" };
+      if (target === "video") return { ...prev, videoUrl: "" };
+      if (target === "gallery" && galleryIndex !== undefined) {
+        return {
+          ...prev,
+          images: (prev.images || []).filter((_, i) => i !== galleryIndex),
+        };
+      }
+      return prev;
+    });
+
     // Call backend to destroy on Cloudinary and MongoDB
     if (token) {
-      const res = await adminDeleteMedia(token, url, projectId, field);
+      const res = await adminDeleteMedia(token, url, projectId, field, resourceType);
       if (res.success) {
         setToast({
           isOpen: true,
@@ -521,7 +544,7 @@ export default function AdminProjectsPage() {
           title: "Media Removed",
           message: `${
             target === "video" ? "Video" : "Image"
-          } deleted from Cloudinary & project.`,
+          } removed successfully.`,
         });
         if (projectId) {
           loadProjects(token);
@@ -592,11 +615,11 @@ export default function AdminProjectsPage() {
         .filter(Boolean),
       challenge: formData.challenge.trim(),
       solution: formData.solution.trim(),
-      outcome: formData.outcome.trim() || undefined,
-      thumbnail: formData.thumbnail.trim() || undefined,
+      outcome: formData.outcome.trim(),
+      thumbnail: formData.thumbnail.trim(),
       images: formData.images,
-      videoUrl: formData.videoUrl.trim() || undefined,
-      liveUrl: formData.liveUrl.trim() || undefined,
+      videoUrl: formData.videoUrl.trim(),
+      liveUrl: formData.liveUrl.trim(),
     };
 
     const targetId = editingProject?._id || editingProject?.slug;

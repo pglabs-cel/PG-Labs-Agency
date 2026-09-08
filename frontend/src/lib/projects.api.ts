@@ -270,7 +270,8 @@ export async function adminDeleteMedia(
   token: string,
   url: string,
   projectId?: string,
-  field?: "thumbnail" | "videoUrl" | "galleryImage"
+  field?: "thumbnail" | "videoUrl" | "galleryImage",
+  resourceType?: "image" | "video"
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const res = await fetch(getProjectsApiUrl("/admin/media/delete"), {
@@ -279,7 +280,7 @@ export async function adminDeleteMedia(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ url, projectId, field }),
+      body: JSON.stringify({ url, projectId, field, resourceType }),
     });
 
     const data = await res.json().catch(() => ({}));

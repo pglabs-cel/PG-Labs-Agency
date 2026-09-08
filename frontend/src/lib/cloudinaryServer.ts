@@ -39,9 +39,10 @@ export function parseCloudinaryUrl(url: string): {
 } | null {
   if (!url || typeof url !== "string") return null;
 
+  const cleanUrl = url.split("?")[0].split("#")[0];
   const regex =
-    /res\.cloudinary\.com\/[^/]+\/(image|video)\/upload\/(?:v\d+\/)?(.+?)(?:\.[a-zA-Z0-9]+)?$/;
-  const match = url.match(regex);
+    /res\.cloudinary\.com\/[^/]+\/(image|video)\/upload\/(?:(?:[a-z]{1,3}_[^/]+,?)+\/)*(?:v\d+\/)?(.+?)(?:\.[a-zA-Z0-9]+)?$/;
+  const match = cleanUrl.match(regex);
 
   if (match && match[1] && match[2]) {
     return {

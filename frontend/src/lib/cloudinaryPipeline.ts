@@ -2,9 +2,11 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
+import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/db";
 import { MediaAsset } from "@/models/MediaAsset";
 import { Project } from "@/models/Project";
+import { parseCloudinaryUrl } from "@/lib/cloudinaryServer";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -240,31 +242,62 @@ export class CloudinaryPipeline {
    */
   public static async safeDeleteMedia(
     publicIdOrUrl: string,
-    resourceType: "image" | "video" = "image"
+    resourceType: "image" | "video" = "image",
+    excludeProjectId?: string
   ): Promise<{ deleted: boolean; remainingReferences: number }> {
     await connectToDatabase();
 
-    // 1. Check if any projects currently reference this asset URL
-    const activeProjectRefs = await Project.countDocuments({
+    // 1. Build reference count query to check other projects
+    const refQuery: any = {
       $or: [
         { thumbnail: publicIdOrUrl },
         { images: publicIdOrUrl },
         { videoUrl: publicIdOrUrl },
       ],
-    });
+    };
+
+    if (excludeProjectId) {
+      if (mongoose.isValidObjectId(excludeProjectId)) {
+        refQuery._id = { $ne: new mongoose.Types.ObjectId(excludeProjectId) };
+      } else {
+        refQuery.slug = { $ne: excludeProjectId };
+      }
+    }
+
+    const activeProjectRefs = await Project.countDocuments(refQuery);
 
     if (activeProjectRefs > 0) {
       console.log(
-        `[CloudinaryPipeline] Asset preserved: referenced by ${activeProjectRefs} project record(s).`
+        `[CloudinaryPipeline] Asset preserved: referenced by ${activeProjectRefs} other project record(s).`
       );
       return { deleted: false, remainingReferences: activeProjectRefs };
     }
 
-    // 2. Find asset in MediaAsset collection
+    // 2. Parse publicId and resourceType if a Cloudinary URL was provided
+    let targetPublicId = publicIdOrUrl;
+    let targetResourceType = resourceType;
+
+    const parsed = parseCloudinaryUrl(publicIdOrUrl);
+    if (parsed) {
+      targetPublicId = parsed.publicId;
+      targetResourceType = parsed.resourceType;
+    }
+
+    // 3. Find asset in MediaAsset collection
     const asset = await MediaAsset.findOne({
-      $or: [{ publicId: publicIdOrUrl }, { url: publicIdOrUrl }],
+      $or: [
+        { publicId: targetPublicId },
+        { publicId: publicIdOrUrl },
+        { url: publicIdOrUrl },
+      ],
     });
 
+    if (asset) {
+      targetPublicId = asset.publicId;
+      targetResourceType = asset.resourceType || targetResourceType;
+    }
+
+    // 4. Handle local fallback file deletion
     if (asset && asset.isLocal) {
       const filePath = path.join(this.localUploadDir, asset.publicId);
       if (fs.existsSync(filePath)) {
@@ -274,11 +307,11 @@ export class CloudinaryPipeline {
       return { deleted: true, remainingReferences: 0 };
     }
 
+    // 5. Cloudinary destruction with CDN cache invalidation
     if (this.isConfigured()) {
-      const targetPublicId = asset ? asset.publicId : publicIdOrUrl;
       try {
         await cloudinary.uploader.destroy(targetPublicId, {
-          resource_type: resourceType,
+          resource_type: targetResourceType,
           invalidate: true, // CDN invalidation (Requirement 12)
         });
       } catch (err) {
