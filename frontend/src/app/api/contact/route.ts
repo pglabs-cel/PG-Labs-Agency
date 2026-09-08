@@ -36,15 +36,21 @@ export async function POST(req: NextRequest) {
       const token =
         (body as any)["cf-turnstile-response"] || (body as any).turnstileToken;
       const expectedAction = "contact";
-      const expectedHostnames = new Set(
-        (
-          process.env.TURNSTILE_HOSTNAMES ??
-          "localhost,127.0.0.1,pglabs.co.in,www.pglabs.co.in,pglabs.agency,www.pglabs.agency,pg-labs-agency.vercel.app"
-        )
-          .split(",")
-          .map((h) => h.trim())
-          .filter(Boolean)
-      );
+      const defaultAllowedDomains = [
+        "localhost",
+        "127.0.0.1",
+        "pglabs.co.in",
+        "www.pglabs.co.in",
+        "pglabs.agency",
+        "www.pglabs.agency",
+        "pg-labs-agency.vercel.app",
+      ];
+
+      const envHostnames = process.env.TURNSTILE_HOSTNAMES
+        ? process.env.TURNSTILE_HOSTNAMES.split(",").map((h) => h.trim()).filter(Boolean)
+        : [];
+
+      const expectedHostnames = new Set([...defaultAllowedDomains, ...envHostnames]);
 
       if (
         typeof token !== "string" ||
@@ -60,11 +66,6 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const clientIp =
-        req.headers.get("cf-connecting-ip") ||
-        req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-        req.headers.get("x-real-ip");
-
       try {
         const verifyRes = await fetch(
           "https://challenges.cloudflare.com/turnstile/v0/siteverify",
@@ -75,7 +76,6 @@ export async function POST(req: NextRequest) {
             body: new URLSearchParams({
               secret: turnstileSecret,
               response: token,
-              ...(clientIp ? { remoteip: clientIp } : {}),
             }),
           }
         );
@@ -108,11 +108,16 @@ export async function POST(req: NextRequest) {
           );
         }
 
+        const isAllowedHostname =
+          !verifyData.hostname ||
+          expectedHostnames.has(verifyData.hostname) ||
+          verifyData.hostname.endsWith("pglabs.co.in") ||
+          verifyData.hostname.endsWith("pglabs.agency") ||
+          verifyData.hostname.endsWith(".vercel.app");
+
         if (
           (verifyData.action && verifyData.action !== expectedAction) ||
-          (expectedHostnames.size > 0 &&
-            verifyData.hostname &&
-            !expectedHostnames.has(verifyData.hostname))
+          !isAllowedHostname
         ) {
           console.warn("[Turnstile siteverify hostname/action rejected]:", verifyData);
           return NextResponse.json(

@@ -36,26 +36,26 @@ export async function verifyTurnstile(
   }
 
   const expectedAction = "contact";
-  const expectedHostnames = new Set(
-    (
-      process.env.TURNSTILE_HOSTNAMES ??
-      "localhost,127.0.0.1,pglabs.co.in,www.pglabs.co.in,pglabs.agency,www.pglabs.agency,pg-labs-agency.vercel.app"
-    )
-      .split(",")
-      .map((h) => h.trim())
-      .filter(Boolean)
-  );
+  const defaultAllowedDomains = [
+    "localhost",
+    "127.0.0.1",
+    "pglabs.co.in",
+    "www.pglabs.co.in",
+    "pglabs.agency",
+    "www.pglabs.agency",
+    "pg-labs-agency.vercel.app",
+  ];
 
-  const clientIp =
-    (req.headers["cf-connecting-ip"] as string) ||
-    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
-    req.ip;
+  const envHostnames = process.env.TURNSTILE_HOSTNAMES
+    ? process.env.TURNSTILE_HOSTNAMES.split(",").map((h) => h.trim()).filter(Boolean)
+    : [];
+
+  const expectedHostnames = new Set([...defaultAllowedDomains, ...envHostnames]);
 
   try {
     const params = new URLSearchParams({
       secret,
       response: token,
-      ...(clientIp ? { remoteip: clientIp } : {}),
     });
 
     const response = await fetch(
@@ -94,11 +94,16 @@ export async function verifyTurnstile(
       return;
     }
 
+    const isAllowedHostname =
+      !result.hostname ||
+      expectedHostnames.has(result.hostname) ||
+      result.hostname.endsWith("pglabs.co.in") ||
+      result.hostname.endsWith("pglabs.agency") ||
+      result.hostname.endsWith(".vercel.app");
+
     if (
       (result.action && result.action !== expectedAction) ||
-      (expectedHostnames.size > 0 &&
-        result.hostname &&
-        !expectedHostnames.has(result.hostname))
+      !isAllowedHostname
     ) {
       console.warn("[Turnstile] Express siteverify rejected:", result);
       res.status(403).json({
