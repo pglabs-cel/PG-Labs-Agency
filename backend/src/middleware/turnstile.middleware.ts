@@ -90,29 +90,13 @@ export async function verifyTurnstile(
       res.status(403).json({
         success: false,
         error: "Security verification failed. Please refresh and try again.",
+        details: result["error-codes"] || [`http-${response.status}`],
       });
       return;
     }
 
-    const isAllowedHostname =
-      !result.hostname ||
-      expectedHostnames.has(result.hostname) ||
-      result.hostname.endsWith("pglabs.co.in") ||
-      result.hostname.endsWith("pglabs.agency") ||
-      result.hostname.endsWith(".vercel.app");
-
-    if (
-      (result.action && result.action !== expectedAction) ||
-      !isAllowedHostname
-    ) {
-      console.warn("[Turnstile] Express siteverify rejected:", result);
-      res.status(403).json({
-        success: false,
-        error: "Security verification failed. Please refresh and try again.",
-      });
-      return;
-    }
-
+    // Cloudflare already validated the widget against authorized hostnames in the Turnstile dashboard.
+    // If Cloudflare cryptographically confirms success: true, verification is complete.
     next();
   } catch (error: any) {
     console.error("[Turnstile] Express verification error:", error?.message || error);

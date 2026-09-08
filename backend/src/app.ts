@@ -75,7 +75,8 @@ app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({
     status: "ok",
     service: "PG Labs Backend API",
-    version: "1.0.0",
+    version: "1.0.1",
+    build: "turnstile-cloud-verify",
     database: getDBStatus(),
     mailConfigured: isMailConfigured(),
     endpoints: {
@@ -93,6 +94,8 @@ app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({
     status: "ok",
     service: "PG Labs API",
+    version: "1.0.1",
+    build: "turnstile-cloud-verify",
     database: getDBStatus(),
     mailConfigured: isMailConfigured(),
     timestamp: new Date().toISOString(),

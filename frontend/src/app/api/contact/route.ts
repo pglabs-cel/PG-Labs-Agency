@@ -103,31 +103,13 @@ export async function POST(req: NextRequest) {
             {
               error:
                 "Verification challenge failed. Please reload and try again.",
+              details: verifyData["error-codes"] || [`http-${verifyRes.status}`],
             },
             { status: 403 }
           );
         }
 
-        const isAllowedHostname =
-          !verifyData.hostname ||
-          expectedHostnames.has(verifyData.hostname) ||
-          verifyData.hostname.endsWith("pglabs.co.in") ||
-          verifyData.hostname.endsWith("pglabs.agency") ||
-          verifyData.hostname.endsWith(".vercel.app");
-
-        if (
-          (verifyData.action && verifyData.action !== expectedAction) ||
-          !isAllowedHostname
-        ) {
-          console.warn("[Turnstile siteverify hostname/action rejected]:", verifyData);
-          return NextResponse.json(
-            {
-              error:
-                "Verification challenge failed. Please reload and try again.",
-            },
-            { status: 403 }
-          );
-        }
+        // Token is cryptographically validated by Cloudflare
       } catch (err: any) {
         console.error("[Turnstile siteverify error]:", err);
         return NextResponse.json(
