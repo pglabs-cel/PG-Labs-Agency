@@ -24,15 +24,26 @@ export interface ProjectDTO {
   updatedAt?: string;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+function getProjectsApiUrl(path: string): string {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+
+  if (envUrl && envUrl.startsWith("http")) {
+    return `${envUrl.replace(/\/+$/, "")}${cleanPath}`;
+  }
+  if (typeof window !== "undefined") {
+    return `/api${cleanPath}`;
+  }
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  return `${siteUrl.replace(/\/+$/, "")}/api${cleanPath}`;
+}
 
 export async function fetchPublicProjects(featuredOnly = false): Promise<ProjectItem[]> {
   try {
-    const url = new URL(`${API_BASE_URL}/projects`);
-    if (featuredOnly) url.searchParams.append("featured", "true");
+    const base = getProjectsApiUrl("/projects");
+    const targetUrl = featuredOnly ? `${base}?featured=true` : base;
 
-    const res = await fetch(url.toString(), {
+    const res = await fetch(targetUrl, {
       next: { revalidate: 60 }, // Revalidate every 60 seconds
     });
 
@@ -56,7 +67,7 @@ export async function fetchPublicProjectBySlug(
   slug: string
 ): Promise<ProjectItem | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/projects/${slug}`, {
+    const res = await fetch(getProjectsApiUrl(`/projects/${slug}`), {
       next: { revalidate: 60 },
     });
 
@@ -80,7 +91,7 @@ export async function adminFetchProjects(
   token: string
 ): Promise<{ success: boolean; data: ProjectDTO[]; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/projects`, {
+    const res = await fetch(getProjectsApiUrl("/admin/projects"), {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -115,7 +126,7 @@ export async function adminCreateProject(
   payload: Omit<ProjectDTO, "_id" | "createdAt" | "updatedAt">
 ): Promise<{ success: boolean; data?: ProjectDTO; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/admin/projects`, {
+    const res = await fetch(getProjectsApiUrl("/admin/projects"), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -150,7 +161,7 @@ export async function adminUpdateProject(
   payload: Partial<ProjectDTO>
 ): Promise<{ success: boolean; data?: ProjectDTO; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/admin/projects/${id}`, {
+    const res = await fetch(getProjectsApiUrl(`/admin/projects/${id}`), {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -184,7 +195,7 @@ export async function adminDeleteProject(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/admin/projects/${id}`, {
+    const res = await fetch(getProjectsApiUrl(`/admin/projects/${id}`), {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -224,7 +235,7 @@ export async function adminUploadMedia(
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch(`${API_BASE_URL}/admin/upload`, {
+    const res = await fetch(getProjectsApiUrl("/admin/upload"), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -260,7 +271,7 @@ export async function adminDeleteMedia(
   field?: "thumbnail" | "videoUrl" | "galleryImage"
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/admin/media/delete`, {
+    const res = await fetch(getProjectsApiUrl("/admin/media/delete"), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

@@ -40,7 +40,8 @@ export function getApiBaseUrl(): string {
   }
 
   // Server-side default
-  return "http://localhost:5000/api";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  return `${siteUrl.replace(/\/+$/, "")}/api`;
 }
 
 export async function submitContactInquiry(

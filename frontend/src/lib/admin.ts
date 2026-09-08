@@ -19,8 +19,15 @@ export interface InquiryStats {
   archived: number;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+function getAdminApiUrl(endpoint: string): string {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+
+  if (envUrl && envUrl.startsWith("http")) {
+    return `${envUrl.replace(/\/+$/, "")}${cleanEndpoint}`;
+  }
+  return `/api${cleanEndpoint}`;
+}
 
 export async function adminLogin(passcode: string): Promise<{
   success: boolean;
@@ -28,7 +35,7 @@ export async function adminLogin(passcode: string): Promise<{
   error?: string;
 }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/admin/login`, {
+    const res = await fetch(getAdminApiUrl("/admin/login"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ passcode }),
@@ -68,12 +75,13 @@ export async function fetchAdminInquiries(
   error?: string;
 }> {
   try {
-    const url = new URL(`${API_BASE_URL}/admin/inquiries`);
-    if (statusFilter && statusFilter !== "all") {
-      url.searchParams.append("status", statusFilter);
-    }
+    const base = getAdminApiUrl("/admin/inquiries");
+    const targetUrl =
+      statusFilter && statusFilter !== "all"
+        ? `${base}?status=${encodeURIComponent(statusFilter)}`
+        : base;
 
-    const res = await fetch(url.toString(), {
+    const res = await fetch(targetUrl, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -122,7 +130,7 @@ export async function updateInquiryStatus(
   status: InquiryItem["status"]
 ): Promise<{ success: boolean; data?: InquiryItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/admin/inquiries/${id}/status`, {
+    const res = await fetch(getAdminApiUrl(`/admin/inquiries/${id}/status`), {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -160,7 +168,7 @@ export async function deleteInquiry(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/admin/inquiries/${id}`, {
+    const res = await fetch(getAdminApiUrl(`/admin/inquiries/${id}`), {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

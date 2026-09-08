@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendInquiryEmails } from "@/lib/email";
+import { connectToDatabase } from "@/lib/db";
+import { Contact } from "@/models/Contact";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30; // Allow up to 30s for Vercel serverless
@@ -170,88 +172,38 @@ export async function POST(req: NextRequest) {
       message: message.trim(),
     };
 
-    // Determine Backend API endpoint
-    let backendApi =
-      process.env.BACKEND_API_URL ||
-      process.env.NEXT_PUBLIC_API_URL ||
-      "http://localhost:5000/api";
-
-    // Strip trailing slashes
-    backendApi = backendApi.replace(/\/+$/, "");
-
-    // Ensure URL has /api suffix if not present
-    const targetUrl = backendApi.endsWith("/contact")
-      ? backendApi
-      : backendApi.endsWith("/api")
-      ? `${backendApi}/contact`
-      : `${backendApi}/api/contact`;
-
-    // Forward request to Node.js/Express backend (for MongoDB storage)
-    let backendSuccess = false;
-    let backendData: any = {};
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout for cold start
-
+    // Save directly to MongoDB Atlas
+    let savedInquiry: any = null;
     try {
-      const response = await fetch(targetUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          ...(turnstileSecret ? { "x-verified-turnstile": turnstileSecret } : {}),
-        },
-        body: JSON.stringify(sanitizedData),
-        signal: controller.signal,
+      await connectToDatabase();
+      savedInquiry = await Contact.create({
+        ...sanitizedData,
+        status: "new",
       });
-
-      clearTimeout(timeoutId);
-
-      backendData = await response.json().catch(() => ({}));
-      backendSuccess = response.ok;
-
-      if (!backendSuccess) {
-        console.error(
-          `[Next.js /api/contact] Backend returned ${response.status}:`,
-          backendData.error || "unknown"
-        );
-      }
-    } catch (fetchError: any) {
-      clearTimeout(timeoutId);
-      console.error("[Next.js /api/contact] Backend connection error:", fetchError.message);
-      // Don't return error — still try to send emails even if backend is down
+      console.log(`[Next.js /api/contact] Inquiry saved to MongoDB (${savedInquiry._id})`);
+    } catch (dbError: any) {
+      console.error("[Next.js /api/contact] MongoDB storage error:", dbError.message);
+      // Non-blocking: Still dispatch emails so inquiries are never dropped
     }
 
-    // Send emails from Vercel (bypasses Render SMTP block)
+    // Send emails via Nodemailer with styled templates
     try {
       await sendInquiryEmails(sanitizedData);
-      console.log("[Next.js /api/contact] Emails dispatched from Vercel");
+      console.log("[Next.js /api/contact] Emails dispatched successfully");
     } catch (emailError: any) {
       console.error("[Next.js /api/contact] Email send error:", emailError.message);
     }
 
-    // If backend saved successfully, return 201
-    if (backendSuccess) {
-      return NextResponse.json(
-        {
-          success: true,
-          message:
-            backendData.message ||
-            "Inquiry received successfully. We will be in touch within 24 hours.",
-          data: backendData.data,
-        },
-        { status: 201 }
-      );
-    }
-
-    // Even if backend was down, if we reached here the form was valid and emails were attempted
     return NextResponse.json(
       {
         success: true,
         message:
-          "Your inquiry has been received. We will get back to you within 24 hours.",
+          "Inquiry received successfully. We will be in touch within 24 hours.",
+        data: savedInquiry
+          ? { id: savedInquiry._id.toString(), createdAt: savedInquiry.createdAt }
+          : undefined,
       },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (error: any) {
     console.error("[Next.js /api/contact] Handler error:", error);
