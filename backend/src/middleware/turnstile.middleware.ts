@@ -39,7 +39,7 @@ export async function verifyTurnstile(
   const expectedHostnames = new Set(
     (
       process.env.TURNSTILE_HOSTNAMES ??
-      "localhost,127.0.0.1,pglabs.agency,www.pglabs.agency,pg-labs-agency.vercel.app"
+      "localhost,127.0.0.1,pglabs.co.in,www.pglabs.co.in,pglabs.agency,www.pglabs.agency,pg-labs-agency.vercel.app"
     )
       .split(",")
       .map((h) => h.trim())
@@ -68,19 +68,33 @@ export async function verifyTurnstile(
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`siteverify returned HTTP ${response.status}`);
-    }
-
-    const result = (await response.json()) as {
+    const result = (await response.json().catch(() => ({}))) as {
       success: boolean;
       action?: string;
       hostname?: string;
       "error-codes"?: string[];
     };
 
+    if (!response.ok || !result.success) {
+      console.warn("[Turnstile] Express siteverify rejected or failed:", {
+        status: response.status,
+        result,
+      });
+
+      if (result["error-codes"]?.includes("invalid-input-secret")) {
+        console.error(
+          "[Turnstile] CONFIG ERROR: TURNSTILE_SECRET is invalid or rejected by Cloudflare. Check your Render environment variable!"
+        );
+      }
+
+      res.status(403).json({
+        success: false,
+        error: "Security verification failed. Please refresh and try again.",
+      });
+      return;
+    }
+
     if (
-      !result.success ||
       (result.action && result.action !== expectedAction) ||
       (expectedHostnames.size > 0 &&
         result.hostname &&

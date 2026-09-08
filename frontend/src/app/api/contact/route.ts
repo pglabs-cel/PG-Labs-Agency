@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       const expectedHostnames = new Set(
         (
           process.env.TURNSTILE_HOSTNAMES ??
-          "localhost,127.0.0.1,pglabs.agency,www.pglabs.agency,pg-labs-agency.vercel.app"
+          "localhost,127.0.0.1,pglabs.co.in,www.pglabs.co.in,pglabs.agency,www.pglabs.agency,pg-labs-agency.vercel.app"
         )
           .split(",")
           .map((h) => h.trim())
@@ -80,25 +80,41 @@ export async function POST(req: NextRequest) {
           }
         );
 
-        if (!verifyRes.ok) {
-          throw new Error(`siteverify returned status ${verifyRes.status}`);
-        }
-
-        const verifyData = (await verifyRes.json()) as {
+        const verifyData = (await verifyRes.json().catch(() => ({}))) as {
           success: boolean;
           action?: string;
           hostname?: string;
           "error-codes"?: string[];
         };
 
+        if (!verifyRes.ok || !verifyData.success) {
+          console.warn("[Turnstile siteverify rejected/failed]:", {
+            status: verifyRes.status,
+            verifyData,
+          });
+
+          if (verifyData["error-codes"]?.includes("invalid-input-secret")) {
+            console.error(
+              "[Turnstile] CONFIG ERROR: TURNSTILE_SECRET is invalid or rejected by Cloudflare. Check your Vercel environment variable!"
+            );
+          }
+
+          return NextResponse.json(
+            {
+              error:
+                "Verification challenge failed. Please reload and try again.",
+            },
+            { status: 403 }
+          );
+        }
+
         if (
-          !verifyData.success ||
           (verifyData.action && verifyData.action !== expectedAction) ||
           (expectedHostnames.size > 0 &&
             verifyData.hostname &&
             !expectedHostnames.has(verifyData.hostname))
         ) {
-          console.warn("[Turnstile siteverify rejected]:", verifyData);
+          console.warn("[Turnstile siteverify hostname/action rejected]:", verifyData);
           return NextResponse.json(
             {
               error:

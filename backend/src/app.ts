@@ -47,7 +47,7 @@ app.use(
       }
 
       // Allow custom domains
-      if (/^https:\/\/(www\.)?pglabs\.(agency|dev|com)$/.test(origin)) {
+      if (/^https:\/\/(www\.)?pglabs\.(agency|dev|com|co\.in)$/.test(origin)) {
         return callback(null, true);
       }
 

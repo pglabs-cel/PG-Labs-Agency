@@ -13,7 +13,7 @@ services:
       - key: MONGO_DB_URL
         sync: false
       - key: ALLOWED_ORIGINS
-        value: https://pglabs.agency,https://www.pglabs.agency,http://localhost:3000
+        value: https://pglabs.co.in,https://www.pglabs.co.in,https://pglabs.agency,https://www.pglabs.agency,http://localhost:3000
       - key: SMTP_HOST
         value: smtp.gmail.com
       - key: SMTP_PORT
