@@ -3,10 +3,10 @@
 import React from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
-import { RefreshCw, LogOut, MessageSquare, FolderKanban, ArrowUpRight } from "lucide-react";
+import { RefreshCw, LogOut, MessageSquare, FolderKanban, ArrowUpRight, PhoneCall } from "lucide-react";
 
 interface AdminHeaderProps {
-  activeTab: "inquiries" | "projects";
+  activeTab: "inquiries" | "projects" | "contact-info";
   onRefresh?: () => void;
   onLogout: () => void;
   loading?: boolean;
@@ -58,6 +58,18 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             >
               <FolderKanban className="w-3.5 h-3.5" />
               <span>Projects</span>
+            </Link>
+
+            <Link
+              href="/admin/contact-info"
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                activeTab === "contact-info"
+                  ? "bg-accent text-white shadow-sm"
+                  : "text-foreground-secondary hover:text-foreground hover:bg-background-secondary"
+              }`}
+            >
+              <PhoneCall className="w-3.5 h-3.5" />
+              <span>Contact Info</span>
             </Link>
           </nav>
         </div>

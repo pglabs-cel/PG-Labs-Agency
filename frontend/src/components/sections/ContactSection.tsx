@@ -8,7 +8,16 @@ import { FadeUp } from "@/components/animations/FadeUp";
 import { Toast } from "@/components/ui/Toast";
 import { TurnstileWidget, TurnstileRef } from "@/components/ui/TurnstileWidget";
 import { submitContactInquiry, ContactPayload } from "@/lib/api";
-import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import {
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  Paperclip,
+  FileText,
+  Image as ImageIcon,
+  X,
+  UploadCloud,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const PROJECT_TYPE_OPTIONS = [
@@ -30,6 +39,9 @@ export const ContactSection: React.FC = () => {
     message: "",
   });
 
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [turnstileToken, setTurnstileToken] = useState<string>("");
   const turnstileRef = useRef<TurnstileRef>(null);
 
@@ -46,6 +58,59 @@ export const ContactSection: React.FC = () => {
     title: "",
     message: "",
   });
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const handleAddFiles = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const allowedExts = [".pdf", ".png", ".jpg", ".jpeg", ".webp", ".gif"];
+    const validFiles: File[] = [];
+    let err = "";
+
+    Array.from(files).forEach((f) => {
+      const ext = "." + f.name.split(".").pop()?.toLowerCase();
+      if (!allowedExts.includes(ext)) {
+        err = `File "${f.name}" is unsupported. Please attach PDF or images.`;
+        return;
+      }
+      if (f.size > 10 * 1024 * 1024) {
+        err = `File "${f.name}" exceeds the 10MB limit.`;
+        return;
+      }
+      validFiles.push(f);
+    });
+
+    if (err) {
+      setToast({
+        isOpen: true,
+        type: "error",
+        title: "Attachment Notice",
+        message: err,
+      });
+    }
+
+    setAttachments((prev) => {
+      const combined = [...prev, ...validFiles];
+      if (combined.length > 3) {
+        setToast({
+          isOpen: true,
+          type: "error",
+          title: "File Limit",
+          message: "Maximum 3 attachments allowed per inquiry.",
+        });
+        return combined.slice(0, 3);
+      }
+      return combined;
+    });
+  };
+
+  const handleRemoveFile = (idxToRemove: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== idxToRemove));
+  };
 
   const validateClient = (): string | null => {
     if (!formData.name.trim()) return "Please enter your name.";
@@ -83,6 +148,7 @@ export const ContactSection: React.FC = () => {
     try {
       const response = await submitContactInquiry({
         ...formData,
+        attachments: attachments.length > 0 ? attachments : undefined,
         turnstileToken,
         "cf-turnstile-response": turnstileToken,
       });
@@ -101,6 +167,7 @@ export const ContactSection: React.FC = () => {
         projectType: "Web Application",
         message: "",
       });
+      setAttachments([]);
 
       // Token lifecycle: single-use token consumed, reset widget for fresh token
       setTurnstileToken("");
@@ -272,6 +339,86 @@ export const ContactSection: React.FC = () => {
                     placeholder="Provide an overview of what you want to build, current challenges, or timeline..."
                     className="w-full rounded-xl bg-background-surface/80 border border-border/80 px-4 py-3 text-foreground placeholder:text-foreground-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent text-sm resize-y transition-colors hover:border-border min-h-[120px]"
                   />
+                </div>
+
+                {/* Optional Project Brief / Files Attachment */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-mono uppercase tracking-wider text-foreground-secondary flex items-center gap-1.5">
+                      <Paperclip className="w-3.5 h-3.5 text-accent" />
+                      Attach Brief or Mockups <span className="text-foreground-muted font-normal lowercase">(optional)</span>
+                    </label>
+                    <span className="text-[11px] font-mono text-foreground-muted">
+                      PDF, Images &bull; Max 10MB
+                    </span>
+                  </div>
+
+                  {/* Hidden Input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept=".pdf,image/png,image/jpeg,image/webp,image/gif"
+                    className="hidden"
+                    onChange={(e) => {
+                      handleAddFiles(e.target.files);
+                      e.target.value = "";
+                    }}
+                    disabled={status === "loading"}
+                  />
+
+                  {/* Drop/Click Zone */}
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (status !== "loading") handleAddFiles(e.dataTransfer.files);
+                    }}
+                    className="w-full p-4 rounded-xl border border-dashed border-border/80 hover:border-accent/60 bg-background-surface/40 hover:bg-background-surface/70 transition-all cursor-pointer text-center group"
+                  >
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-foreground-secondary group-hover:text-accent transition-colors">
+                      <UploadCloud className="w-4 h-4 text-accent/80 shrink-0" />
+                      <span className="text-xs font-medium">
+                        Click to attach or drag & drop project specs, RFP or wireframes (PDF, PNG, JPG)
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Attached Files List */}
+                  {attachments.length > 0 && (
+                    <div className="space-y-2 pt-1">
+                      {attachments.map((file, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-background-surface border border-border/80 text-xs"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            {file.name.toLowerCase().endsWith(".pdf") ? (
+                              <FileText className="w-4 h-4 text-red-400 shrink-0" />
+                            ) : (
+                              <ImageIcon className="w-4 h-4 text-blue-400 shrink-0" />
+                            )}
+                            <span className="font-medium text-foreground truncate max-w-[200px] sm:max-w-[320px]">
+                              {file.name}
+                            </span>
+                            <span className="text-[10px] font-mono text-foreground-muted shrink-0">
+                              ({formatFileSize(file.size)})
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFile(idx)}
+                            disabled={status === "loading"}
+                            className="p-1 rounded hover:bg-red-500/10 text-foreground-muted hover:text-red-400 transition-colors"
+                            title="Remove file"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Cloudflare Turnstile Bot Verification (Centered) */}

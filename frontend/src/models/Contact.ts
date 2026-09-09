@@ -1,5 +1,12 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 
+export interface IContactAttachment {
+  filename: string;
+  url: string;
+  size?: number;
+  mimeType?: string;
+}
+
 export interface IContact extends Document {
   name: string;
   email: string;
@@ -8,6 +15,7 @@ export interface IContact extends Document {
   budget?: string;
   message: string;
   status: "new" | "contacted" | "in-progress" | "completed" | "archived";
+  attachments?: IContactAttachment[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -64,6 +72,14 @@ const ContactSchema: Schema = new Schema<IContact>(
       enum: ["new", "contacted", "in-progress", "completed", "archived"],
       default: "new",
     },
+    attachments: [
+      {
+        filename: { type: String, required: true },
+        url: { type: String, required: true },
+        size: { type: Number },
+        mimeType: { type: String },
+      },
+    ],
   },
   {
     timestamps: true,

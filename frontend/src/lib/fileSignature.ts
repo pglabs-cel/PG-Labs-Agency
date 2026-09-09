@@ -9,7 +9,7 @@ export interface FileSignatureResult {
   isValid: boolean;
   detectedMime?: string;
   detectedExt?: string;
-  resourceType?: "image" | "video";
+  resourceType?: "image" | "video" | "document";
   error?: string;
 }
 
@@ -99,7 +99,22 @@ export function verifyFileSignature(buffer: Buffer): FileSignatureResult {
     };
   }
 
-  // 7. Check for SVG (XML) — SVG upload is strictly disallowed to prevent stored XSS (Requirement 6)
+  // 7. PDF Document: starts with '%PDF-' (0x25 0x50 0x44 0x46)
+  if (
+    buffer[0] === 0x25 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x44 &&
+    buffer[3] === 0x46
+  ) {
+    return {
+      isValid: true,
+      detectedMime: "application/pdf",
+      detectedExt: "pdf",
+      resourceType: "document",
+    };
+  }
+
+  // 8. Check for SVG (XML) — SVG upload is strictly disallowed to prevent stored XSS (Requirement 6)
   const startStr = buffer.subarray(0, 100).toString("utf8").toLowerCase();
   if (
     startStr.includes("<svg") ||
@@ -116,6 +131,6 @@ export function verifyFileSignature(buffer: Buffer): FileSignatureResult {
   return {
     isValid: false,
     error:
-      "Invalid file signature. File header does not match any allowed image or video format.",
+      "Invalid file signature. File header does not match any allowed image, video, or PDF document format.",
   };
 }

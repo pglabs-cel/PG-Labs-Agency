@@ -6,12 +6,19 @@ if (dns.setDefaultResultOrder) {
   dns.setDefaultResultOrder("ipv4first");
 }
 
+export interface EmailAttachment {
+  filename: string;
+  content: Buffer;
+  contentType?: string;
+}
+
 export interface InquiryEmailData {
   name: string;
   email: string;
   company?: string;
   projectType: string;
   message: string;
+  attachments?: EmailAttachment[];
 }
 
 function getEmailConfig() {
@@ -81,6 +88,26 @@ function getAdminHtml(data: InquiryEmailData): string {
     </table>
     <div style="font-size:11px;text-transform:uppercase;color:#94a3b8;font-weight:700;margin-bottom:8px;">Message:</div>
     <div style="background:#1a1a1f;border:1px solid #33333d;border-radius:8px;padding:16px;color:#f1f5f9;font-size:14px;line-height:1.6;">${message}</div>
+    ${
+      data.attachments && data.attachments.length > 0
+        ? `
+    <div style="margin-top:20px;padding:14px 18px;background:#18181c;border:1px solid #2d2d33;border-radius:8px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#c084fc;margin-bottom:8px;">
+        Attached Brief / Files (${data.attachments.length})
+      </div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.5;color:#e2e8f0;">
+        ${data.attachments
+          .map(
+            (att) =>
+              `<li style="margin-bottom:4px;">&#128206; <strong style="color:#fff;">${escapeHtml(
+                att.filename
+              )}</strong></li>`
+          )
+          .join("")}
+      </ul>
+    </div>`
+        : ""
+    }
   </div>
   <div style="padding:16px 28px;border-top:1px solid #2d2d33;background:#18181c;text-align:center;color:#94a3b8;font-size:12px;">PG Labs Notification System</div>
 </div>`.trim();
@@ -140,6 +167,11 @@ export async function sendInquiryEmails(data: InquiryEmailData): Promise<void> {
         subject: `[New Inquiry] ${data.name} — ${data.projectType}`,
         text: `New Inquiry from ${data.name} (${data.email})\nCompany: ${data.company || "N/A"}\nProject: ${data.projectType}\n\nMessage:\n${data.message}`,
         html: getAdminHtml(data),
+        attachments: data.attachments?.map((att) => ({
+          filename: att.filename,
+          content: att.content,
+          contentType: att.contentType,
+        })),
       }),
       transporter.sendMail({
         from: `"${config.senderName}" <${config.user}>`,
@@ -162,4 +194,107 @@ export async function sendInquiryEmails(data: InquiryEmailData): Promise<void> {
   } catch (error: any) {
     console.error("[Vercel Mail] Unexpected error:", error.message);
   }
+}
+
+function getReplyHtml(
+  clientName: string,
+  messageBody: string,
+  attachments?: EmailAttachment[]
+): string {
+  const name = escapeHtml(clientName);
+  const body = escapeHtml(messageBody).replace(/\n/g, "<br />");
+
+  let attachmentsHtml = "";
+  if (attachments && attachments.length > 0) {
+    const listItems = attachments
+      .map(
+        (att) =>
+          `<li style="margin-bottom:6px;color:#f1f5f9;"><span style="color:#c084fc;font-weight:600;">&#128206;</span> <strong style="color:#ffffff;">${escapeHtml(
+            att.filename
+          )}</strong></li>`
+      )
+      .join("");
+
+    attachmentsHtml = `
+    <div style="background:#18181c;border:1px solid #2d2d33;border-radius:8px;padding:14px 18px;margin:24px 0 16px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#c084fc;margin-bottom:8px;">
+        Attached Documents (${attachments.length})
+      </div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;">
+        ${listItems}
+      </ul>
+      <p style="margin:8px 0 0;font-size:11px;color:#94a3b8;">
+        The attached files have also been included directly with this email for you to download.
+      </p>
+    </div>`;
+  }
+
+  return `
+<div style="font-family:sans-serif;max-width:580px;margin:0 auto;background:#121215;border:1px solid #2d2d33;border-radius:12px;overflow:hidden;">
+  <div style="padding:24px 32px;border-bottom:1px solid #2d2d33;background:#18181c;">
+    <table border="0" cellspacing="0" cellpadding="0" style="width:100%;">
+      <tr>
+        <td style="vertical-align:middle;width:44px;padding-right:14px;">
+          <img src="https://res.cloudinary.com/y20gw7iu/image/upload/v1788118208/Logo_Only.jpg" alt="PG Labs" width="40" height="40" style="display:block;border-radius:8px;" />
+        </td>
+        <td style="vertical-align:middle;">
+          <div style="font-size:18px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:#fff;">PG LABS</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#c084fc;margin-top:2px;">Digital Product Studio</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div style="padding:32px;color:#e2e8f0;font-size:15px;line-height:1.7;">
+    <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:20px;">Hi ${name},</div>
+    <div style="color:#f1f5f9;font-size:15px;line-height:1.7;">${body}</div>
+    ${attachmentsHtml}
+    <div style="border-top:1px solid #2d2d33;padding-top:20px;margin-top:28px;">
+      <div style="font-size:14px;font-weight:700;color:#fff;">PG Labs Engineering Team</div>
+      <div style="font-size:13px;color:#94a3b8;margin-top:2px;">Web Applications &bull; AI Solutions &bull; Custom Software</div>
+      <div style="font-size:12px;color:#71717a;margin-top:6px;">
+        <a href="https://pglabs.in" style="color:#c084fc;text-decoration:none;">pglabs.in</a>
+      </div>
+    </div>
+  </div>
+  <div style="padding:18px 32px;border-top:1px solid #2d2d33;background:#18181c;text-align:center;color:#94a3b8;font-size:12px;">&copy; ${new Date().getFullYear()} PG Labs. All rights reserved.</div>
+</div>`.trim();
+}
+
+export interface ReplyEmailData {
+  recipientEmail: string;
+  recipientName: string;
+  subject: string;
+  message: string;
+  attachments?: EmailAttachment[];
+}
+
+export async function sendReplyEmail(data: ReplyEmailData): Promise<void> {
+  const config = getEmailConfig();
+
+  if (!config.user || !config.pass || config.pass.length < 8) {
+    throw new Error("Email credentials not configured. Cannot send reply.");
+  }
+
+  const transporter = createTransporter();
+
+  const mailOptions: any = {
+    from: `"${config.senderName}" <${config.user}>`,
+    to: data.recipientEmail,
+    replyTo: config.adminEmail,
+    subject: data.subject,
+    text: `Hi ${data.recipientName},\n\n${data.message}\n\nBest regards,\nPG Labs Engineering Team\nhttps://pglabs.in`,
+    html: getReplyHtml(data.recipientName, data.message, data.attachments),
+  };
+
+  if (data.attachments && data.attachments.length > 0) {
+    mailOptions.attachments = data.attachments.map((att) => ({
+      filename: att.filename,
+      content: att.content,
+      contentType: att.contentType,
+    }));
+  }
+
+  const result = await transporter.sendMail(mailOptions);
+
+  console.log(`[Vercel Mail] ✓ Admin Reply sent to ${data.recipientEmail} (${result.messageId}) with ${data.attachments?.length || 0} attachment(s)`);
 }

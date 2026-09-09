@@ -10,10 +10,12 @@ export const SITE_CONFIG = {
   logoMarkUrl: "https://res.cloudinary.com/y20gw7iu/image/upload/v1788118208/Logo_Only.jpg",
   fullLogoUrl: "https://res.cloudinary.com/y20gw7iu/image/upload/v1788118184/Full_logo.jpg",
   links: {
-    twitter: "https://twitter.com/pglabs",
-    github: "https://github.com/pglabs",
-    linkedin: "https://linkedin.com/company/pglabs",
+    twitter: "",
+    github: "",
+    linkedin: "",
     email: "pglabs.agency@gmail.com",
+    phone: "",
+    whatsapp: "",
   },
 };
 

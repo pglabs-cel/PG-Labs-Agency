@@ -11,6 +11,7 @@ import {
   fetchAdminInquiries,
   updateInquiryStatus,
   deleteInquiry,
+  sendInquiryReply,
   InquiryItem,
   InquiryStats,
 } from "@/lib/admin";
@@ -33,6 +34,12 @@ import {
   Building,
   DollarSign,
   Calendar,
+  Send,
+  Paperclip,
+  FileText,
+  Image as ImageIcon,
+  Download,
+  UploadCloud,
 } from "lucide-react";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -62,6 +69,14 @@ export default function AdminInquiriesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedInquiry, setSelectedInquiry] = useState<InquiryItem | null>(null);
 
+  // Reply Modal State
+  const [replyTarget, setReplyTarget] = useState<InquiryItem | null>(null);
+  const [replySubject, setReplySubject] = useState("");
+  const [replyMessage, setReplyMessage] = useState("");
+  const [replySending, setReplySending] = useState(false);
+  const [replyAttachments, setReplyAttachments] = useState<File[]>([]);
+  const replyFileInputRef = React.useRef<HTMLInputElement>(null);
+
   const [toast, setToast] = useState<{
     isOpen: boolean;
     type: "success" | "error";
@@ -73,6 +88,125 @@ export default function AdminInquiriesPage() {
     title: "",
     message: "",
   });
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const handleAddReplyAttachments = (newFiles: FileList | null) => {
+    if (!newFiles || newFiles.length === 0) return;
+    const allowedExts = [".pdf", ".png", ".jpg", ".jpeg", ".webp", ".gif"];
+    const validFiles: File[] = [];
+    let errorMsg = "";
+
+    Array.from(newFiles).forEach((file) => {
+      const ext = "." + file.name.split(".").pop()?.toLowerCase();
+      if (!allowedExts.includes(ext)) {
+        errorMsg = `File "${file.name}" is unsupported. Please attach PDF or images.`;
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        errorMsg = `File "${file.name}" exceeds the 10MB limit.`;
+        return;
+      }
+      validFiles.push(file);
+    });
+
+    if (errorMsg) {
+      setToast({
+        isOpen: true,
+        type: "error",
+        title: "Attachment Notice",
+        message: errorMsg,
+      });
+    }
+
+    setReplyAttachments((prev) => {
+      const combined = [...prev, ...validFiles];
+      if (combined.length > 5) {
+        setToast({
+          isOpen: true,
+          type: "error",
+          title: "Attachment Limit",
+          message: "Maximum 5 attachments allowed per email reply.",
+        });
+        return combined.slice(0, 5);
+      }
+      return combined;
+    });
+  };
+
+  const handleRemoveReplyAttachment = (indexToRemove: number) => {
+    setReplyAttachments((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const openReplyModal = (item: InquiryItem) => {
+    setReplyTarget(item);
+    setReplyAttachments([]);
+    setReplySubject(`Re: ${item.projectType} Inquiry — PG Labs`);
+    setReplyMessage(
+      `Thank you for reaching out to PG Labs regarding your ${item.projectType} project.\n\nWe have reviewed your requirements and would love to connect for a quick discussion on how we can build this for you.\n\nCould you please share your availability for a brief call this week?`
+    );
+  };
+
+  const handleSendReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token || !replyTarget) return;
+    if (!replySubject.trim() || !replyMessage.trim()) {
+      setToast({
+        isOpen: true,
+        type: "error",
+        title: "Validation Error",
+        message: "Subject and message are required.",
+      });
+      return;
+    }
+
+    setReplySending(true);
+    const res = await sendInquiryReply(token, replyTarget._id, {
+      subject: replySubject.trim(),
+      message: replyMessage.trim(),
+      attachments: replyAttachments,
+    });
+
+    if (res.success) {
+      setToast({
+        isOpen: true,
+        type: "success",
+        title: "Reply Sent",
+        message: `Branded email with ${replyAttachments.length} attachment(s) sent to ${replyTarget.email}.`,
+      });
+
+      if (res.updatedStatus) {
+        setInquiries((prev) =>
+          prev.map((item) =>
+            item._id === replyTarget._id
+              ? { ...item, status: res.updatedStatus as InquiryItem["status"] }
+              : item
+          )
+        );
+        if (selectedInquiry?._id === replyTarget._id) {
+          setSelectedInquiry((prev) =>
+            prev ? { ...prev, status: res.updatedStatus as InquiryItem["status"] } : null
+          );
+        }
+      }
+
+      setReplyAttachments([]);
+      setReplyTarget(null);
+      loadInquiries(token, activeTab);
+    } else {
+      setToast({
+        isOpen: true,
+        type: "error",
+        title: "Send Failed",
+        message: res.error || "Failed to dispatch email reply.",
+      });
+    }
+    setReplySending(false);
+  };
 
   // Check saved session on mount
   useEffect(() => {
@@ -277,9 +411,6 @@ export default function AdminInquiriesPage() {
             </Button>
           </form>
 
-          <p className="text-center text-xs font-mono text-foreground-muted mt-6">
-            Default passcode: <code className="text-foreground-secondary">pglabs_admin_2026</code>
-          </p>
         </div>
 
         <Toast
@@ -448,9 +579,20 @@ export default function AdminInquiriesPage() {
 
                       {/* Project Type */}
                       <td className="py-4 px-4 whitespace-nowrap">
-                        <Badge variant="default" size="sm">
-                          {item.projectType}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="default" size="sm">
+                            {item.projectType}
+                          </Badge>
+                          {item.attachments && item.attachments.length > 0 && (
+                            <span
+                              className="inline-flex items-center gap-1 text-[10px] font-mono font-medium text-accent bg-accent/10 border border-accent/25 px-1.5 py-0.5 rounded"
+                              title={`${item.attachments.length} attachment(s) included`}
+                            >
+                              <Paperclip className="w-3 h-3" />
+                              <span>{item.attachments.length}</span>
+                            </span>
+                          )}
+                        </div>
                       </td>
 
                       {/* Status Selector */}
@@ -497,18 +639,14 @@ export default function AdminInquiriesPage() {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex items-center justify-end gap-2">
-                          <a
-                            href={`mailto:${item.email}?subject=${encodeURIComponent(
-                              `Re: ${item.projectType} Inquiry — PG Labs`
-                            )}&body=${encodeURIComponent(
-                              `Hi ${item.name},\n\nThank you for reaching out to PG Labs regarding your ${item.projectType} project.\n\nWe have reviewed your inquiry and would love to schedule a brief technical discovery call.\n\nBest regards,\nPG Labs Engineering Team`
-                            )}`}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-accent/10 hover:bg-accent text-accent hover:text-white border border-accent/30 transition-all font-medium"
-                            title="Reply via Email"
+                          <button
+                            onClick={() => openReplyModal(item)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-accent/10 hover:bg-accent text-accent hover:text-white border border-accent/30 transition-all font-medium text-xs shadow-sm"
+                            title="Send Branded Reply Email"
                           >
                             <Mail className="w-3.5 h-3.5" />
                             <span>Reply</span>
-                          </a>
+                          </button>
 
                           <button
                             onClick={() => handleDelete(item._id, item.name)}
@@ -606,6 +744,48 @@ export default function AdminInquiriesPage() {
               </div>
             </div>
 
+            {/* Client Attachments */}
+            {selectedInquiry.attachments && selectedInquiry.attachments.length > 0 && (
+              <div className="mb-8">
+                <span className="text-xs font-mono uppercase tracking-wider text-foreground-muted flex items-center gap-1.5 mb-2.5">
+                  <Paperclip className="w-3.5 h-3.5 text-accent" />
+                  Client Attached Brief & Files ({selectedInquiry.attachments.length})
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {selectedInquiry.attachments.map((att, idx) => (
+                    <a
+                      key={idx}
+                      href={att.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 rounded-xl bg-background-surface border border-border hover:border-accent/50 group transition-all"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        {att.filename.toLowerCase().endsWith(".pdf") ? (
+                          <FileText className="w-4 h-4 text-red-400 shrink-0" />
+                        ) : (
+                          <ImageIcon className="w-4 h-4 text-blue-400 shrink-0" />
+                        )}
+                        <div className="truncate">
+                          <p className="text-xs font-medium text-foreground group-hover:text-accent transition-colors truncate">
+                            {att.filename}
+                          </p>
+                          {att.size && (
+                            <p className="text-[10px] font-mono text-foreground-muted">
+                              {formatFileSize(att.size)}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="p-1.5 rounded-lg bg-background-secondary text-foreground-muted group-hover:text-accent shrink-0 ml-2">
+                        <Download className="w-3.5 h-3.5" />
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Modal Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-border">
               <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -631,19 +811,210 @@ export default function AdminInquiriesPage() {
               </div>
 
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                <a
-                  href={`mailto:${selectedInquiry.email}?subject=${encodeURIComponent(
-                    `Re: ${selectedInquiry.projectType} Inquiry — PG Labs`
-                  )}&body=${encodeURIComponent(
-                    `Hi ${selectedInquiry.name},\n\nThank you for reaching out to PG Labs regarding your ${selectedInquiry.projectType} project.\n\nWe have reviewed your requirements and would like to connect on next steps.\n\nBest regards,\nPG Labs Engineering Team`
-                  )}`}
-                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-accent text-white font-medium text-xs hover:bg-accent-hover transition-colors"
+                <button
+                  onClick={() => openReplyModal(selectedInquiry)}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-accent text-white font-medium text-xs hover:bg-accent-hover transition-colors shadow-sm"
                 >
                   <Mail className="w-4 h-4" />
-                  <span>Reply via Email</span>
-                </a>
+                  <span>Send Branded Reply</span>
+                </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Branded Reply Modal */}
+      {replyTarget && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-xl rounded-2xl bg-background-secondary border border-border shadow-2xl p-6 sm:p-7 relative max-h-[92vh] overflow-y-auto no-scrollbar">
+            {/* Close Button */}
+            <button
+              onClick={() => setReplyTarget(null)}
+              disabled={replySending}
+              className="absolute top-5 right-5 p-1.5 rounded-lg text-foreground-muted hover:text-foreground hover:bg-background-surface transition-colors disabled:opacity-50"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Header */}
+            <div className="mb-5">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-accent/30 bg-accent/10 text-accent font-mono text-[10px] tracking-wider uppercase mb-2">
+                <Mail className="w-3 h-3" />
+                PG Labs Official Response
+              </div>
+              <h3 className="text-xl font-bold text-foreground">
+                Reply to {replyTarget.name}
+              </h3>
+              <p className="text-xs text-foreground-secondary mt-1">
+                Recipient: <span className="text-foreground font-mono">{replyTarget.email}</span>
+                {replyTarget.company && ` (${replyTarget.company})`}
+              </p>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSendReply} className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground-muted mb-1.5">
+                  Subject Line
+                </label>
+                <input
+                  type="text"
+                  value={replySubject}
+                  onChange={(e) => setReplySubject(e.target.value)}
+                  placeholder="Subject..."
+                  required
+                  disabled={replySending}
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-background-surface border border-border text-foreground text-xs focus:outline-none focus:border-accent transition-colors disabled:opacity-50"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-[11px] font-mono uppercase tracking-wider text-foreground-muted">
+                    Message Body
+                  </label>
+                  <span className="text-[10px] text-foreground-muted">
+                    Client sees personalized greeting, your message, and PG Labs signature
+                  </span>
+                </div>
+                <textarea
+                  rows={7}
+                  value={replyMessage}
+                  onChange={(e) => setReplyMessage(e.target.value)}
+                  placeholder="Type your response to the client..."
+                  required
+                  disabled={replySending}
+                  className="w-full p-3.5 rounded-lg bg-background-surface border border-border text-foreground text-xs leading-relaxed focus:outline-none focus:border-accent transition-colors resize-none disabled:opacity-50"
+                />
+              </div>
+
+              {/* File Attachments Section */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-[11px] font-mono uppercase tracking-wider text-foreground-muted flex items-center gap-1.5">
+                    <Paperclip className="w-3.5 h-3.5 text-accent" />
+                    Attachments (PDF, Images)
+                  </label>
+                  <span className="text-[10px] text-foreground-muted font-mono">
+                    Max 5 files &bull; 10MB each
+                  </span>
+                </div>
+
+                {/* Hidden File Input */}
+                <input
+                  ref={replyFileInputRef}
+                  type="file"
+                  multiple
+                  accept=".pdf,image/png,image/jpeg,image/webp,image/gif"
+                  className="hidden"
+                  onChange={(e) => {
+                    handleAddReplyAttachments(e.target.files);
+                    e.target.value = "";
+                  }}
+                  disabled={replySending}
+                />
+
+                {/* Drop/Click Zone */}
+                <div
+                  onClick={() => replyFileInputRef.current?.click()}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (!replySending) handleAddReplyAttachments(e.dataTransfer.files);
+                  }}
+                  className="w-full p-3 rounded-lg border border-dashed border-border hover:border-accent/60 bg-background-surface/40 hover:bg-background-surface/70 transition-all cursor-pointer text-center group"
+                >
+                  <div className="flex items-center justify-center gap-2 text-foreground-secondary group-hover:text-accent transition-colors">
+                    <UploadCloud className="w-4 h-4 text-accent/80" />
+                    <span className="text-xs font-medium">
+                      Click to browse or drag & drop PDF, PNG, JPG, WebP
+                    </span>
+                  </div>
+                </div>
+
+                {/* Attachment Chips */}
+                {replyAttachments.length > 0 && (
+                  <div className="mt-2.5 space-y-1.5">
+                    {replyAttachments.map((file, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between px-3 py-2 rounded-lg bg-background-surface border border-border/80 text-xs"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          {file.name.toLowerCase().endsWith(".pdf") ? (
+                            <FileText className="w-4 h-4 text-red-400 shrink-0" />
+                          ) : (
+                            <ImageIcon className="w-4 h-4 text-blue-400 shrink-0" />
+                          )}
+                          <span className="font-medium text-foreground truncate max-w-[240px] sm:max-w-[340px]">
+                            {file.name}
+                          </span>
+                          <span className="text-[10px] font-mono text-foreground-muted shrink-0">
+                            ({formatFileSize(file.size)})
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveReplyAttachment(idx)}
+                          disabled={replySending}
+                          className="p-1 rounded hover:bg-red-500/10 text-foreground-muted hover:text-red-400 transition-colors"
+                          title="Remove attachment"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Email Template Preview Hint */}
+              <div className="p-3 rounded-lg bg-background-surface/70 border border-border/80 text-[11px] text-foreground-secondary space-y-1">
+                <div className="font-semibold text-foreground flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  HTML Email Preview
+                </div>
+                <p className="text-foreground-muted leading-relaxed">
+                  Delivered as an official styled dark-theme PG Labs email with studio branding, engineering signature, and MIME attachments.
+                </p>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setReplyTarget(null)}
+                  disabled={replySending}
+                  className="px-4 py-2 rounded-lg text-xs font-medium text-foreground-secondary hover:text-foreground hover:bg-background-surface transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={replySending}
+                  className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-accent text-white text-xs font-medium hover:bg-accent-hover transition-colors shadow-sm disabled:opacity-50"
+                >
+                  {replySending ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Sending Email...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>
+                        {replyAttachments.length > 0
+                          ? `Send Reply (${replyAttachments.length} file${
+                              replyAttachments.length > 1 ? "s" : ""
+                            })`
+                          : "Send Reply"}
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

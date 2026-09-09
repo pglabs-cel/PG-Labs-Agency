@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendInquiryEmails } from "@/lib/email";
+import fs from "fs";
+import path from "path";
+import { sendInquiryEmails, EmailAttachment } from "@/lib/email";
 import { connectToDatabase } from "@/lib/db";
 import { Contact } from "@/models/Contact";
+import { verifyFileSignature } from "@/lib/fileSignature";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryPipeline } from "@/lib/cloudinaryPipeline";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30; // Allow up to 30s for Vercel serverless
@@ -26,9 +31,126 @@ const ALLOWED_PROJECT_TYPES = [
 
 export async function POST(req: NextRequest) {
   try {
-    const body: ContactBody = await req.json().catch(() => ({}));
+    const contentType = req.headers.get("content-type") || "";
+    let name = "";
+    let email = "";
+    let company = "";
+    let projectType = "";
+    let message = "";
+    let turnstileToken = "";
+    const emailAttachments: EmailAttachment[] = [];
+    const savedAttachments: Array<{ filename: string; url: string; size: number; mimeType: string }> = [];
 
-    const { name, email, company, projectType, message } = body;
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await req.formData();
+      name = (formData.get("name") as string) || "";
+      email = (formData.get("email") as string) || "";
+      company = (formData.get("company") as string) || "";
+      projectType = (formData.get("projectType") as string) || "";
+      message = (formData.get("message") as string) || "";
+      turnstileToken =
+        (formData.get("cf-turnstile-response") as string) ||
+        (formData.get("turnstileToken") as string) ||
+        "";
+
+      const rawFiles = [
+        ...formData.getAll("attachments"),
+        ...formData.getAll("files"),
+      ];
+
+      const uploadsDir = path.resolve(process.cwd(), "public/uploads/attachments");
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      for (const entry of rawFiles) {
+        if (entry && typeof entry === "object" && "arrayBuffer" in entry) {
+          const file = entry as File;
+          if (file.size === 0) continue;
+          if (file.size > 10 * 1024 * 1024) {
+            return NextResponse.json(
+              { error: `File "${file.name}" exceeds the 10MB limit.` },
+              { status: 400 }
+            );
+          }
+
+          const buffer = Buffer.from(await file.arrayBuffer());
+          const sigCheck = verifyFileSignature(buffer);
+          if (!sigCheck.isValid) {
+            return NextResponse.json(
+              {
+                error: `File "${file.name}" rejected: ${
+                  sigCheck.error || "Unsupported file format. Please attach PDF or images."
+                }`,
+              },
+              { status: 400 }
+            );
+          }
+
+          const sanitizedBase = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+          const safeFilename = `${Date.now()}_${sanitizedBase}`;
+          let fileUrl = `/uploads/attachments/${safeFilename}`;
+
+          if (CloudinaryPipeline.isConfigured()) {
+            try {
+              const resType: "image" | "raw" | "auto" =
+                sigCheck.resourceType === "document" ? "raw" : "image";
+
+              const uploadRes: any = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                  {
+                    folder: "pglabs/inquiries",
+                    resource_type: resType,
+                    public_id: `${Date.now()}_${sanitizedBase.replace(/\.[^/.]+$/, "")}`,
+                    overwrite: true,
+                  },
+                  (error, result) => {
+                    if (error || !result) {
+                      reject(error || new Error("Cloudinary upload failed"));
+                    } else {
+                      resolve(result);
+                    }
+                  }
+                );
+                stream.end(buffer);
+              });
+
+              if (uploadRes && uploadRes.secure_url) {
+                fileUrl = uploadRes.secure_url;
+              }
+            } catch (cloudErr) {
+              console.warn("[Cloudinary] Inquiries upload fallback to local disk:", cloudErr);
+              const filePath = path.join(uploadsDir, safeFilename);
+              await fs.promises.writeFile(filePath, buffer);
+            }
+          } else {
+            const filePath = path.join(uploadsDir, safeFilename);
+            await fs.promises.writeFile(filePath, buffer);
+          }
+
+          emailAttachments.push({
+            filename: file.name,
+            content: buffer,
+            contentType: sigCheck.detectedMime || file.type || "application/octet-stream",
+          });
+
+          savedAttachments.push({
+            filename: file.name,
+            url: fileUrl,
+            size: file.size,
+            mimeType: sigCheck.detectedMime || file.type || "application/octet-stream",
+          });
+        }
+      }
+    } else {
+      const body: any = await req.json().catch(() => ({}));
+      name = body.name || "";
+      email = body.email || "";
+      company = body.company || "";
+      projectType = body.projectType || "";
+      message = body.message || "";
+      turnstileToken = body["cf-turnstile-response"] || body.turnstileToken || "";
+    }
 
     // Cloudflare Turnstile Server-Side Verification
     const KNOWN_VALID_SECRET = "0x4AAAAAAErHiSb1Pmra9Byt7gDGhZMOylQ";
@@ -47,8 +169,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (turnstileSecret) {
-      const token =
-        (body as any)["cf-turnstile-response"] || (body as any).turnstileToken;
+      const token = turnstileToken;
 
       if (
         typeof token !== "string" ||
@@ -199,9 +320,10 @@ export async function POST(req: NextRequest) {
 
       savedInquiry = await Contact.create({
         ...sanitizedData,
+        attachments: savedAttachments.length > 0 ? savedAttachments : undefined,
         status: "new",
       });
-      console.log(`[Next.js /api/contact] Inquiry saved to MongoDB (${savedInquiry._id})`);
+      console.log(`[Next.js /api/contact] Inquiry saved to MongoDB (${savedInquiry._id}) with ${savedAttachments.length} attachment(s)`);
     } catch (dbError: any) {
       console.error("[Next.js /api/contact] MongoDB storage error:", dbError.message);
       // Non-blocking: Still dispatch emails so inquiries are never dropped
@@ -209,7 +331,10 @@ export async function POST(req: NextRequest) {
 
     // Send emails via Nodemailer with styled templates
     try {
-      await sendInquiryEmails(sanitizedData);
+      await sendInquiryEmails({
+        ...sanitizedData,
+        attachments: emailAttachments.length > 0 ? emailAttachments : undefined,
+      });
       console.log("[Next.js /api/contact] Emails dispatched successfully");
     } catch (emailError: any) {
       console.error("[Next.js /api/contact] Email send error:", emailError.message);

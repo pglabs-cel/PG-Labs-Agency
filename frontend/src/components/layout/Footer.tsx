@@ -1,11 +1,49 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { SITE_CONFIG, NAV_LINKS } from "@/lib/constants";
 import { ArrowUpRight } from "lucide-react";
 
+interface ContactLinks {
+  email: string;
+  phone?: string;
+  whatsappNumber?: string;
+  linkedin?: string;
+  twitter?: string;
+  github?: string;
+}
+
 export const Footer: React.FC = () => {
+  const [links, setLinks] = useState<ContactLinks>({
+    email: SITE_CONFIG.links.email || "pglabs.agency@gmail.com",
+    phone: "",
+    whatsappNumber: "",
+    linkedin: "",
+    twitter: "",
+    github: "",
+  });
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data) {
+          setLinks({
+            email: data.data.email || SITE_CONFIG.links.email || "pglabs.agency@gmail.com",
+            phone: data.data.phone || "",
+            whatsappNumber: data.data.whatsappNumber || "",
+            linkedin: data.data.linkedin || "",
+            twitter: data.data.twitter || "",
+            github: data.data.github || "",
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <footer className="border-t border-border bg-background-secondary text-foreground-secondary pt-16 pb-12 mt-auto">
       <Container>
@@ -65,43 +103,97 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Connect Column */}
+          {/* Connect Column - Conditionally Rendered */}
           <div className="md:col-span-3 space-y-4">
             <p className="text-xs font-mono uppercase tracking-widest text-foreground font-semibold">
               Connect
             </p>
             <ul className="space-y-2.5 text-sm" role="list">
-              <li>
-                <a
-                  href={`mailto:${SITE_CONFIG.links.email}`}
-                  className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
-                >
-                  <span>{SITE_CONFIG.links.email}</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href={SITE_CONFIG.links.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
-                >
-                  <span>LinkedIn</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://wa.me/919999999999"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
-                >
-                  <span>WhatsApp</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
-                </a>
-              </li>
+              {/* Email is always available */}
+              {links.email && (
+                <li>
+                  <a
+                    href={`mailto:${links.email}`}
+                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
+                  >
+                    <span>{links.email}</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
+                  </a>
+                </li>
+              )}
+
+              {/* Direct Call Phone - Only shown if provided */}
+              {links.phone && links.phone.trim().length > 0 && (
+                <li>
+                  <a
+                    href={`tel:${links.phone.replace(/[^+\d]/g, "")}`}
+                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
+                  >
+                    <span>{links.phone}</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
+                  </a>
+                </li>
+              )}
+
+              {/* WhatsApp - Only shown if provided */}
+              {links.whatsappNumber && links.whatsappNumber.trim().length > 0 && (
+                <li>
+                  <a
+                    href={`https://wa.me/${links.whatsappNumber.replace(/[^0-9]/g, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
+                  >
+                    <span>WhatsApp</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
+                  </a>
+                </li>
+              )}
+
+              {/* LinkedIn - Only shown if provided */}
+              {links.linkedin && links.linkedin.trim().length > 0 && (
+                <li>
+                  <a
+                    href={links.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
+                  >
+                    <span>LinkedIn</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
+                  </a>
+                </li>
+              )}
+
+              {/* Twitter / X - Only shown if provided */}
+              {links.twitter && links.twitter.trim().length > 0 && (
+                <li>
+                  <a
+                    href={links.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
+                  >
+                    <span>Twitter / X</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
+                  </a>
+                </li>
+              )}
+
+              {/* GitHub - Only shown if provided */}
+              {links.github && links.github.trim().length > 0 && (
+                <li>
+                  <a
+                    href={links.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
+                  >
+                    <span>GitHub</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
         </div>

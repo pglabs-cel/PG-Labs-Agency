@@ -6,6 +6,7 @@ export interface ContactPayload {
   message: string;
   turnstileToken?: string;
   "cf-turnstile-response"?: string;
+  attachments?: File[];
 }
 
 export interface ContactResponse {
@@ -45,7 +46,7 @@ export function getApiBaseUrl(): string {
 }
 
 export async function submitContactInquiry(
-  payload: ContactPayload
+  payload: ContactPayload | FormData
 ): Promise<ContactResponse> {
   const baseUrl = getApiBaseUrl();
   const endpoint = baseUrl.endsWith("/contact")
@@ -55,13 +56,35 @@ export async function submitContactInquiry(
     : `${baseUrl}/api/contact`;
 
   try {
+    let body: BodyInit;
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (payload instanceof FormData) {
+      body = payload;
+    } else if (payload.attachments && payload.attachments.length > 0) {
+      const fd = new FormData();
+      fd.append("name", payload.name);
+      fd.append("email", payload.email);
+      fd.append("company", payload.company || "");
+      fd.append("projectType", payload.projectType);
+      fd.append("message", payload.message);
+      if (payload.turnstileToken) fd.append("turnstileToken", payload.turnstileToken);
+      if (payload["cf-turnstile-response"]) fd.append("cf-turnstile-response", payload["cf-turnstile-response"]);
+      for (const file of payload.attachments) {
+        fd.append("attachments", file);
+      }
+      body = fd;
+    } else {
+      headers["Content-Type"] = "application/json";
+      body = JSON.stringify(payload);
+    }
+
     const res = await fetch(endpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(payload),
+      headers,
+      body,
     });
 
     const data = await res.json().catch(() => ({}));

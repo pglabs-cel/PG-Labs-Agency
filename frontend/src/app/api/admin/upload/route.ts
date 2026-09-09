@@ -56,7 +56,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const resourceType = signatureCheck.resourceType || "image";
+    if (signatureCheck.resourceType === "document") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Document uploads are not supported for portfolio media assets. Please upload JPG, PNG, WebP, or MP4.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const resourceType: "image" | "video" =
+      signatureCheck.resourceType === "video" ? "video" : "image";
 
     // Enforce 50MB ceiling
     if (rawBuffer.length > 50 * 1024 * 1024) {

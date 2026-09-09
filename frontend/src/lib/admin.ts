@@ -7,6 +7,12 @@ export interface InquiryItem {
   budget?: string;
   message: string;
   status: "new" | "contacted" | "in-progress" | "completed" | "archived";
+  attachments?: Array<{
+    filename: string;
+    url: string;
+    size?: number;
+    mimeType?: string;
+  }>;
   createdAt: string;
   updatedAt?: string;
 }
@@ -193,6 +199,67 @@ export async function deleteInquiry(
       success: false,
       error:
         err instanceof Error ? err.message : "Network error deleting inquiry.",
+    };
+  }
+}
+
+export async function sendInquiryReply(
+  token: string,
+  id: string,
+  payload:
+    | { subject: string; message: string; attachments?: File[] }
+    | FormData
+): Promise<{ success: boolean; message?: string; updatedStatus?: string; error?: string }> {
+  try {
+    let body: BodyInit;
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    if (payload instanceof FormData) {
+      body = payload;
+      // Do not set Content-Type header so browser sets multipart boundary automatically
+    } else if (payload.attachments && payload.attachments.length > 0) {
+      const fd = new FormData();
+      fd.append("subject", payload.subject);
+      fd.append("message", payload.message);
+      for (const file of payload.attachments) {
+        fd.append("attachments", file);
+      }
+      body = fd;
+    } else {
+      headers["Content-Type"] = "application/json";
+      body = JSON.stringify({
+        subject: payload.subject,
+        message: payload.message,
+      });
+    }
+
+    const res = await fetch(getAdminApiUrl(`/admin/inquiries/${id}/reply`), {
+      method: "POST",
+      headers,
+      body,
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: data.error || "Failed to send reply email.",
+      };
+    }
+
+    return {
+      success: true,
+      message: data.message,
+      updatedStatus: data.updatedStatus,
+    };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error:
+        err instanceof Error ? err.message : "Network error sending reply email.",
     };
   }
 }
