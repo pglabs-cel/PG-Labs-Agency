@@ -298,3 +298,42 @@ export async function sendReplyEmail(data: ReplyEmailData): Promise<void> {
 
   console.log(`[Vercel Mail] ✓ Admin Reply sent to ${data.recipientEmail} (${result.messageId}) with ${data.attachments?.length || 0} attachment(s)`);
 }
+
+export interface OutreachEmailData {
+  recipientEmail: string;
+  recipientName: string;
+  subject: string;
+  message: string;
+  attachments?: EmailAttachment[];
+}
+
+export async function sendOutreachEmail(data: OutreachEmailData): Promise<void> {
+  const config = getEmailConfig();
+
+  if (!config.user || !config.pass || config.pass.length < 8) {
+    throw new Error("Email credentials not configured. Cannot send email.");
+  }
+
+  const transporter = createTransporter();
+
+  const mailOptions: any = {
+    from: `"${config.senderName}" <${config.user}>`,
+    to: data.recipientEmail,
+    replyTo: config.adminEmail,
+    subject: data.subject,
+    text: `Hi ${data.recipientName},\n\n${data.message}\n\nBest regards,\nPG Labs Engineering Team\nhttps://pglabs.in`,
+    html: getReplyHtml(data.recipientName, data.message, data.attachments),
+  };
+
+  if (data.attachments && data.attachments.length > 0) {
+    mailOptions.attachments = data.attachments.map((att) => ({
+      filename: att.filename,
+      content: att.content,
+      contentType: att.contentType,
+    }));
+  }
+
+  const result = await transporter.sendMail(mailOptions);
+
+  console.log(`[Vercel Mail] ✓ General Outreach email sent to ${data.recipientEmail} (${result.messageId}) with ${data.attachments?.length || 0} attachment(s)`);
+}

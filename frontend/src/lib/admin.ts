@@ -263,3 +263,58 @@ export async function sendInquiryReply(
     };
   }
 }
+
+export async function sendAdminOutreachEmail(
+  token: string,
+  payload: {
+    recipientEmail: string;
+    recipientName?: string;
+    subject: string;
+    message: string;
+    attachments?: File[];
+  }
+): Promise<{ success: boolean; message?: string; error?: string }> {
+  try {
+    const fd = new FormData();
+    fd.append("recipientEmail", payload.recipientEmail);
+    if (payload.recipientName) {
+      fd.append("recipientName", payload.recipientName);
+    }
+    fd.append("subject", payload.subject);
+    fd.append("message", payload.message);
+
+    if (payload.attachments && payload.attachments.length > 0) {
+      for (const file of payload.attachments) {
+        fd.append("attachments", file);
+      }
+    }
+
+    const res = await fetch(getAdminApiUrl("/admin/emails/send"), {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: fd,
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      return {
+        success: false,
+        error: data.error || "Failed to send email.",
+      };
+    }
+
+    return {
+      success: true,
+      message: data.message || "Email successfully sent.",
+    };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error:
+        err instanceof Error ? err.message : "Network error sending email.",
+    };
+  }
+}
