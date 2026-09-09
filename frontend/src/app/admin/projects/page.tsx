@@ -145,9 +145,10 @@ export default function AdminProjectsPage() {
         uncommittedMediaRef.current.forEach((url) => {
           const payload = JSON.stringify({ url });
           if (navigator.sendBeacon) {
+            const apiBase = process.env.NEXT_PUBLIC_API_URL || "/api";
             const blob = new Blob([payload], { type: "application/json" });
             navigator.sendBeacon(
-              `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"}/admin/media/delete`,
+              `${apiBase}/admin/media/delete`,
               blob
             );
           }
