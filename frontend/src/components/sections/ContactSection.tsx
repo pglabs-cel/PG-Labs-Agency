@@ -343,12 +343,13 @@ export const ContactSection: React.FC = () => {
 
                 {/* Optional Project Brief / Files Attachment */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-mono uppercase tracking-wider text-foreground-secondary flex items-center gap-1.5">
-                      <Paperclip className="w-3.5 h-3.5 text-accent" />
-                      Attach Brief or Mockups <span className="text-foreground-muted font-normal lowercase">(optional)</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
+                    <label className="text-xs font-mono uppercase tracking-wider text-foreground-secondary flex items-center gap-1.5 flex-wrap">
+                      <Paperclip className="w-3.5 h-3.5 text-accent shrink-0" />
+                      <span>Attach Brief or Mockups</span>
+                      <span className="text-foreground-muted font-normal lowercase tracking-normal">(optional)</span>
                     </label>
-                    <span className="text-[11px] font-mono text-foreground-muted">
+                    <span className="text-[11px] font-mono text-foreground-muted pl-5 sm:pl-0">
                       PDF, Images &bull; Max 10MB
                     </span>
                   </div>
