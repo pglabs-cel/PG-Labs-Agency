@@ -5,7 +5,21 @@ import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { SITE_CONFIG } from "@/lib/constants";
-import { ArrowUpRight, Mail } from "lucide-react";
+import { ArrowUpRight, Mail, Instagram, Facebook, Linkedin, Twitter, Github } from "lucide-react";
+
+function ThreadsIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg
+      role="img"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M18.263 11.097c-.03-3.486-1.92-5.586-5.111-5.586-2.13 0-3.922.963-4.863 2.499l2.062 1.438c.535-.843 1.272-1.543 2.628-1.543 1.528 0 2.318.85 2.544 2.431a15 15 0 0 0-2.236-.173c-4.125 0-6.068 1.867-6.068 4.336s1.943 3.99 4.804 3.99c3.139 0 5.013-2.115 5.781-4.735.798.361 1.348 1.204 1.348 2.47 0 3.387-3.907 5.232-7.22 5.232-4.885 0-8.077-3.207-8.077-8.424 0-6.392 4.223-10.487 9.9-10.487 3.808 0 5.69 1.671 6.97 3.914l2.108-1.475C21.44 2.078 18.331 0 13.663 0 6.227 0 1.168 5.277 1.168 12.934c0 7 4.953 11.066 10.856 11.066 4.878 0 9.809-2.846 9.809-7.716 0-2.545-1.46-4.231-3.569-5.187m-6.33 4.855c-1.077 0-2.026-.512-2.026-1.453 0-1.483 1.822-1.934 3.606-1.934.678 0 1.34.045 1.927.173-.422 1.927-1.671 3.215-3.508 3.214Z" />
+    </svg>
+  );
+}
 
 interface ContactLinks {
   email: string;
@@ -14,6 +28,9 @@ interface ContactLinks {
   linkedin?: string;
   twitter?: string;
   github?: string;
+  instagram?: string;
+  facebook?: string;
+  threads?: string;
 }
 
 export const Footer: React.FC = () => {
@@ -24,6 +41,9 @@ export const Footer: React.FC = () => {
     linkedin: "",
     twitter: "",
     github: "",
+    instagram: "",
+    facebook: "",
+    threads: "",
   });
 
   useEffect(() => {
@@ -38,6 +58,9 @@ export const Footer: React.FC = () => {
             linkedin: data.data.linkedin || "",
             twitter: data.data.twitter || "",
             github: data.data.github || "",
+            instagram: data.data.instagram || "",
+            facebook: data.data.facebook || "",
+            threads: data.data.threads || "",
           });
         }
       })
@@ -47,9 +70,9 @@ export const Footer: React.FC = () => {
   return (
     <footer className="border-t border-border bg-background-secondary text-foreground-secondary pt-16 pb-12 mt-auto">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-12 pb-16 border-b border-border/60">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-16 border-b border-border/60">
           {/* Studio Info Column */}
-          <div className="md:col-span-4 space-y-4">
+          <div className="lg:col-span-4 md:col-span-1 space-y-4">
             <Link
               href="/"
               className="group inline-flex items-center focus:outline-none focus:ring-2 focus:ring-accent/50 rounded-xl"
@@ -88,7 +111,7 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Column 2: Build & Grow */}
-          <div className="md:col-span-3 space-y-3">
+          <div className="lg:col-span-3 md:col-span-1 space-y-3">
             <p className="text-xs font-mono uppercase tracking-widest text-foreground font-semibold">
               BUILD & GROW
             </p>
@@ -132,7 +155,7 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Column 3: Brand & Automate */}
-          <div className="md:col-span-3 space-y-3">
+          <div className="lg:col-span-2 md:col-span-1 space-y-3">
             <p className="text-xs font-mono uppercase tracking-widest text-foreground font-semibold">
               BRAND & AUTOMATE
             </p>
@@ -171,7 +194,7 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Column 4: Studio & Connect */}
-          <div className="md:col-span-2 space-y-3">
+          <div className="lg:col-span-3 md:col-span-1 space-y-3">
             <p className="text-xs font-mono uppercase tracking-widest text-foreground font-semibold">
               STUDIO
             </p>
@@ -208,14 +231,126 @@ export const Footer: React.FC = () => {
               </li>
             </ul>
 
-            <div className="pt-3 border-t border-border/40">
-              <a
-                href={`mailto:${links.email}`}
-                className="inline-flex items-center gap-1.5 text-xs text-foreground hover:text-accent transition-colors font-mono"
-              >
-                <Mail className="w-3.5 h-3.5 text-accent" />
-                <span>Email Studio</span>
-              </a>
+            <div className="pt-3 border-t border-border/40 space-y-3">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-foreground-muted block mb-1.5 font-medium">
+                  Direct Inquiries
+                </span>
+                <a
+                  href={`mailto:${links.email}`}
+                  className="inline-flex items-center gap-2 text-xs font-mono text-foreground hover:text-accent transition-colors py-1.5 px-3 rounded-xl bg-background-surface/90 border border-border/80 hover:border-accent/60 whitespace-nowrap group shadow-sm max-w-full overflow-hidden"
+                  title={`Send email to ${links.email}`}
+                >
+                  <Mail className="w-3.5 h-3.5 text-accent shrink-0 group-hover:scale-110 transition-transform" />
+                  <span className="font-medium truncate">{links.email}</span>
+                </a>
+              </div>
+
+              {links.phone ? (
+                <div>
+                  <a
+                    href={`tel:${links.phone}`}
+                    className="inline-flex items-center gap-2 text-xs font-mono text-foreground hover:text-accent transition-colors py-1.5 px-3 rounded-xl bg-background-surface/90 border border-border/80 hover:border-accent/60 whitespace-nowrap group shadow-sm"
+                  >
+                    <span>{links.phone}</span>
+                  </a>
+                </div>
+              ) : null}
+
+              {links.whatsappNumber ? (
+                <div>
+                  <a
+                    href={`https://wa.me/${links.whatsappNumber.replace(/[^0-9]/g, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-xs font-mono text-foreground hover:text-emerald-400 transition-colors py-1.5 px-3 rounded-xl bg-background-surface/90 border border-border/80 hover:border-emerald-500/50 whitespace-nowrap group shadow-sm"
+                  >
+                    <span>WhatsApp ↗</span>
+                  </a>
+                </div>
+              ) : null}
+
+              {(links.instagram || links.facebook || links.threads || links.linkedin || links.twitter || links.github) ? (
+                <div className="pt-2 border-t border-border/30">
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-foreground-muted mb-2 font-medium">
+                    Follow & Connect
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {links.instagram ? (
+                      <a
+                        href={links.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="PG Labs on Instagram"
+                        title="Instagram"
+                        className="w-8 h-8 rounded-lg bg-background-surface/90 border border-border/80 hover:border-accent hover:text-accent text-foreground-secondary hover:bg-background-surface flex items-center justify-center transition-all group shadow-sm"
+                      >
+                        <Instagram className="w-4 h-4 transition-transform group-hover:scale-110" />
+                      </a>
+                    ) : null}
+                    {links.facebook ? (
+                      <a
+                        href={links.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="PG Labs on Facebook"
+                        title="Facebook"
+                        className="w-8 h-8 rounded-lg bg-background-surface/90 border border-border/80 hover:border-accent hover:text-accent text-foreground-secondary hover:bg-background-surface flex items-center justify-center transition-all group shadow-sm"
+                      >
+                        <Facebook className="w-4 h-4 transition-transform group-hover:scale-110" />
+                      </a>
+                    ) : null}
+                    {links.threads ? (
+                      <a
+                        href={links.threads}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="PG Labs on Threads"
+                        title="Threads"
+                        className="w-8 h-8 rounded-lg bg-background-surface/90 border border-border/80 hover:border-accent hover:text-accent text-foreground-secondary hover:bg-background-surface flex items-center justify-center transition-all group shadow-sm"
+                      >
+                        <ThreadsIcon className="w-4 h-4 transition-transform group-hover:scale-110" />
+                      </a>
+                    ) : null}
+                    {links.linkedin ? (
+                      <a
+                        href={links.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="PG Labs on LinkedIn"
+                        title="LinkedIn"
+                        className="w-8 h-8 rounded-lg bg-background-surface/90 border border-border/80 hover:border-accent hover:text-accent text-foreground-secondary hover:bg-background-surface flex items-center justify-center transition-all group shadow-sm"
+                      >
+                        <Linkedin className="w-4 h-4 transition-transform group-hover:scale-110" />
+                      </a>
+                    ) : null}
+                    {links.twitter ? (
+                      <a
+                        href={links.twitter}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="PG Labs on X (Twitter)"
+                        title="X (Twitter)"
+                        className="w-8 h-8 rounded-lg bg-background-surface/90 border border-border/80 hover:border-accent hover:text-accent text-foreground-secondary hover:bg-background-surface flex items-center justify-center transition-all group shadow-sm"
+                      >
+                        <Twitter className="w-4 h-4 transition-transform group-hover:scale-110" />
+                      </a>
+                    ) : null}
+                    {links.github ? (
+                      <a
+                        href={links.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="PG Labs on GitHub"
+                        title="GitHub"
+                        className="w-8 h-8 rounded-lg bg-background-surface/90 border border-border/80 hover:border-accent hover:text-accent text-foreground-secondary hover:bg-background-surface flex items-center justify-center transition-all group shadow-sm"
+                      >
+                        <Github className="w-4 h-4 transition-transform group-hover:scale-110" />
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>

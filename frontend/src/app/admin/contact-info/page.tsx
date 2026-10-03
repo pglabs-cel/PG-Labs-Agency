@@ -15,6 +15,8 @@ import {
   Linkedin,
   Twitter,
   Github,
+  Instagram,
+  Facebook,
   Save,
   CheckCircle2,
   AlertCircle,
@@ -23,6 +25,20 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+function ThreadsIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
+  return (
+    <svg
+      role="img"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M18.263 11.097c-.03-3.486-1.92-5.586-5.111-5.586-2.13 0-3.922.963-4.863 2.499l2.062 1.438c.535-.843 1.272-1.543 2.628-1.543 1.528 0 2.318.85 2.544 2.431a15 15 0 0 0-2.236-.173c-4.125 0-6.068 1.867-6.068 4.336s1.943 3.99 4.804 3.99c3.139 0 5.013-2.115 5.781-4.735.798.361 1.348 1.204 1.348 2.47 0 3.387-3.907 5.232-7.22 5.232-4.885 0-8.077-3.207-8.077-8.424 0-6.392 4.223-10.487 9.9-10.487 3.808 0 5.69 1.671 6.97 3.914l2.108-1.475C21.44 2.078 18.331 0 13.663 0 6.227 0 1.168 5.277 1.168 12.934c0 7 4.953 11.066 10.856 11.066 4.878 0 9.809-2.846 9.809-7.716 0-2.545-1.46-4.231-3.569-5.187m-6.33 4.855c-1.077 0-2.026-.512-2.026-1.453 0-1.483 1.822-1.934 3.606-1.934.678 0 1.34.045 1.927.173-.422 1.927-1.671 3.215-3.508 3.214Z" />
+    </svg>
+  );
+}
+
 interface ContactSettingsData {
   email: string;
   phone: string;
@@ -30,6 +46,9 @@ interface ContactSettingsData {
   linkedin: string;
   twitter: string;
   github: string;
+  instagram: string;
+  facebook: string;
+  threads: string;
 }
 
 export default function AdminContactInfoPage() {
@@ -45,6 +64,9 @@ export default function AdminContactInfoPage() {
     linkedin: "",
     twitter: "",
     github: "",
+    instagram: "",
+    facebook: "",
+    threads: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -86,6 +108,9 @@ export default function AdminContactInfoPage() {
           linkedin: data.data.linkedin || "",
           twitter: data.data.twitter || "",
           github: data.data.github || "",
+          instagram: data.data.instagram || "",
+          facebook: data.data.facebook || "",
+          threads: data.data.threads || "",
         });
       } else {
         if (res.status === 401) {
@@ -274,6 +299,9 @@ export default function AdminContactInfoPage() {
     Boolean(settings.linkedin.trim()),
     Boolean(settings.twitter.trim()),
     Boolean(settings.github.trim()),
+    Boolean(settings.instagram.trim()),
+    Boolean(settings.facebook.trim()),
+    Boolean(settings.threads.trim()),
   ].filter(Boolean).length;
 
   return (
@@ -460,6 +488,69 @@ export default function AdminContactInfoPage() {
                     className="w-full px-4 py-2.5 rounded-xl bg-background-surface border border-border text-foreground text-sm font-mono focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
+
+                {/* Instagram */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-mono uppercase tracking-wider text-foreground-secondary flex items-center gap-1.5">
+                      <Instagram className="w-3.5 h-3.5 text-pink-400" />
+                      Instagram Profile URL
+                    </label>
+                    <span className="text-[10px] font-mono text-foreground-muted">Optional</span>
+                  </div>
+                  <input
+                    type="url"
+                    value={settings.instagram}
+                    onChange={(e) => setSettings({ ...settings, instagram: e.target.value })}
+                    placeholder="https://instagram.com/pglabs.in"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background-surface border border-border text-foreground text-sm font-mono focus:outline-none focus:border-accent transition-colors"
+                  />
+                  <p className="text-[11px] text-foreground-muted mt-1.5">
+                    Paste your Instagram account URL. Appears in the footer once saved.
+                  </p>
+                </div>
+
+                {/* Facebook */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-mono uppercase tracking-wider text-foreground-secondary flex items-center gap-1.5">
+                      <Facebook className="w-3.5 h-3.5 text-blue-500" />
+                      Facebook Page URL
+                    </label>
+                    <span className="text-[10px] font-mono text-foreground-muted">Optional</span>
+                  </div>
+                  <input
+                    type="url"
+                    value={settings.facebook}
+                    onChange={(e) => setSettings({ ...settings, facebook: e.target.value })}
+                    placeholder="https://facebook.com/pglabs"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background-surface border border-border text-foreground text-sm font-mono focus:outline-none focus:border-accent transition-colors"
+                  />
+                  <p className="text-[11px] text-foreground-muted mt-1.5">
+                    Paste your official Facebook business/studio page URL.
+                  </p>
+                </div>
+
+                {/* Threads */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-mono uppercase tracking-wider text-foreground-secondary flex items-center gap-1.5">
+                      <ThreadsIcon className="w-3.5 h-3.5 text-zinc-300" />
+                      Threads Profile URL
+                    </label>
+                    <span className="text-[10px] font-mono text-foreground-muted">Optional</span>
+                  </div>
+                  <input
+                    type="url"
+                    value={settings.threads}
+                    onChange={(e) => setSettings({ ...settings, threads: e.target.value })}
+                    placeholder="https://threads.net/@pglabs"
+                    className="w-full px-4 py-2.5 rounded-xl bg-background-surface border border-border text-foreground text-sm font-mono focus:outline-none focus:border-accent transition-colors"
+                  />
+                  <p className="text-[11px] text-foreground-muted mt-1.5">
+                    Paste your Meta Threads profile URL. Appears in the footer once saved.
+                  </p>
+                </div>
               </div>
 
               {/* Submit Button */}
@@ -550,11 +641,38 @@ export default function AdminContactInfoPage() {
                     </div>
                   ) : null}
 
+                  {/* Instagram */}
+                  {settings.instagram.trim() ? (
+                    <div className="flex items-center justify-between text-foreground-secondary">
+                      <span>Instagram ↗</span>
+                      <span className="text-[10px] text-emerald-400 font-mono">Live</span>
+                    </div>
+                  ) : null}
+
+                  {/* Facebook */}
+                  {settings.facebook.trim() ? (
+                    <div className="flex items-center justify-between text-foreground-secondary">
+                      <span>Facebook ↗</span>
+                      <span className="text-[10px] text-emerald-400 font-mono">Live</span>
+                    </div>
+                  ) : null}
+
+                  {/* Threads */}
+                  {settings.threads.trim() ? (
+                    <div className="flex items-center justify-between text-foreground-secondary">
+                      <span>Threads ↗</span>
+                      <span className="text-[10px] text-emerald-400 font-mono">Live</span>
+                    </div>
+                  ) : null}
+
                   {!settings.phone.trim() &&
                     !settings.whatsappNumber.trim() &&
                     !settings.linkedin.trim() &&
                     !settings.twitter.trim() &&
-                    !settings.github.trim() && (
+                    !settings.github.trim() &&
+                    !settings.instagram.trim() &&
+                    !settings.facebook.trim() &&
+                    !settings.threads.trim() && (
                       <div className="py-2 text-[11px] text-foreground-muted italic">
                         No dummy links rendered. Only direct email is shown.
                       </div>

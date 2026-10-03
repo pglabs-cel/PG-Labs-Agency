@@ -20,6 +20,9 @@ export async function GET() {
             linkedin: "",
             twitter: "",
             github: "",
+            instagram: "",
+            facebook: "",
+            threads: "",
           },
         },
         { status: 200 }
@@ -36,6 +39,9 @@ export async function GET() {
           linkedin: settings.linkedin || "",
           twitter: settings.twitter || "",
           github: settings.github || "",
+          instagram: settings.instagram || "",
+          facebook: settings.facebook || "",
+          threads: settings.threads || "",
         },
       },
       { status: 200 }
@@ -52,6 +58,9 @@ export async function GET() {
           linkedin: "",
           twitter: "",
           github: "",
+          instagram: "",
+          facebook: "",
+          threads: "",
         },
       },
       { status: 200 }

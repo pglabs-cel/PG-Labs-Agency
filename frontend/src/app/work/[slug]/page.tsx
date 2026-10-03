@@ -194,6 +194,7 @@ export default async function CaseStudyPage({ params }: Props) {
                         alt={project.title}
                         fill
                         priority
+                        unoptimized={Boolean(project.thumbnail && !project.thumbnail.includes("res.cloudinary.com"))}
                         sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px"
                         className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-500"
                       />
@@ -240,6 +241,7 @@ export default async function CaseStudyPage({ params }: Props) {
                         alt={project.title}
                         fill
                         priority
+                        unoptimized={Boolean(project.thumbnail && !project.thumbnail.includes("res.cloudinary.com"))}
                         sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px"
                         className="w-full h-full object-cover"
                       />
@@ -345,6 +347,7 @@ export default async function CaseStudyPage({ params }: Props) {
                       src={getCloudinaryUrl(imgUrl, { width: 1200, quality: "good" })}
                       alt={`${project.title} screenshot ${i + 1}`}
                       fill
+                      unoptimized={Boolean(imgUrl && !imgUrl.includes("res.cloudinary.com"))}
                       sizes="(max-width: 640px) 100vw, 50vw"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

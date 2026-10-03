@@ -54,42 +54,52 @@ export default function ContactPage() {
       <section className="pt-16 pb-12 md:pt-24 md:pb-16 bg-tech-grid border-b border-border/60">
         <Container className="max-w-4xl text-center">
           <FadeUp>
-            <span className="text-xs font-mono tracking-widest text-accent uppercase font-medium px-3 py-1 rounded-full border border-border bg-background-surface mb-6 inline-block">
+            <span className="text-xs font-mono tracking-widest text-accent uppercase font-medium px-3.5 py-1 rounded-full border border-border bg-background-surface mb-6 inline-block shadow-sm">
               LET’S TALK
             </span>
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-foreground mb-6 leading-tight">
               Start a Project
             </h1>
-            <p className="text-foreground-secondary text-lg sm:text-2xl leading-relaxed max-w-xl mx-auto">
-              Have a problem you need solved with software? Tell us what you’re building.
+            <p className="text-foreground-secondary text-lg sm:text-2xl leading-relaxed max-w-2xl mx-auto">
+              Have a problem you need solved with software, digital growth, or automation? Tell us what you’re building.
             </p>
           </FadeUp>
 
           {/* Quick Contact Badges */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12 text-left">
-            <div className="p-4 rounded-xl bg-background-secondary border border-border flex items-center gap-3">
-              <Mail className="w-5 h-5 text-accent shrink-0" />
-              <div>
-                <p className="text-[11px] font-mono uppercase text-foreground-muted">Email Direct</p>
-                <a href={`mailto:${SITE_CONFIG.links.email}`} className="text-sm font-medium text-foreground hover:text-accent transition-colors">
+            <div className="p-4 rounded-xl bg-background-secondary border border-border flex items-center gap-3.5 hover:border-accent/40 transition-colors shadow-sm">
+              <div className="p-2.5 rounded-lg bg-accent/10 text-accent border border-accent/20 shrink-0">
+                <Mail className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-mono uppercase tracking-wider text-foreground-muted">Email Direct</p>
+                <a
+                  href={`mailto:${SITE_CONFIG.links.email}`}
+                  className="text-xs sm:text-sm font-medium text-foreground hover:text-accent transition-colors font-mono truncate block"
+                  title={SITE_CONFIG.links.email}
+                >
                   {SITE_CONFIG.links.email}
                 </a>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-background-secondary border border-border flex items-center gap-3">
-              <Clock className="w-5 h-5 text-accent shrink-0" />
+            <div className="p-4 rounded-xl bg-background-secondary border border-border flex items-center gap-3.5 hover:border-accent/40 transition-colors shadow-sm">
+              <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                <Clock className="w-4 h-4" />
+              </div>
               <div>
-                <p className="text-[11px] font-mono uppercase text-foreground-muted">Direct Response</p>
-                <p className="text-sm font-medium text-foreground">Prompt Engineering Reply</p>
+                <p className="text-[10px] font-mono uppercase tracking-wider text-foreground-muted">Response Time</p>
+                <p className="text-xs sm:text-sm font-medium text-foreground">Under 24 Hours</p>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-background-secondary border border-border flex items-center gap-3">
-              <MessageSquare className="w-5 h-5 text-accent shrink-0" />
+            <div className="p-4 rounded-xl bg-background-secondary border border-border flex items-center gap-3.5 hover:border-accent/40 transition-colors shadow-sm">
+              <div className="p-2.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
+                <MessageSquare className="w-4 h-4" />
+              </div>
               <div>
-                <p className="text-[11px] font-mono uppercase text-foreground-muted">Location</p>
-                <p className="text-sm font-medium text-foreground">Remote-First Studio</p>
+                <p className="text-[10px] font-mono uppercase tracking-wider text-foreground-muted">Direct Engineering</p>
+                <p className="text-xs sm:text-sm font-medium text-foreground">Talk With Builders</p>
               </div>
             </div>
           </div>
@@ -97,7 +107,7 @@ export default function ContactPage() {
       </section>
 
       {/* Main Interactive Form Component */}
-      <ContactSection />
+      <ContactSection showHeading={false} className="py-12 md:py-20" />
 
       {/* FAQ Section */}
       <section className="py-20 md:py-28 border-t border-border/60 bg-background-secondary/30">

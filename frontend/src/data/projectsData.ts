@@ -46,10 +46,10 @@ export const CANONICAL_PROJECTS: ProjectData[] = [
     year: "2024",
     featured: true,
     order: 1,
-    thumbnail: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=80",
+    thumbnail: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791031791/pglabs/projects/parttrack_thumb.jpg",
     images: [
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
+      "https://res.cloudinary.com/y20gw7iu/image/upload/v1791031791/pglabs/projects/parttrack_thumb.jpg",
+      "https://res.cloudinary.com/y20gw7iu/image/upload/v1791031792/pglabs/projects/parttrack_warehouse.jpg",
     ],
   },
   {
@@ -78,10 +78,10 @@ export const CANONICAL_PROJECTS: ProjectData[] = [
     year: "2024",
     featured: true,
     order: 2,
-    thumbnail: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80",
+    thumbnail: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791031792/pglabs/projects/hiremeet_thumb.jpg",
     images: [
-      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
+      "https://res.cloudinary.com/y20gw7iu/image/upload/v1791031792/pglabs/projects/hiremeet_thumb.jpg",
+      "https://res.cloudinary.com/y20gw7iu/image/upload/v1791031793/pglabs/projects/hiremeet_editor.jpg",
     ],
   },
   {
@@ -110,10 +110,10 @@ export const CANONICAL_PROJECTS: ProjectData[] = [
     year: "2023",
     featured: true,
     order: 3,
-    thumbnail: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80",
+    thumbnail: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791031794/pglabs/projects/ckb_thumb.jpg",
     images: [
-      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?auto=format&fit=crop&w=1200&q=80",
+      "https://res.cloudinary.com/y20gw7iu/image/upload/v1791031794/pglabs/projects/ckb_thumb.jpg",
+      "https://res.cloudinary.com/y20gw7iu/image/upload/v1791031795/pglabs/projects/ckb_proctoring.jpg",
     ],
   },
 ];

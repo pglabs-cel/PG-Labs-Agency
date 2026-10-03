@@ -38,22 +38,20 @@ const PROJECT_TYPE_OPTIONS = [
   { value: "Other", label: "Other" },
 ];
 
-const BUDGET_OPTIONS = [
-  { value: "Under ₹25,000", label: "Under ₹25K (<$300)" },
-  { value: "₹25,000 - ₹50,000", label: "₹25K – ₹50K ($300 – $600)" },
-  { value: "₹50,000 - ₹1,50,000", label: "₹50K – ₹1.5L ($600 – $1.8K)" },
-  { value: "₹1,50,000 - ₹3,00,000", label: "₹1.5L – ₹3L ($1.8K – $3.6K)" },
-  { value: "₹3,00,000+", label: "₹3L+ ($3.6K+)" },
-  { value: "Flexible / To Discuss", label: "Flexible / Let's Discuss" },
-];
+export interface ContactSectionProps {
+  showHeading?: boolean;
+  className?: string;
+}
 
-export const ContactSection: React.FC = () => {
+export const ContactSection: React.FC<ContactSectionProps> = ({
+  showHeading = true,
+  className,
+}) => {
   const [formData, setFormData] = useState<ContactPayload>({
     name: "",
     email: "",
     company: "",
     projectType: "Web Application",
-    budget: "",
     message: "",
   });
 
@@ -211,19 +209,27 @@ export const ContactSection: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-20 md:py-32 border-t border-border/60">
+    <section
+      id="contact"
+      className={cn(
+        showHeading ? "py-20 md:py-32 border-t border-border/60" : "py-8 md:py-14",
+        className
+      )}
+    >
       <Container className="max-w-3xl">
-        <FadeUp>
-          <SectionHeading
-            align="center"
-            eyebrow="CONTACT"
-            title="Let’s build something useful."
-            description="Have a project, idea or problem you’d like to solve? Tell us about it."
-          />
-        </FadeUp>
+        {showHeading && (
+          <FadeUp>
+            <SectionHeading
+              align="center"
+              eyebrow="CONTACT"
+              title="Let’s build something useful."
+              description="Have a project, idea or problem you’d like to solve? Tell us about it."
+            />
+          </FadeUp>
+        )}
 
-        <FadeUp delay={0.1}>
-          <div className="bg-background-secondary/80 border border-border/80 rounded-2xl p-5 sm:p-10 shadow-2xl backdrop-blur-sm">
+        <FadeUp delay={showHeading ? 0.1 : 0}>
+          <div className="bg-background-secondary/80 border border-border/80 rounded-2xl p-6 sm:p-10 shadow-2xl backdrop-blur-sm">
             {status === "success" ? (
               <div className="py-12 text-center space-y-4">
                 <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
@@ -243,7 +249,6 @@ export const ContactSection: React.FC = () => {
                       email: "",
                       company: "",
                       projectType: "Web Application",
-                      budget: "",
                       message: "",
                     });
                     setAttachments([]);
@@ -338,41 +343,6 @@ export const ContactSection: React.FC = () => {
                             "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border cursor-pointer select-none active:scale-[0.98]",
                             isSelected
                               ? "bg-accent text-white border-accent shadow-[0_2px_12px_rgba(139,92,246,0.35)] font-semibold"
-                              : "bg-background-surface/60 border-border/80 text-foreground-secondary hover:text-foreground hover:border-accent/40 hover:bg-background-surface"
-                          )}
-                        >
-                          {opt.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Estimated Budget Range (Optional) */}
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-xs font-mono uppercase tracking-wider text-foreground-secondary">
-                      Estimated Budget Range
-                    </label>
-                    <span className="text-[11px] font-mono text-foreground-muted">optional</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {BUDGET_OPTIONS.map((opt) => {
-                      const isSelected = formData.budget === opt.value;
-                      return (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() =>
-                            setFormData({
-                              ...formData,
-                              budget: isSelected ? "" : opt.value,
-                            })
-                          }
-                          className={cn(
-                            "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border cursor-pointer select-none active:scale-[0.98]",
-                            isSelected
-                              ? "bg-accent/20 text-white border-accent shadow-[0_2px_12px_rgba(139,92,246,0.25)] font-semibold"
                               : "bg-background-surface/60 border-border/80 text-foreground-secondary hover:text-foreground hover:border-accent/40 hover:bg-background-surface"
                           )}
                         >

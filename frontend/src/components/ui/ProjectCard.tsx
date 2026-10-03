@@ -94,6 +94,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                 src={getCloudinaryUrl(thumbnail, { width: 900, quality: "good" })}
                 alt={title}
                 fill
+                unoptimized={Boolean(thumbnail && !thumbnail.includes("res.cloudinary.com"))}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />

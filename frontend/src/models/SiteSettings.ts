@@ -7,6 +7,9 @@ export interface ISiteSettings extends Document {
   linkedin?: string;
   twitter?: string;
   github?: string;
+  instagram?: string;
+  facebook?: string;
+  threads?: string;
   updatedAt: Date;
   createdAt: Date;
 }
@@ -40,6 +43,21 @@ const SiteSettingsSchema: Schema = new Schema<ISiteSettings>(
       default: "",
     },
     github: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    instagram: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    facebook: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    threads: {
       type: String,
       trim: true,
       default: "",

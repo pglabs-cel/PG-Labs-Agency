@@ -25,6 +25,9 @@ export async function GET(req: NextRequest) {
         linkedin: "",
         twitter: "",
         github: "",
+        instagram: "",
+        facebook: "",
+        threads: "",
       });
     }
 
@@ -38,6 +41,9 @@ export async function GET(req: NextRequest) {
           linkedin: settings.linkedin || "",
           twitter: settings.twitter || "",
           github: settings.github || "",
+          instagram: settings.instagram || "",
+          facebook: settings.facebook || "",
+          threads: settings.threads || "",
         },
       },
       { status: 200 }
@@ -61,7 +67,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json().catch(() => ({}));
-    const { email, phone, whatsappNumber, linkedin, twitter, github } = body;
+    const { email, phone, whatsappNumber, linkedin, twitter, github, instagram, facebook, threads } = body;
 
     if (!email || typeof email !== "string" || !/^\S+@\S+\.\S+$/.test(email.trim())) {
       return NextResponse.json(
@@ -80,6 +86,9 @@ export async function PUT(req: NextRequest) {
       linkedin: typeof linkedin === "string" ? linkedin.trim() : "",
       twitter: typeof twitter === "string" ? twitter.trim() : "",
       github: typeof github === "string" ? github.trim() : "",
+      instagram: typeof instagram === "string" ? instagram.trim() : "",
+      facebook: typeof facebook === "string" ? facebook.trim() : "",
+      threads: typeof threads === "string" ? threads.trim() : "",
     };
 
     if (!settings) {
@@ -91,6 +100,9 @@ export async function PUT(req: NextRequest) {
       settings.linkedin = updatePayload.linkedin;
       settings.twitter = updatePayload.twitter;
       settings.github = updatePayload.github;
+      settings.instagram = updatePayload.instagram;
+      settings.facebook = updatePayload.facebook;
+      settings.threads = updatePayload.threads;
       await settings.save();
     }
 
@@ -105,6 +117,9 @@ export async function PUT(req: NextRequest) {
           linkedin: settings.linkedin,
           twitter: settings.twitter,
           github: settings.github,
+          instagram: settings.instagram,
+          facebook: settings.facebook,
+          threads: settings.threads,
         },
       },
       { status: 200 }
