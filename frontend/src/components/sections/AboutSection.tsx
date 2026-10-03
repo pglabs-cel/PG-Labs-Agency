@@ -1,7 +1,8 @@
-﻿import React from "react";
+import React from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { FadeUp } from "@/components/animations/FadeUp";
+import { Button } from "@/components/ui/Button";
 import { CheckCircle2 } from "lucide-react";
 
 export const AboutSection: React.FC = () => {
@@ -25,6 +26,11 @@ export const AboutSection: React.FC = () => {
                 </p>
                 <div className="p-4 rounded-xl bg-background-secondary border border-border/80 text-foreground font-mono text-sm">
                   <span className="text-accent font-bold">CORE PHILOSOPHY:</span> Small team. Direct communication. No unnecessary layers.
+                </div>
+                <div className="pt-2">
+                  <Button href="/about" variant="outline" showArrow>
+                    Learn More About Our Studio
+                  </Button>
                 </div>
               </div>
             </FadeUp>

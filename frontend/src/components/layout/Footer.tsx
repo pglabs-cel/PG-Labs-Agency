@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
-import { SITE_CONFIG, NAV_LINKS } from "@/lib/constants";
-import { ArrowUpRight } from "lucide-react";
+import { SITE_CONFIG } from "@/lib/constants";
+import { ArrowUpRight, Mail } from "lucide-react";
 
 interface ContactLinks {
   email: string;
@@ -47,9 +47,9 @@ export const Footer: React.FC = () => {
   return (
     <footer className="border-t border-border bg-background-secondary text-foreground-secondary pt-16 pb-12 mt-auto">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-border/60">
-          {/* Studio Info */}
-          <div className="md:col-span-6 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-12 pb-16 border-b border-border/60">
+          {/* Studio Info Column */}
+          <div className="md:col-span-4 space-y-4">
             <Link
               href="/"
               className="group inline-flex items-center focus:outline-none focus:ring-2 focus:ring-accent/50 rounded-xl"
@@ -65,9 +65,20 @@ export const Footer: React.FC = () => {
                 />
               </div>
             </Link>
-            <p className="text-foreground-secondary text-base max-w-sm leading-relaxed">
-              Digital products, AI solutions and custom software engineered for forward-thinking businesses.
+
+            <div className="space-y-1">
+              <p className="text-foreground font-semibold text-sm">
+                Digital Products. Technology. Growth.
+              </p>
+              <p className="font-mono text-xs text-accent">
+                BUILD • AUTOMATE • SCALE
+              </p>
+            </div>
+
+            <p className="text-foreground-secondary text-sm max-w-sm leading-relaxed">
+              We design, build, and grow modern web applications, digital brands, performance marketing funnels, and practical business automations.
             </p>
+
             <div className="pt-2">
               <span className="inline-flex items-center gap-2 text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -76,137 +87,148 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Explore Column */}
-          <div className="md:col-span-3 space-y-4">
+          {/* Column 2: Build & Grow */}
+          <div className="md:col-span-3 space-y-3">
             <p className="text-xs font-mono uppercase tracking-widest text-foreground font-semibold">
-              Explore
+              BUILD & GROW
             </p>
-            <ul className="space-y-2.5 text-sm" role="list">
-              {NAV_LINKS.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="hover:text-foreground transition-colors duration-200 inline-block py-0.5"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
+            <ul className="space-y-2 text-xs" role="list">
               <li>
-                <Link
-                  href="/contact"
-                  className="hover:text-foreground transition-colors duration-200 inline-block py-0.5"
-                >
-                  Contact
+                <Link href="/services/web-development" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Web Development
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/wordpress-development" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  WordPress Development
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/shopify-development" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Shopify Development
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/custom-software" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Custom Software
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/ui-ux-design" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  UI/UX Design
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/seo" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  SEO & Analytics
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/performance-marketing" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Performance Marketing
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Connect Column - Conditionally Rendered */}
-          <div className="md:col-span-3 space-y-4">
+          {/* Column 3: Brand & Automate */}
+          <div className="md:col-span-3 space-y-3">
             <p className="text-xs font-mono uppercase tracking-widest text-foreground font-semibold">
-              Connect
+              BRAND & AUTOMATE
             </p>
-            <ul className="space-y-2.5 text-sm" role="list">
-              {/* Email is always available */}
-              {links.email && (
-                <li>
-                  <a
-                    href={`mailto:${links.email}`}
-                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
-                  >
-                    <span>{links.email}</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
-                  </a>
-                </li>
-              )}
-
-              {/* Direct Call Phone - Only shown if provided */}
-              {links.phone && links.phone.trim().length > 0 && (
-                <li>
-                  <a
-                    href={`tel:${links.phone.replace(/[^+\d]/g, "")}`}
-                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
-                  >
-                    <span>{links.phone}</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
-                  </a>
-                </li>
-              )}
-
-              {/* WhatsApp - Only shown if provided */}
-              {links.whatsappNumber && links.whatsappNumber.trim().length > 0 && (
-                <li>
-                  <a
-                    href={`https://wa.me/${links.whatsappNumber.replace(/[^0-9]/g, "")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
-                  >
-                    <span>WhatsApp</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
-                  </a>
-                </li>
-              )}
-
-              {/* LinkedIn - Only shown if provided */}
-              {links.linkedin && links.linkedin.trim().length > 0 && (
-                <li>
-                  <a
-                    href={links.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
-                  >
-                    <span>LinkedIn</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
-                  </a>
-                </li>
-              )}
-
-              {/* Twitter / X - Only shown if provided */}
-              {links.twitter && links.twitter.trim().length > 0 && (
-                <li>
-                  <a
-                    href={links.twitter}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
-                  >
-                    <span>Twitter / X</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
-                  </a>
-                </li>
-              )}
-
-              {/* GitHub - Only shown if provided */}
-              {links.github && links.github.trim().length > 0 && (
-                <li>
-                  <a
-                    href={links.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors duration-200 py-0.5 group"
-                  >
-                    <span>GitHub</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-foreground-muted group-hover:text-accent transition-colors" />
-                  </a>
-                </li>
-              )}
+            <ul className="space-y-2 text-xs" role="list">
+              <li>
+                <Link href="/services/branding" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Logo & Brand Identity
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/business-collateral" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Business Collateral
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/social-media-management" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Social Media Management
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/automation" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Business Automation
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/backend-api-development" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Backend & APIs
+                </Link>
+              </li>
+              <li>
+                <Link href="/services/ai-solutions" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  AI & Machine Learning
+                </Link>
+              </li>
             </ul>
+          </div>
+
+          {/* Column 4: Studio & Connect */}
+          <div className="md:col-span-2 space-y-3">
+            <p className="text-xs font-mono uppercase tracking-widest text-foreground font-semibold">
+              STUDIO
+            </p>
+            <ul className="space-y-2 text-xs" role="list">
+              <li>
+                <Link href="/services" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  All Services
+                </Link>
+              </li>
+              <li>
+                <Link href="/work" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Selected Work
+                </Link>
+              </li>
+              <li>
+                <Link href="/process" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Delivery Process
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Pricing & Tiers
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  About PG Labs
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-foreground transition-colors py-0.5 inline-block">
+                  Start Inquiry
+                </Link>
+              </li>
+            </ul>
+
+            <div className="pt-3 border-t border-border/40">
+              <a
+                href={`mailto:${links.email}`}
+                className="inline-flex items-center gap-1.5 text-xs text-foreground hover:text-accent transition-colors font-mono"
+              >
+                <Mail className="w-3.5 h-3.5 text-accent" />
+                <span>Email Studio</span>
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* Bottom Legal Bar */}
+        {/* Bottom Legal & Copyright Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-foreground-muted">
-          <p>© {new Date().getFullYear()} PG Labs. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} PG Labs Studio. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" prefetch={false} className="hover:text-foreground transition-colors">
               Privacy Policy
             </Link>
             <Link href="/terms" prefetch={false} className="hover:text-foreground transition-colors">
-              Terms
+              Terms of Service
             </Link>
           </div>
         </div>

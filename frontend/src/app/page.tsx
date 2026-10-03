@@ -1,6 +1,6 @@
-﻿import { Hero } from "@/components/sections/Hero";
+import { Hero } from "@/components/sections/Hero";
 import { Capabilities } from "@/components/sections/Capabilities";
-import { ServicesSection } from "@/components/sections/ServicesSection";
+import { WhatWeBuildSection } from "@/components/sections/WhatWeBuildSection";
 import { FeaturedWork } from "@/components/sections/FeaturedWork";
 import { CaseStudyHighlight } from "@/components/sections/CaseStudyHighlight";
 import { ProcessSection } from "@/components/sections/ProcessSection";
@@ -19,8 +19,8 @@ export default function HomePage() {
       {/* 3. Capabilities Strip */}
       <Capabilities />
 
-      {/* 4. Services */}
-      <ServicesSection />
+      {/* 4. What We Build (5 Pillars) */}
+      <WhatWeBuildSection />
 
       {/* 5. Featured Work */}
       <FeaturedWork />

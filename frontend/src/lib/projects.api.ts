@@ -39,7 +39,14 @@ function getProjectsApiUrl(path: string): string {
   return `${siteUrl.replace(/\/+$/, "")}/api${cleanPath}`;
 }
 
+import { CANONICAL_PROJECTS, getProjectBySlug } from "@/data/projectsData";
+
 export async function fetchPublicProjects(featuredOnly = false): Promise<ProjectItem[]> {
+  const getFallback = () =>
+    (featuredOnly
+      ? CANONICAL_PROJECTS.filter((p) => p.featured)
+      : CANONICAL_PROJECTS) as ProjectItem[];
+
   try {
     const base = getProjectsApiUrl("/projects");
     const targetUrl = featuredOnly ? `${base}?featured=true` : base;
@@ -49,31 +56,33 @@ export async function fetchPublicProjects(featuredOnly = false): Promise<Project
     });
 
     if (!res.ok) {
-      return [];
+      return getFallback();
     }
 
     const data = await res.json().catch(() => ({}));
-    if (data.success && Array.isArray(data.data)) {
+    if (data.success && Array.isArray(data.data) && data.data.length > 0) {
       return data.data;
     }
 
-    return [];
+    return getFallback();
   } catch (err) {
-    console.error("[fetchPublicProjects] Error:", err);
-    return [];
+    console.error("[fetchPublicProjects] Fallback activated due to error:", err);
+    return getFallback();
   }
 }
 
 export async function fetchPublicProjectBySlug(
   slug: string
 ): Promise<ProjectItem | null> {
+  const fallback = getProjectBySlug(slug);
+
   try {
     const res = await fetch(getProjectsApiUrl(`/projects/${slug}`), {
       next: { revalidate: 60 },
     });
 
     if (!res.ok) {
-      return null;
+      return (fallback as ProjectItem) || null;
     }
 
     const data = await res.json().catch(() => ({}));
@@ -81,10 +90,10 @@ export async function fetchPublicProjectBySlug(
       return data.data;
     }
 
-    return null;
+    return (fallback as ProjectItem) || null;
   } catch (err) {
-    console.error(`[fetchPublicProjectBySlug] Error fetching slug ${slug}:`, err);
-    return null;
+    console.error(`[fetchPublicProjectBySlug] Fallback activated for ${slug}:`, err);
+    return (fallback as ProjectItem) || null;
   }
 }
 

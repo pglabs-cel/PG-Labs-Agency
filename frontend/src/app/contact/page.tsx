@@ -1,7 +1,8 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { FadeUp } from "@/components/animations/FadeUp";
+import { BreadcrumbJsonLd } from "@/components/JsonLd";
 import { SITE_CONFIG } from "@/lib/constants";
 import { Mail, MessageSquare, Clock } from "lucide-react";
 
@@ -42,6 +43,13 @@ const FAQS = [
 export default function ContactPage() {
   return (
     <main className="flex flex-col min-h-screen">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "/" },
+          { name: "Contact", url: "/contact" },
+        ]}
+      />
+
       {/* Contact Hero */}
       <section className="pt-16 pb-12 md:pt-24 md:pb-16 bg-tech-grid border-b border-border/60">
         <Container className="max-w-4xl text-center">
@@ -72,8 +80,8 @@ export default function ContactPage() {
             <div className="p-4 rounded-xl bg-background-secondary border border-border flex items-center gap-3">
               <Clock className="w-5 h-5 text-accent shrink-0" />
               <div>
-                <p className="text-[11px] font-mono uppercase text-foreground-muted">Response Time</p>
-                <p className="text-sm font-medium text-foreground">Within 24 Hours</p>
+                <p className="text-[11px] font-mono uppercase text-foreground-muted">Direct Response</p>
+                <p className="text-sm font-medium text-foreground">Prompt Engineering Reply</p>
               </div>
             </div>
 

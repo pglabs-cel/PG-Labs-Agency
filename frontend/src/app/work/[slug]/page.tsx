@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { CtaSection } from "@/components/sections/CtaSection";
-import { ProjectJsonLd } from "@/components/JsonLd";
+import { ProjectJsonLd, BreadcrumbJsonLd } from "@/components/JsonLd";
 import { fetchPublicProjects, fetchPublicProjectBySlug, ProjectItem } from "@/lib/projects.api";
 import { SITE_CONFIG } from "@/lib/constants";
 import { ArrowLeft, ArrowRight, CheckCircle2, Globe, ExternalLink } from "lucide-react";
@@ -80,6 +80,13 @@ export default async function CaseStudyPage({ params }: Props) {
 
   return (
     <main className="flex flex-col min-h-screen">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "/" },
+          { name: "Work", url: "/work" },
+          { name: project.title, url: `/work/${project.slug}` },
+        ]}
+      />
       <ProjectJsonLd
         title={project.title}
         description={project.shortDescription}

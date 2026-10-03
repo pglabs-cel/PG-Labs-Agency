@@ -16,16 +16,25 @@ interface ContactBody {
   email?: string;
   company?: string;
   projectType?: string;
+  budget?: string;
   message?: string;
 }
 
 const ALLOWED_PROJECT_TYPES = [
   "Website",
   "Web Application",
-  "SaaS",
-  "AI/ML",
+  "WordPress",
+  "Shopify",
   "Custom Software",
+  "UI/UX Design",
+  "SEO & Analytics",
+  "Performance Marketing",
+  "Social Media Management",
+  "Brand & Identity",
+  "Business Collateral",
   "Automation",
+  "AI/ML",
+  "SaaS",
   "Other",
 ];
 
@@ -36,6 +45,7 @@ export async function POST(req: NextRequest) {
     let email = "";
     let company = "";
     let projectType = "";
+    let budget = "";
     let message = "";
     let turnstileToken = "";
     const emailAttachments: EmailAttachment[] = [];
@@ -47,6 +57,7 @@ export async function POST(req: NextRequest) {
       email = (formData.get("email") as string) || "";
       company = (formData.get("company") as string) || "";
       projectType = (formData.get("projectType") as string) || "";
+      budget = (formData.get("budget") as string) || "";
       message = (formData.get("message") as string) || "";
       turnstileToken =
         (formData.get("cf-turnstile-response") as string) ||
@@ -148,6 +159,7 @@ export async function POST(req: NextRequest) {
       email = body.email || "";
       company = body.company || "";
       projectType = body.projectType || "";
+      budget = body.budget || "";
       message = body.message || "";
       turnstileToken = body["cf-turnstile-response"] || body.turnstileToken || "";
     }
@@ -290,6 +302,7 @@ export async function POST(req: NextRequest) {
       email: email.trim().toLowerCase(),
       company: company?.trim() || "",
       projectType: resolvedProjectType,
+      budget: budget?.trim() || "",
       message: message.trim(),
     };
 
@@ -311,7 +324,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             success: true,
-            message: "Inquiry received successfully. We will be in touch within 24 hours.",
+            message: "Inquiry received successfully. We will be in touch promptly with direct engineering feedback.",
             data: { id: existingInquiry._id.toString(), createdAt: existingInquiry.createdAt },
           },
           { status: 200 }
@@ -344,7 +357,7 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         message:
-          "Inquiry received successfully. We will be in touch within 24 hours.",
+          "Inquiry received successfully. We will be in touch promptly with direct engineering feedback.",
         data: savedInquiry
           ? { id: savedInquiry._id.toString(), createdAt: savedInquiry.createdAt }
           : undefined,

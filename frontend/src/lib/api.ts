@@ -3,6 +3,7 @@ export interface ContactPayload {
   email: string;
   company?: string;
   projectType: string;
+  budget?: string;
   message: string;
   turnstileToken?: string;
   "cf-turnstile-response"?: string;
@@ -69,6 +70,7 @@ export async function submitContactInquiry(
       fd.append("email", payload.email);
       fd.append("company", payload.company || "");
       fd.append("projectType", payload.projectType);
+      if (payload.budget) fd.append("budget", payload.budget);
       fd.append("message", payload.message);
       if (payload.turnstileToken) fd.append("turnstileToken", payload.turnstileToken);
       if (payload["cf-turnstile-response"]) fd.append("cf-turnstile-response", payload["cf-turnstile-response"]);

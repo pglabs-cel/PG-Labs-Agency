@@ -1,7 +1,9 @@
-﻿import React from "react";
+import React from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { FadeUp } from "@/components/animations/FadeUp";
+
+import { Button } from "@/components/ui/Button";
 
 const STEPS = [
   {
@@ -91,6 +93,13 @@ export const ProcessSection: React.FC = () => {
             </FadeUp>
           ))}
         </div>
+
+        {/* Dedicated Process Page CTA */}
+        <FadeUp delay={0.3} className="mt-14 text-center flex justify-center">
+          <Button href="/process" variant="outline" showArrow>
+            Explore Detailed 5-Step Methodology & Deliverables
+          </Button>
+        </FadeUp>
       </Container>
     </section>
   );

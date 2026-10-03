@@ -1,10 +1,11 @@
 export const SITE_CONFIG = {
   name: "PG Labs",
   legalName: "PG Labs Studio",
-  tagline: "We Build Digital Products That Actually Work.",
+  tagline: "Digital Products. Technology. Growth.",
+  subTagline: "BUILD • AUTOMATE • SCALE",
   description:
-    "PG Labs builds modern web applications, AI-powered solutions, and custom software built around real business problems.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://pglabs.dev",
+    "PG Labs builds modern digital products, web applications, performance marketing channels, brand systems, and practical business automation.",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.pglabs.co.in",
   ogImage: "/og.png",
   logo: "/logo-mark.jpg",
   logoMarkUrl: "https://res.cloudinary.com/y20gw7iu/image/upload/v1788118208/Logo_Only.jpg",
@@ -22,6 +23,7 @@ export const SITE_CONFIG = {
 export const NAV_LINKS = [
   { name: "Services", href: "/services" },
   { name: "Work", href: "/work" },
-  { name: "Process", href: "/#process" },
+  { name: "Process", href: "/process" },
   { name: "About", href: "/about" },
+  { name: "Pricing", href: "/pricing" },
 ];

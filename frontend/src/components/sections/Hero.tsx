@@ -63,9 +63,9 @@ export const Hero: React.FC = () => {
           className="text-4xl sm:text-6xl md:text-7xl lg:text-[88px] font-bold tracking-tight
             text-foreground max-w-5xl leading-[1.07] sm:leading-[1.05] mb-7"
         >
-          We Build Digital Products That{" "}
+          We Build Digital Systems That{" "}
           <span className="text-gradient-accent relative">
-            Actually Work.
+            Help Businesses Grow.
             {/* Subtle glow under accent text */}
             <span
               className="absolute -inset-x-4 -bottom-2 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent"
@@ -80,10 +80,9 @@ export const Hero: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.22, ease }}
           className="text-foreground-secondary text-lg sm:text-xl md:text-2xl
-            max-w-2xl mx-auto leading-relaxed mb-10"
+            max-w-3xl mx-auto leading-relaxed mb-10"
         >
-          Modern web applications, AI-powered solutions, and custom software built
-          around real business problems.
+          Websites, software, SEO, marketing, branding and practical automation — built around your business.
         </motion.p>
 
         {/* Step 4: CTAs */}
@@ -107,14 +106,13 @@ export const Hero: React.FC = () => {
 
           {/* Secondary CTA */}
           <Button
-            href="#work"
+            href="#what-we-build"
             variant="outline"
             size="lg"
-            showArrow
             fullWidth
             className="sm:w-auto"
           >
-            View Our Work
+            Explore Services ↓
           </Button>
         </motion.div>
       </Container>

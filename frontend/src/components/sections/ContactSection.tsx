@@ -22,12 +22,29 @@ import { cn } from "@/lib/utils";
 
 const PROJECT_TYPE_OPTIONS = [
   { value: "Web Application", label: "Web Application" },
+  { value: "Custom Software", label: "Custom Software" },
   { value: "SaaS", label: "SaaS Platform" },
   { value: "AI/ML", label: "AI & ML" },
-  { value: "Custom Software", label: "Custom Software" },
-  { value: "Website", label: "Website" },
+  { value: "Website", label: "Custom Website" },
+  { value: "WordPress", label: "WordPress" },
+  { value: "Shopify", label: "Shopify Store" },
+  { value: "UI/UX Design", label: "UI / UX Design" },
+  { value: "SEO & Analytics", label: "SEO & Analytics" },
+  { value: "Performance Marketing", label: "Paid Ads (Google / Meta)" },
+  { value: "Social Media Management", label: "Social Media" },
+  { value: "Brand & Identity", label: "Brand & Logo" },
+  { value: "Business Collateral", label: "Business Collateral" },
   { value: "Automation", label: "Automation" },
   { value: "Other", label: "Other" },
+];
+
+const BUDGET_OPTIONS = [
+  { value: "Under ₹25,000", label: "Under ₹25K (<$300)" },
+  { value: "₹25,000 - ₹50,000", label: "₹25K – ₹50K ($300 – $600)" },
+  { value: "₹50,000 - ₹1,50,000", label: "₹50K – ₹1.5L ($600 – $1.8K)" },
+  { value: "₹1,50,000 - ₹3,00,000", label: "₹1.5L – ₹3L ($1.8K – $3.6K)" },
+  { value: "₹3,00,000+", label: "₹3L+ ($3.6K+)" },
+  { value: "Flexible / To Discuss", label: "Flexible / Let's Discuss" },
 ];
 
 export const ContactSection: React.FC = () => {
@@ -36,6 +53,7 @@ export const ContactSection: React.FC = () => {
     email: "",
     company: "",
     projectType: "Web Application",
+    budget: "",
     message: "",
   });
 
@@ -213,13 +231,22 @@ export const ContactSection: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-foreground">Inquiry Received</h3>
                 <p className="text-foreground-secondary text-sm max-w-md mx-auto leading-relaxed">
-                  Thank you for reaching out. We will review your project details and get back to you within 24 hours.
+                  Thank you for reaching out. We will review your project details and get back to you promptly with direct engineering feedback.
                 </p>
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={() => {
                     setStatus("idle");
+                    setFormData({
+                      name: "",
+                      email: "",
+                      company: "",
+                      projectType: "Web Application",
+                      budget: "",
+                      message: "",
+                    });
+                    setAttachments([]);
                     setTurnstileToken("");
                     turnstileRef.current?.reset();
                   }}
@@ -321,6 +348,40 @@ export const ContactSection: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Estimated Budget Range (Optional) */}
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-mono uppercase tracking-wider text-foreground-secondary">
+                      Estimated Budget Range
+                    </label>
+                    <span className="text-[11px] font-mono text-foreground-muted">optional</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {BUDGET_OPTIONS.map((opt) => {
+                      const isSelected = formData.budget === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() =>
+                            setFormData({
+                              ...formData,
+                              budget: isSelected ? "" : opt.value,
+                            })
+                          }
+                          className={cn(
+                            "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border cursor-pointer select-none active:scale-[0.98]",
+                            isSelected
+                              ? "bg-accent/20 text-white border-accent shadow-[0_2px_12px_rgba(139,92,246,0.25)] font-semibold"
+                              : "bg-background-surface/60 border-border/80 text-foreground-secondary hover:text-foreground hover:border-accent/40 hover:bg-background-surface"
+                          )}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
                 {/* Message */}
                 <div className="space-y-2">

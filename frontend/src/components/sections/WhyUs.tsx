@@ -4,7 +4,7 @@ import React from "react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { FadeUp } from "@/components/animations/FadeUp";
-import { Target, Cpu, Sparkles, TrendingUp } from "lucide-react";
+import { Target, MessageSquare, Cpu, TrendingUp } from "lucide-react";
 
 const POINTS = [
   {
@@ -18,20 +18,20 @@ const POINTS = [
     iconColor: "group-hover:text-violet-400",
   },
   {
-    title: "Modern Stack",
+    title: "Direct Communication",
     description:
-      "We use modern tools to build maintainable and scalable products without legacy baggage or technical debt.",
-    icon: Cpu,
+      "You collaborate directly with product builders and engineers. No account executives playing telephone or relaying messages.",
+    icon: MessageSquare,
     accent: "from-blue-500/20 to-transparent",
     border: "group-hover:border-blue-500/40",
     iconBg: "group-hover:bg-blue-500/10 group-hover:border-blue-500/30",
     iconColor: "group-hover:text-blue-400",
   },
   {
-    title: "AI When It Matters",
+    title: "Practical Technology",
     description:
-      "We use AI where it creates measurable value — not simply because it's trending.",
-    icon: Sparkles,
+      "We use modern, battle-tested tools to build maintainable and scalable products without chasing fragile novelty trends.",
+    icon: Cpu,
     accent: "from-accent/20 to-transparent",
     border: "group-hover:border-accent/40",
     iconBg: "group-hover:bg-accent/10 group-hover:border-accent/30",
@@ -40,7 +40,7 @@ const POINTS = [
   {
     title: "Built for Growth",
     description:
-      "Products are designed with future users, features and scale in mind from the very first architecture sketch.",
+      "Systems are architected with future scale, new features, and team expansion in mind from the very first pull request.",
     icon: TrendingUp,
     accent: "from-emerald-500/20 to-transparent",
     border: "group-hover:border-emerald-500/40",
