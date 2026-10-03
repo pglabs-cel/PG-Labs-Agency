@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/animations/FadeUp";
 import { BreadcrumbJsonLd } from "@/components/JsonLd";
+import { PageHero } from "@/components/ui/PageHero";
 import {
   SERVICES_DATA,
   PILLARS_CONFIG,
@@ -63,48 +64,25 @@ export default function ServicesPage() {
       <BreadcrumbJsonLd items={breadcrumbs} />
 
       {/* ── 1. Services Hub Hero ───────────────────────────────────── */}
-      <section className="pt-24 pb-16 md:pt-32 md:pb-24 bg-tech-grid border-b border-border/60 relative overflow-hidden">
-        <div
-          className="pointer-events-none absolute left-1/2 top-1/4 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] rounded-full bg-accent/10 blur-[130px]"
-          aria-hidden="true"
-        />
-
-        <Container className="text-center max-w-4xl relative z-10 space-y-6">
-          {/* Breadcrumbs */}
-          <nav aria-label="Breadcrumb" className="mb-4 flex justify-center">
-            <ol className="flex items-center gap-2 text-xs font-mono text-foreground-muted">
-              <li>
-                <Link href="/" className="hover:text-foreground transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <ChevronRight className="w-3 h-3 text-border" aria-hidden="true" />
-              </li>
-              <li>
-                <span className="text-accent font-semibold" aria-current="page">
-                  Services
-                </span>
-              </li>
-            </ol>
-          </nav>
-
-          <FadeUp>
-            <span className="text-xs font-mono tracking-widest text-accent uppercase font-bold px-3 py-1 rounded-full border border-accent/40 bg-accent/10 mb-4 inline-block">
-              CAPABILITIES & SERVICES ECOSYSTEM
+      <PageHero
+        badge="CAPABILITIES & SERVICES ECOSYSTEM"
+        badgeTag="FULL-LIFECYCLE"
+        breadcrumbs={breadcrumbs}
+        title={
+          <>
+            Digital Products. Technology.{" "}
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-accent to-purple-300">
+              Growth.
             </span>
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-foreground leading-[1.08]">
-              Digital Products. Technology. Growth.
-            </h1>
-            <p className="text-base sm:text-xl font-mono text-accent mt-3">
-              BUILD • AUTOMATE • SCALE
-            </p>
-            <p className="text-foreground-secondary text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mt-4">
-              We design, build, brand, and scale modern web platforms, e-commerce storefronts, performance ad funnels, and practical automations.
-            </p>
-          </FadeUp>
-        </Container>
-      </section>
+          </>
+        }
+        subtitle="We design, build, brand, and scale modern web platforms, e-commerce storefronts, performance ad funnels, and practical automations."
+        tags={[
+          { label: "BUILD • CODE & PLATFORMS", dot: true, dotColor: "bg-accent" },
+          { label: "GROW • SEO & PAID ADS", dot: true, dotColor: "bg-emerald-400" },
+          { label: "AUTOMATE • APPLIED AI", dot: true, dotColor: "bg-amber-400" },
+        ]}
+      />
 
       {/* ── 2. Interactive Pillar Filter Tabs ──────────────────────── */}
       <section className="py-8 border-b border-border/60 bg-background-secondary/40 sticky top-[64px] sm:top-[72px] z-30 backdrop-blur-md">

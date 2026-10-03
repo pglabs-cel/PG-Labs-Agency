@@ -10,6 +10,7 @@ import { CANONICAL_PROJECTS } from "@/data/projectsData";
 import { FadeUp } from "@/components/animations/FadeUp";
 import { CtaSection } from "@/components/sections/CtaSection";
 import { BreadcrumbJsonLd } from "@/components/JsonLd";
+import { PageHero } from "@/components/ui/PageHero";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Compass, Cpu, TrendingUp } from "lucide-react";
 
@@ -66,21 +67,28 @@ export default function WorkPage() {
       />
 
       {/* Portfolio Hero */}
-      <section className="pt-16 pb-16 md:pt-24 md:pb-20 bg-tech-grid border-b border-border/60">
-        <Container className="text-center max-w-3xl">
-          <FadeUp>
-            <span className="text-xs font-mono tracking-widest text-accent uppercase font-medium px-3 py-1 rounded-full border border-border bg-background-surface mb-6 inline-block">
-              SELECTED WORK
+      <PageHero
+        badge="SELECTED WORK"
+        badgeTag="ENGINEERING ARCHIVE"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Work", url: "/work" },
+        ]}
+        title={
+          <>
+            Things We&apos;ve{" "}
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-accent to-purple-300">
+              Built.
             </span>
-            <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-foreground mb-6 leading-tight">
-              Things We&apos;ve Built.
-            </h1>
-            <p className="text-foreground-secondary text-lg sm:text-xl leading-relaxed">
-              A selection of products, platforms, and experiments engineered across web development, business software, and practical AI.
-            </p>
-          </FadeUp>
-        </Container>
-      </section>
+          </>
+        }
+        subtitle="A selection of products, platforms, and experiments engineered across web development, business software, and practical AI."
+        tags={[
+          { label: "PRODUCTION DEPLOYED", dot: true, dotColor: "bg-emerald-400" },
+          { label: "REAL CLIENT CODE", dot: true, dotColor: "bg-accent" },
+          { label: "FULL-STACK & APPLIED AI" },
+        ]}
+      />
 
       {/* Filter Tabs & Projects Grid */}
       <section className="py-16 md:py-24">

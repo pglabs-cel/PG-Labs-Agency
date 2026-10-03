@@ -1,28 +1,30 @@
 "use client";
 
 import React, { useState, useEffect, MouseEvent as ReactMouseEvent } from "react";
-import dynamic from "next/dynamic";
 import { useMotionValue, motion, useMotionTemplate } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-// Dynamically import CanvasRevealEffect so Three.js is not bundled or executed during initial page load
-const CanvasRevealEffect = dynamic(
-  () =>
-    import("@/components/ui/canvas-reveal-effect").then(
-      (mod) => mod.CanvasRevealEffect
-    ),
-  { ssr: false }
+// Dynamically load CanvasRevealEffect using React.lazy so Three.js loads only on hover
+const CanvasRevealEffect = React.lazy(() =>
+  import("@/components/ui/canvas-reveal-effect").then((mod) => ({
+    default: mod.CanvasRevealEffect,
+  }))
 );
 
 export const CardSpotlight = ({
   children,
   radius = 350,
   color = "rgba(139, 92, 246, 0.3)",
+  canvasColors = [
+    [139, 92, 246],
+    [167, 139, 250],
+  ],
   className,
   ...props
 }: {
   radius?: number;
   color?: string;
+  canvasColors?: number[][];
   children: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>) => {
   const mouseX = useMotionValue(0);
@@ -35,7 +37,6 @@ export const CardSpotlight = ({
     radial-gradient(
       ${radius}px circle at ${mouseX}px ${mouseY}px,
       ${color},
-      rgba(167, 139, 250, 0.12) 40%,
       transparent 75%
     )
   `;
@@ -98,7 +99,7 @@ export const CardSpotlight = ({
 
       {/* Desktop / Safari Radial Spotlight Glow (Smooth, vibrant & zero crash risk) */}
       <motion.div
-        className="pointer-events-none absolute z-0 -inset-px rounded-xl opacity-0 transition duration-300 group-hover/spotlight:opacity-100 hidden sm:block"
+        className="pointer-events-none absolute z-0 -inset-px rounded-2xl opacity-0 transition duration-300 group-hover/spotlight:opacity-100 hidden sm:block"
         style={{
           background: spotlightBg,
         }}
@@ -107,22 +108,21 @@ export const CardSpotlight = ({
       {/* Interactive Aceternity Canvas Reveal Effect (Active on Desktop Chrome/Firefox/Edge/Brave) */}
       {enable3D && isHovering && (
         <motion.div
-          className="pointer-events-none absolute z-0 inset-0 rounded-xl opacity-0 transition duration-300 group-hover/spotlight:opacity-100 hidden md:block overflow-hidden"
+          className="pointer-events-none absolute z-0 inset-0 rounded-2xl opacity-0 transition duration-300 group-hover/spotlight:opacity-100 hidden md:block overflow-hidden"
           style={{
             maskImage,
             WebkitMaskImage: maskImage,
           }}
         >
-          <CanvasRevealEffect
-            animationSpeed={3}
-            containerClassName="bg-transparent absolute inset-0 pointer-events-none"
-            colors={[
-              [139, 92, 246],
-              [167, 139, 250],
-            ]}
-            dotSize={2.5}
-            showGradient={false}
-          />
+          <React.Suspense fallback={null}>
+            <CanvasRevealEffect
+              animationSpeed={3}
+              containerClassName="bg-transparent absolute inset-0 pointer-events-none"
+              colors={canvasColors}
+              dotSize={2.5}
+              showGradient={false}
+            />
+          </React.Suspense>
         </motion.div>
       )}
 

@@ -95,7 +95,16 @@ export default async function CaseStudyPage({ params }: Props) {
       />
 
       {/* Hero Header */}
-      <section className="pt-28 pb-16 md:pt-36 md:pb-24 border-b border-border/40 relative overflow-hidden">
+      <section className="pt-28 pb-16 md:pt-36 md:pb-24 border-b border-border/40 relative overflow-hidden bg-background">
+        {/* Top Laser Accent Light Beam */}
+        <div
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-48 sm:w-96 h-[1px] bg-gradient-to-r from-transparent via-accent/80 to-transparent z-10"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-24 sm:w-48 h-[2px] bg-accent/40 blur-[3px] z-10"
+          aria-hidden="true"
+        />
         <div className="absolute top-1/4 -right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
         <Container>
           <div className="mb-8">
@@ -120,7 +129,7 @@ export default async function CaseStudyPage({ params }: Props) {
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-foreground leading-[1.08]">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.08] bg-clip-text text-transparent bg-gradient-to-b from-white via-white/95 to-white/70">
               {project.title}
             </h1>
 

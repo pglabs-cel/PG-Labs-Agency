@@ -6,6 +6,7 @@ import { TechnologySection } from "@/components/sections/TechnologySection";
 import { CtaSection } from "@/components/sections/CtaSection";
 import { FadeUp } from "@/components/animations/FadeUp";
 import { BreadcrumbJsonLd } from "@/components/JsonLd";
+import { PageHero } from "@/components/ui/PageHero";
 import {
   Terminal,
   ShieldCheck,
@@ -106,21 +107,28 @@ export default function AboutPage() {
       />
 
       {/* Hero */}
-      <section className="pt-16 pb-20 md:pt-24 md:pb-28 bg-tech-grid border-b border-border/60">
-        <Container className="max-w-4xl text-center">
-          <FadeUp>
-            <span className="text-xs font-mono tracking-widest text-accent uppercase font-medium px-3 py-1 rounded-full border border-border bg-background-surface mb-6 inline-block">
-              ABOUT PG LABS
+      <PageHero
+        badge="ABOUT PG LABS"
+        badgeTag="FOUNDER-LED STUDIO"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "About", url: "/about" },
+        ]}
+        title={
+          <>
+            A Small Studio With a{" "}
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-accent to-purple-300">
+              Builder Mindset.
             </span>
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-foreground mb-6 leading-tight">
-              A Small Studio With a Builder Mindset.
-            </h1>
-            <p className="text-foreground-secondary text-lg sm:text-2xl leading-relaxed max-w-2xl mx-auto">
-              We combine product intuition, modern engineering, and digital growth to turn ideas into working digital systems.
-            </p>
-          </FadeUp>
-        </Container>
-      </section>
+          </>
+        }
+        subtitle="We combine product intuition, modern engineering, and digital growth to turn ideas into working digital systems."
+        tags={[
+          { label: "FOUNDER-LED ENGINEERING", dot: true, dotColor: "bg-accent" },
+          { label: "ZERO BLOATED LAYERS", dot: true, dotColor: "bg-emerald-400" },
+          { label: "CLIENT ASSET OWNERSHIP" },
+        ]}
+      />
 
       {/* Honest Positioning & Mission */}
       <section className="py-20 md:py-28">

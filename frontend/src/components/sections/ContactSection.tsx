@@ -21,20 +21,14 @@ import {
 import { cn } from "@/lib/utils";
 
 const PROJECT_TYPE_OPTIONS = [
-  { value: "Web Application", label: "Web Application" },
-  { value: "Custom Software", label: "Custom Software" },
-  { value: "SaaS", label: "SaaS Platform" },
-  { value: "AI/ML", label: "AI & ML" },
-  { value: "Website", label: "Custom Website" },
-  { value: "WordPress", label: "WordPress" },
-  { value: "Shopify", label: "Shopify Store" },
+  { value: "Web Applications", label: "Web Applications" },
+  { value: "WordPress Sites", label: "WordPress Sites" },
+  { value: "Shopify Store", label: "Shopify Store" },
   { value: "SEO & Analytics", label: "SEO & Analytics" },
-  { value: "Performance Marketing", label: "Paid Ads (Google / Meta)" },
-  { value: "Social Media Management", label: "Social Media" },
-  { value: "Brand & Identity", label: "Brand & Logo" },
-  { value: "Business Collateral", label: "Business Collateral" },
-  { value: "Automation", label: "Automation" },
-  { value: "Other", label: "Other" },
+  { value: "Paid Ads (Google / Meta)", label: "Paid Ads (Google / Meta)" },
+  { value: "Social Media Management", label: "Social Media Management" },
+  { value: "Startup Pack (Logo, Branding etc.)", label: "Startup Pack (Logo, Branding etc.)" },
+  { value: "Others", label: "Others" },
 ];
 
 export interface ContactSectionProps {
@@ -50,7 +44,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     name: "",
     email: "",
     company: "",
-    projectType: "Web Application",
+    projectType: "Web Applications",
     message: "",
   });
 
@@ -179,7 +173,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
         name: "",
         email: "",
         company: "",
-        projectType: "Web Application",
+        projectType: "Web Applications",
         message: "",
       });
       setAttachments([]);
@@ -247,7 +241,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       name: "",
                       email: "",
                       company: "",
-                      projectType: "Web Application",
+                      projectType: "Web Applications",
                       message: "",
                     });
                     setAttachments([]);

@@ -1,16 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/animations/FadeUp";
 import { BreadcrumbJsonLd } from "@/components/JsonLd";
+import { PageHero } from "@/components/ui/PageHero";
 import {
   PRICING_CATEGORIES,
   PRICING_DISCLAIMER,
   ENGAGEMENT_MODELS,
   PRICING_FAQS,
+  PricingCategory,
+  EngagementModel,
+  PricingFAQ,
   PricingTier,
 } from "@/data/pricingData";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -29,11 +33,36 @@ import { cn } from "@/lib/utils";
 
 export default function PricingPage() {
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [categories, setCategories] = useState<PricingCategory[]>(PRICING_CATEGORIES);
+  const [disclaimer, setDisclaimer] = useState<string>(PRICING_DISCLAIMER);
+  const [engagementModels, setEngagementModels] = useState<EngagementModel[]>(ENGAGEMENT_MODELS);
+  const [faqs, setFaqs] = useState<PricingFAQ[]>(PRICING_FAQS);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/pricing")
+      .then((res) => res.json())
+      .then((json) => {
+        if (isMounted && json.success && json.data) {
+          if (Array.isArray(json.data.categories)) setCategories(json.data.categories);
+          if (typeof json.data.disclaimer === "string") setDisclaimer(json.data.disclaimer);
+          if (Array.isArray(json.data.engagementModels)) setEngagementModels(json.data.engagementModels);
+          if (Array.isArray(json.data.faqs)) setFaqs(json.data.faqs);
+        }
+      })
+      .catch((err) => {
+        console.warn("[PricingPage] Using default baseline pricing:", err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const displayedCategories =
     activeCategory === "all"
-      ? PRICING_CATEGORIES
-      : PRICING_CATEGORIES.filter((c) => c.id === activeCategory);
+      ? categories
+      : categories.filter((c) => c.id === activeCategory);
 
   const breadcrumbs = [
     { name: "Home", url: SITE_CONFIG.url },
@@ -45,60 +74,35 @@ export default function PricingPage() {
       <BreadcrumbJsonLd items={breadcrumbs} />
 
       {/* ── 1. Hero & Disclaimer Section ───────────────────────────── */}
-      <section className="pt-24 pb-16 md:pt-32 md:pb-20 bg-tech-grid border-b border-border/60 relative overflow-hidden">
-        <div
-          className="pointer-events-none absolute left-1/2 top-1/4 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] rounded-full bg-accent/10 blur-[130px]"
-          aria-hidden="true"
-        />
-
-        <Container className="text-center max-w-4xl relative z-10 space-y-6">
-          {/* Breadcrumb Navigation */}
-          <nav aria-label="Breadcrumb" className="mb-4 flex justify-center">
-            <ol className="flex items-center gap-2 text-xs font-mono text-foreground-muted">
-              <li>
-                <Link href="/" className="hover:text-foreground transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <ChevronRight className="w-3 h-3 text-border" aria-hidden="true" />
-              </li>
-              <li>
-                <span className="text-accent font-semibold" aria-current="page">
-                  Pricing
-                </span>
-              </li>
-            </ol>
-          </nav>
-
-          <FadeUp>
-            <span className="text-xs font-mono tracking-widest text-accent uppercase font-bold px-3 py-1 rounded-full border border-accent/40 bg-accent/10 mb-4 inline-block">
-              TRANSPARENT INVESTMENT MODEL
+      <PageHero
+        badge="TRANSPARENT INVESTMENT MODEL"
+        badgeTag="UPFRONT RATES"
+        breadcrumbs={breadcrumbs}
+        title={
+          <>
+            Simple, Transparent{" "}
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-accent to-purple-300">
+              Starting Rates.
             </span>
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-foreground leading-[1.08]">
-              Simple, Transparent Starting Rates.
-            </h1>
-            <p className="text-foreground-secondary text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mt-4">
-              We believe in honest, upfront numbers. Every project starts with a realistic baseline so you know what to expect before technical discovery.
-            </p>
-          </FadeUp>
-
-          {/* Transparent Scope Disclaimer Banner */}
-          <FadeUp delay={0.1}>
-            <div className="mt-8 p-4 sm:p-5 rounded-2xl bg-background-surface border border-accent/30 max-w-2xl mx-auto flex items-start gap-3.5 text-left shadow-lg">
-              <ShieldCheck className="w-5 h-5 text-accent shrink-0 mt-0.5" aria-hidden="true" />
-              <div className="space-y-1">
-                <p className="font-mono text-xs uppercase tracking-wider text-accent font-bold">
-                  TRANSPARENCY GUARANTEE
-                </p>
-                <p className="text-xs sm:text-sm text-foreground-secondary leading-relaxed">
-                  {PRICING_DISCLAIMER}
-                </p>
-              </div>
+          </>
+        }
+        subtitle="We believe in honest, upfront numbers. Every project starts with a realistic baseline so you know what to expect before technical discovery."
+      >
+        {/* Transparent Scope Disclaimer Banner */}
+        <FadeUp delay={0.1}>
+          <div className="p-4 sm:p-5 rounded-2xl bg-background-surface/90 border border-accent/30 max-w-2xl mx-auto flex items-start gap-3.5 text-left shadow-lg hover:border-accent/50 transition-colors backdrop-blur-sm">
+            <ShieldCheck className="w-5 h-5 text-accent shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="space-y-1">
+              <p className="font-mono text-xs uppercase tracking-wider text-accent font-bold">
+                TRANSPARENCY GUARANTEE
+              </p>
+              <p className="text-xs sm:text-sm text-foreground-secondary leading-relaxed">
+                {disclaimer}
+              </p>
             </div>
-          </FadeUp>
-        </Container>
-      </section>
+          </div>
+        </FadeUp>
+      </PageHero>
 
       {/* ── 2. Category Filter Pills ───────────────────────────────── */}
       <section className="py-3.5 sm:py-4 border-b border-border/60 bg-background/95 sm:bg-background-secondary/80 sticky top-[64px] sm:top-[72px] z-30 backdrop-blur-md">
@@ -120,9 +124,9 @@ export default function PricingPage() {
                     : "bg-background-secondary border-border text-foreground-secondary hover:text-white hover:bg-background-surface hover:border-zinc-500"
                 )}
               >
-                All Packages ({PRICING_CATEGORIES.reduce((acc, c) => acc + c.tiers.length, 0)})
+                All Packages ({categories.reduce((acc, c) => acc + c.tiers.length, 0)})
               </button>
-              {PRICING_CATEGORIES.map((cat) => (
+              {categories.map((cat) => (
                 <button
                   key={cat.id}
                   role="tab"
@@ -267,7 +271,7 @@ export default function PricingPage() {
           </FadeUp>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {ENGAGEMENT_MODELS.map((model, idx) => (
+            {engagementModels.map((model, idx) => (
               <FadeUp key={model.title} delay={idx * 0.08} className="h-full">
                 <div className="h-full p-6 sm:p-8 rounded-2xl bg-background-secondary border border-border/80 flex flex-col justify-between space-y-6 hover:border-accent/40 transition-colors">
                   <div className="space-y-4">
@@ -320,7 +324,7 @@ export default function PricingPage() {
           </FadeUp>
 
           <div className="space-y-4">
-            {PRICING_FAQS.map((faq, idx) => (
+            {faqs.map((faq, idx) => (
               <FadeUp key={idx} delay={idx * 0.06}>
                 <details className="group p-5 sm:p-6 rounded-xl bg-background-secondary border border-border/80 transition-all [&_summary::-webkit-details-marker]:none">
                   <summary className="flex items-center justify-between cursor-pointer focus:outline-none">

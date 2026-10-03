@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/Container";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { FadeUp } from "@/components/animations/FadeUp";
 import { BreadcrumbJsonLd } from "@/components/JsonLd";
+import { PageHero } from "@/components/ui/PageHero";
 import { SITE_CONFIG } from "@/lib/constants";
 import { Mail, MessageSquare, Clock } from "lucide-react";
 
@@ -51,60 +52,62 @@ export default function ContactPage() {
       />
 
       {/* Contact Hero */}
-      <section className="pt-16 pb-12 md:pt-24 md:pb-16 bg-tech-grid border-b border-border/60">
-        <Container className="max-w-4xl text-center">
-          <FadeUp>
-            <span className="text-xs font-mono tracking-widest text-accent uppercase font-medium px-3.5 py-1 rounded-full border border-border bg-background-surface mb-6 inline-block shadow-sm">
-              LET’S TALK
+      <PageHero
+        badge="LET’S TALK"
+        badgeTag="FAST RESPONSE"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Contact", url: "/contact" },
+        ]}
+        title={
+          <>
+            Start a{" "}
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-accent to-purple-300">
+              Project.
             </span>
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-foreground mb-6 leading-tight">
-              Start a Project
-            </h1>
-            <p className="text-foreground-secondary text-lg sm:text-2xl leading-relaxed max-w-2xl mx-auto">
-              Have a problem you need solved with software, digital growth, or automation? Tell us what you’re building.
-            </p>
-          </FadeUp>
-
-          {/* Quick Contact Badges */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12 text-left">
-            <div className="p-4 rounded-xl bg-background-secondary border border-border flex items-center gap-3.5 hover:border-accent/40 transition-colors shadow-sm">
-              <div className="p-2.5 rounded-lg bg-accent/10 text-accent border border-accent/20 shrink-0">
-                <Mail className="w-4 h-4" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-mono uppercase tracking-wider text-foreground-muted">Email Direct</p>
-                <a
-                  href={`mailto:${SITE_CONFIG.links.email}`}
-                  className="text-xs sm:text-sm font-medium text-foreground hover:text-accent transition-colors font-mono truncate block"
-                  title={SITE_CONFIG.links.email}
-                >
-                  {SITE_CONFIG.links.email}
-                </a>
-              </div>
+          </>
+        }
+        subtitle="Have a problem you need solved with software, digital growth, or automation? Tell us what you’re building."
+      >
+        {/* Quick Contact Badges */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 text-left max-w-3xl mx-auto">
+          <div className="p-4 rounded-xl bg-background-surface/80 border border-border flex items-center gap-3.5 hover:border-accent/40 transition-colors shadow-sm backdrop-blur-sm">
+            <div className="p-2.5 rounded-lg bg-accent/10 text-accent border border-accent/20 shrink-0">
+              <Mail className="w-4 h-4" />
             </div>
-
-            <div className="p-4 rounded-xl bg-background-secondary border border-border flex items-center gap-3.5 hover:border-accent/40 transition-colors shadow-sm">
-              <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
-                <Clock className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-[10px] font-mono uppercase tracking-wider text-foreground-muted">Response Time</p>
-                <p className="text-xs sm:text-sm font-medium text-foreground">Under 24 Hours</p>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-background-secondary border border-border flex items-center gap-3.5 hover:border-accent/40 transition-colors shadow-sm">
-              <div className="p-2.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
-                <MessageSquare className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-[10px] font-mono uppercase tracking-wider text-foreground-muted">Direct Engineering</p>
-                <p className="text-xs sm:text-sm font-medium text-foreground">Talk With Builders</p>
-              </div>
+            <div className="min-w-0">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-foreground-muted">Email Direct</p>
+              <a
+                href={`mailto:${SITE_CONFIG.links.email}`}
+                className="text-xs sm:text-sm font-medium text-foreground hover:text-accent transition-colors font-mono truncate block"
+                title={SITE_CONFIG.links.email}
+              >
+                {SITE_CONFIG.links.email}
+              </a>
             </div>
           </div>
-        </Container>
-      </section>
+
+          <div className="p-4 rounded-xl bg-background-surface/80 border border-border flex items-center gap-3.5 hover:border-accent/40 transition-colors shadow-sm backdrop-blur-sm">
+            <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+              <Clock className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-[10px] font-mono uppercase tracking-wider text-foreground-muted">Response Time</p>
+              <p className="text-xs sm:text-sm font-medium text-foreground">Under 24 Hours</p>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-xl bg-background-surface/80 border border-border flex items-center gap-3.5 hover:border-accent/40 transition-colors shadow-sm backdrop-blur-sm">
+            <div className="p-2.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
+              <MessageSquare className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-[10px] font-mono uppercase tracking-wider text-foreground-muted">Direct Engineering</p>
+              <p className="text-xs sm:text-sm font-medium text-foreground">Talk With Builders</p>
+            </div>
+          </div>
+        </div>
+      </PageHero>
 
       {/* Main Interactive Form Component */}
       <ContactSection showHeading={false} className="py-12 md:py-20" />

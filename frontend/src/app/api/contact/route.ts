@@ -21,21 +21,31 @@ interface ContactBody {
 }
 
 const ALLOWED_PROJECT_TYPES = [
+  "Web Applications",
+  "WordPress Sites",
+  "Shopify Store",
+  "SEO & Analytics",
+  "SEO and Analytics",
+  "Paid Ads (Google / Meta)",
+  "Paid ADS(Google,meta)",
+  "Social Media Management",
+  "Startup Pack (Logo, Branding etc.)",
+  "Start up pack(logo, branding etc)",
+  "Others",
+  "Other",
+  // Legacy project types for backwards compatibility
   "Website",
   "Web Application",
   "WordPress",
   "Shopify",
   "Custom Software",
   "UI/UX Design",
-  "SEO & Analytics",
   "Performance Marketing",
-  "Social Media Management",
   "Brand & Identity",
   "Business Collateral",
   "Automation",
   "AI/ML",
   "SaaS",
-  "Other",
 ];
 
 export async function POST(req: NextRequest) {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { FadeUp } from "@/components/animations/FadeUp";
+import { CardSpotlight } from "@/components/ui/card-spotlight";
 import {
   Code2,
   TrendingUp,
@@ -24,6 +25,8 @@ interface PillarCard {
   icon: React.ElementType;
   accentGradient: string;
   borderColor: string;
+  spotlightColor: string;
+  canvasColors: number[][];
   features: string[];
   primaryLink: string;
   primaryLinkText: string;
@@ -40,7 +43,12 @@ const PILLARS: PillarCard[] = [
       "We design and engineer high-performance web applications, SaaS platforms, bespoke business tools, and e-commerce stores using modern, maintainable codebases.",
     icon: Code2,
     accentGradient: "from-violet-500/20 via-purple-500/10 to-transparent",
-    borderColor: "group-hover:border-violet-500/50",
+    borderColor: "group-hover/spotlight:border-violet-500/50",
+    spotlightColor: "rgba(139, 92, 246, 0.35)",
+    canvasColors: [
+      [139, 92, 246],
+      [167, 139, 250],
+    ],
     features: [
       "Custom Web Applications & SaaS (Next.js, React)",
       "WordPress & Shopify E-Commerce Development",
@@ -65,7 +73,12 @@ const PILLARS: PillarCard[] = [
       "Turn your digital presence into a measurable customer acquisition engine with rigorous technical SEO, conversion-optimized funnels, and data-driven ad management.",
     icon: TrendingUp,
     accentGradient: "from-emerald-500/20 via-teal-500/10 to-transparent",
-    borderColor: "group-hover:border-emerald-500/50",
+    borderColor: "group-hover/spotlight:border-emerald-500/50",
+    spotlightColor: "rgba(16, 185, 129, 0.35)",
+    canvasColors: [
+      [16, 185, 129],
+      [52, 211, 153],
+    ],
     features: [
       "Technical SEO Audits & Core Web Vitals Optimization",
       "Intent-Driven On-Page Keyword Mapping",
@@ -87,7 +100,12 @@ const PILLARS: PillarCard[] = [
       "Keep your business top of mind with structured monthly content planning, bespoke post graphics, video concepts, and consistent multi-channel publishing.",
     icon: Share2,
     accentGradient: "from-blue-500/20 via-indigo-500/10 to-transparent",
-    borderColor: "group-hover:border-blue-500/50",
+    borderColor: "group-hover/spotlight:border-blue-500/50",
+    spotlightColor: "rgba(59, 130, 246, 0.35)",
+    canvasColors: [
+      [59, 130, 246],
+      [96, 165, 250],
+    ],
     features: [
       "Monthly Content Strategy & Editorial Calendars",
       "High-Craft Branded Graphic Design & Carousels",
@@ -109,7 +127,12 @@ const PILLARS: PillarCard[] = [
       "Establish an authentic, cohesive visual identity that builds buyer confidence across all digital touchpoints and professional print materials.",
     icon: Palette,
     accentGradient: "from-pink-500/20 via-rose-500/10 to-transparent",
-    borderColor: "group-hover:border-pink-500/50",
+    borderColor: "group-hover/spotlight:border-pink-500/50",
+    spotlightColor: "rgba(244, 63, 94, 0.35)",
+    canvasColors: [
+      [244, 63, 94],
+      [251, 113, 133],
+    ],
     features: [
       "Concept-Driven Logo Design & Vector Master Files",
       "Digital Typography Systems & Curated Palettes",
@@ -131,7 +154,12 @@ const PILLARS: PillarCard[] = [
       "Eliminate repetitive manual friction with practical automations that sync forms, databases, WhatsApp alerts, and applied AI models built for real utility.",
     icon: Cpu,
     accentGradient: "from-amber-500/20 via-orange-500/10 to-transparent",
-    borderColor: "group-hover:border-amber-500/50",
+    borderColor: "group-hover/spotlight:border-amber-500/50",
+    spotlightColor: "rgba(245, 158, 11, 0.35)",
+    canvasColors: [
+      [245, 158, 11],
+      [251, 191, 36],
+    ],
     features: [
       "Instant WhatsApp & Email Automated Lead Alerts",
       "CRM, Form & Google Spreadsheet Workflow Syncing",
@@ -159,7 +187,7 @@ export const WhatWeBuildSection: React.FC = () => {
           />
         </FadeUp>
 
-        {/* 5 Pillars Bento Grid - Streamlined & Compact */}
+        {/* 5 Pillars Bento Grid with Interactive Aceternity CardSpotlight & Canvas Reveal */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 items-stretch">
           {PILLARS.map((pillar, idx) => (
             <FadeUp
@@ -169,29 +197,26 @@ export const WhatWeBuildSection: React.FC = () => {
                 idx === 0 ? "lg:col-span-2" : ""
               }`}
             >
-              <div
-                className={`group h-full relative overflow-hidden rounded-2xl bg-background-secondary/80 border border-border/80 ${pillar.borderColor} transition-all duration-300 p-5 sm:p-6 flex flex-col justify-between hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)]`}
+              <CardSpotlight
+                radius={280}
+                color={pillar.spotlightColor}
+                canvasColors={pillar.canvasColors}
+                className={`h-full relative overflow-hidden rounded-2xl bg-background-secondary/80 border border-border/80 ${pillar.borderColor} transition-all duration-300 p-5 sm:p-6 flex flex-col justify-between hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)]`}
               >
-                {/* Background Ambient Glow */}
-                <div
-                  className={`pointer-events-none absolute -top-24 -right-24 w-52 h-52 rounded-full bg-gradient-to-br ${pillar.accentGradient} blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
-                  aria-hidden="true"
-                />
-
-                <div className="relative z-10 space-y-4">
+                <div className="space-y-4">
                   {/* Top Bar with Pillar Badge & Icon */}
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-accent px-2.5 py-0.5 rounded-full border border-border bg-background-surface">
                       {pillar.pillar}
                     </span>
-                    <div className="w-8 h-8 rounded-lg bg-background-surface border border-border flex items-center justify-center text-foreground group-hover:text-accent group-hover:border-accent/40 transition-all">
+                    <div className="w-8 h-8 rounded-lg bg-background-surface border border-border flex items-center justify-center text-foreground group-hover/spotlight:text-accent group-hover/spotlight:border-accent/40 transition-all">
                       <pillar.icon className="w-4 h-4" aria-hidden="true" />
                     </div>
                   </div>
 
                   {/* Title & Description */}
                   <div>
-                    <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-white transition-colors">
+                    <h3 className="text-xl font-bold tracking-tight text-foreground group-hover/spotlight:text-white transition-colors">
                       {pillar.title}
                     </h3>
                     <p className="text-[11px] font-mono text-accent/80 mt-0.5">
@@ -232,7 +257,7 @@ export const WhatWeBuildSection: React.FC = () => {
                 </div>
 
                 {/* Bottom Links & Primary CTA */}
-                <div className="relative z-10 pt-3.5 mt-3.5 border-t border-border/50 flex flex-wrap items-center justify-between gap-2">
+                <div className="pt-3.5 mt-3.5 border-t border-border/50 flex flex-wrap items-center justify-between gap-2">
                   {/* Secondary Quick Tags */}
                   <div className="flex flex-wrap gap-1.5">
                     {pillar.secondaryLinks.map((link) => (
@@ -254,7 +279,7 @@ export const WhatWeBuildSection: React.FC = () => {
                     <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
                   </Link>
                 </div>
-              </div>
+              </CardSpotlight>
             </FadeUp>
           ))}
         </div>

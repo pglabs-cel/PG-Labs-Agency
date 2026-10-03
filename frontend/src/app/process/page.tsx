@@ -1,3 +1,4 @@
+import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
@@ -5,6 +6,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { FadeUp } from "@/components/animations/FadeUp";
 import { CtaSection } from "@/components/sections/CtaSection";
 import { BreadcrumbJsonLd } from "@/components/JsonLd";
+import { PageHero } from "@/components/ui/PageHero";
 import {
   Search,
   Cpu,
@@ -44,6 +46,7 @@ const PROCESS_STEPS = [
     description:
       "We begin by unpacking your business model, core operational bottlenecks, target audience, and system requirements. No assumptions or cookie-cutter solutions.",
     timeline: "3 – 5 Days",
+    focus: "De-risk assumptions and define architecture boundaries before engineering",
     deliverables: [
       "Discovery summary & technical requirements document",
       "Core user flow & journey mapping",
@@ -59,6 +62,7 @@ const PROCESS_STEPS = [
     description:
       "We design the technical blueprint: database schema, API contracts, third-party integrations, and milestone schedule. We prevent technical debt before it starts.",
     timeline: "3 – 7 Days",
+    focus: "Zero architectural bottlenecks, clean schema design and fixed sprint roadmaps",
     deliverables: [
       "System architecture diagram & data model",
       "API contracts & third-party service specifications",
@@ -74,6 +78,7 @@ const PROCESS_STEPS = [
     description:
       "We craft dark-mode-first or brand-aligned UI design systems, responsive wireframes, and interactive prototypes. Every screen is designed for conversion and clarity.",
     timeline: "1 – 2 Weeks",
+    focus: "Production-ready design tokens, responsive layouts and Figma prototypes",
     deliverables: [
       "Interactive Figma click-through prototype",
       "Modular design tokens (typography, colors, spacing)",
@@ -89,6 +94,7 @@ const PROCESS_STEPS = [
     description:
       "We build using modern stacks (Next.js, TypeScript, Node.js, Python). You get live staging URLs updated throughout each sprint so you see progress in real time.",
     timeline: "2 – 6 Weeks",
+    focus: "Clean, modular, type-safe full-stack execution with live staging reviews",
     deliverables: [
       "Live staging URL with continuous deployment",
       "Clean, modular, type-safe codebase",
@@ -104,6 +110,7 @@ const PROCESS_STEPS = [
     description:
       "We handle cloud deployment, DNS cutover, SSL configuration, technical SEO verification, analytics setup, and comprehensive handoff.",
     timeline: "3 – 5 Days",
+    focus: "Zero-downtime cutover, audited technical SEO and full repository ownership",
     deliverables: [
       "Production deployment with zero-downtime cutover",
       "Complete repository & infrastructure access handoff",
@@ -151,118 +158,221 @@ export default function ProcessPage() {
       />
 
       {/* Hero */}
-      <section className="pt-16 pb-20 md:pt-24 md:pb-28 bg-tech-grid border-b border-border/60">
-        <Container className="max-w-4xl text-center">
-          <FadeUp>
-            <span className="text-xs font-mono tracking-widest text-accent uppercase font-medium px-3 py-1 rounded-full border border-border bg-background-surface mb-6 inline-block">
-              OUR PROCESS
+      <PageHero
+        badge="OUR PROCESS"
+        badgeTag="EXECUTION PROTOCOL"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Process", url: "/process" },
+        ]}
+        title={
+          <>
+            <span>From Idea to Launch:</span>
+            <span className="block mt-1 sm:mt-2 bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-accent to-purple-300">
+              A 5-Step Framework.
             </span>
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-foreground mb-6 leading-tight">
-              From Idea to Launch: A Transparent 5-Step Framework.
-            </h1>
-            <p className="text-foreground-secondary text-lg sm:text-2xl leading-relaxed max-w-2xl mx-auto">
-              How we turn business requirements into fast, scalable, and production-ready digital systems with zero bureaucracy.
-            </p>
-          </FadeUp>
-        </Container>
-      </section>
+          </>
+        }
+        subtitle="How we turn business requirements into fast, scalable, and production-ready digital systems with zero bureaucracy."
+        tags={[
+          { label: "5 CLEAR MILESTONES", dot: true, dotColor: "bg-accent" },
+          { label: "WEEKLY PREVIEWS", dot: true, dotColor: "bg-emerald-400" },
+          { label: "DIRECT ENGINEER ACCESS" },
+        ]}
+      />
 
       {/* 5-Step Deep Dive */}
-      <section className="py-20 md:py-28">
+      <section className="py-20 md:py-28 relative">
+        {/* Subtle radial ambient background glow */}
+        <div
+          className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-accent/5 rounded-full blur-[140px] pointer-events-none -z-10"
+          aria-hidden="true"
+        />
+
         <Container className="max-w-5xl">
           <FadeUp>
             <SectionHeading
               eyebrow="THE WORKFLOW"
               title="How Your Project Progresses"
-              description="A disciplined, milestone-driven approach designed to eliminate uncertainty and deliver working software."
+              description="A disciplined, milestone-driven framework engineered to eliminate uncertainty and deliver working software."
               align="center"
             />
           </FadeUp>
 
-          <div className="space-y-12 mt-16">
-            {PROCESS_STEPS.map((step, idx) => (
-              <FadeUp key={step.step} delay={idx * 0.08}>
-                <div className="p-8 sm:p-10 rounded-2xl bg-background-secondary border border-border hover:border-accent/40 transition-colors">
-                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8 pb-6 border-b border-border/60">
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-xl bg-background-surface border border-border flex items-center justify-center text-accent font-mono font-bold text-xl">
+          {/* Quick Milestone Navigation Ribbon */}
+          <FadeUp delay={0.1}>
+            <div className="mt-12 mb-16 p-2 rounded-2xl bg-gradient-to-b from-[#16161b] to-[#0f0f13] border border-border/80 shadow-lg">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                {PROCESS_STEPS.map((step) => (
+                  <a
+                    key={step.step}
+                    href={`#phase-${step.step}`}
+                    className="group relative flex flex-col items-center text-center p-3 sm:p-3.5 rounded-xl bg-background/50 hover:bg-accent/10 border border-transparent hover:border-accent/30 transition-all duration-200"
+                  >
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="font-mono text-xs font-bold text-accent">
                         {step.step}
+                      </span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:scale-125 transition-all" />
+                      <span className="text-xs font-semibold text-foreground group-hover:text-accent transition-colors">
+                        {step.phase}
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-mono text-foreground-muted group-hover:text-foreground-secondary transition-colors">
+                      {step.timeline}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </FadeUp>
+
+          {/* Connected Phase Cards */}
+          <div className="space-y-6">
+            {PROCESS_STEPS.map((step, idx) => (
+              <React.Fragment key={step.step}>
+                <FadeUp delay={idx * 0.06}>
+                  <div
+                    id={`phase-${step.step}`}
+                    className="scroll-mt-28 relative rounded-2xl bg-gradient-to-b from-[#141419] via-[#0f0f13] to-[#0a0a0d] border border-border/80 hover:border-accent/50 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.36)] p-6 sm:p-9 group overflow-hidden"
+                  >
+                    {/* Top 1px laser beam */}
+                    <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
+
+                    {/* Ambient corner glow */}
+                    <div className="absolute -top-24 -left-24 w-48 h-48 bg-accent/10 rounded-full blur-3xl pointer-events-none group-hover:bg-accent/20 transition-all duration-500" />
+
+                    {/* Card Header Row */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-7 border-b border-border/60">
+                      <div className="flex items-center gap-4">
+                        {/* Phase Icon */}
+                        <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 text-accent flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.18)] group-hover:border-accent group-hover:scale-105 transition-all duration-300 shrink-0">
+                          <step.icon className="w-6 h-6 text-accent" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-semibold tracking-wider uppercase text-accent bg-accent/10 border border-accent/25">
+                              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                              Phase {step.step}
+                            </span>
+                            <span className="text-[11px] font-mono text-foreground-muted uppercase tracking-wider hidden sm:inline">
+                              Stage {idx + 1} of 5
+                            </span>
+                          </div>
+                          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight group-hover:text-white transition-colors">
+                            {step.phase}
+                          </h2>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-xs font-mono uppercase tracking-wider text-accent font-semibold">
-                          Phase {step.step}
-                        </span>
-                        <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-                          {step.phase}
-                        </h2>
+
+                      {/* Right Duration & Milestone Badges */}
+                      <div className="flex flex-wrap items-center gap-2 sm:self-center">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background-surface/80 border border-border/80 text-xs font-mono text-foreground-secondary shadow-sm">
+                          <Clock className="w-3.5 h-3.5 text-accent" />
+                          <span>Estimated: <strong className="text-foreground font-semibold">{step.timeline}</strong></span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background-surface border border-border/80 text-xs font-mono text-foreground-secondary self-start">
-                      <Clock className="w-3.5 h-3.5 text-accent" />
-                      <span>Typical duration: {step.timeline}</span>
+                    {/* 2-Column Body Layout */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                      {/* Left: Objective & Philosophy */}
+                      <div className="lg:col-span-7 space-y-4">
+                        <h3 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight leading-snug">
+                          {step.headline}
+                        </h3>
+                        <p className="text-foreground-secondary text-sm sm:text-base leading-relaxed">
+                          {step.description}
+                        </p>
+
+                        <div className="pt-2">
+                          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-background-surface/50 border border-border/60 text-xs font-mono text-foreground-secondary">
+                            <div className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.7)]" />
+                            <span>
+                              <strong className="text-foreground">Strategic Outcome:</strong> {step.focus}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: Key Deliverables Panel */}
+                      <div className="lg:col-span-5 rounded-xl bg-background-surface/60 border border-border/80 p-5 sm:p-6 group-hover:border-accent/30 transition-all shadow-inner">
+                        <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-border/50">
+                          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-accent font-semibold">
+                            <FileCode className="w-3.5 h-3.5" />
+                            <span>Deliverables Manifest</span>
+                          </div>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium text-accent bg-accent/10 border border-accent/20">
+                            4 Assets
+                          </span>
+                        </div>
+                        <ul className="space-y-2.5">
+                          {step.deliverables.map((item) => (
+                            <li
+                              key={item}
+                              className="flex items-start gap-2.5 text-xs sm:text-sm text-foreground/90 leading-snug"
+                            >
+                              <div className="w-4 h-4 rounded-full bg-accent/15 border border-accent/40 flex items-center justify-center shrink-0 mt-0.5 text-accent">
+                                <CheckCircle2 className="w-3 h-3 text-accent" />
+                              </div>
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   </div>
+                </FadeUp>
 
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                    <div className="md:col-span-6 space-y-3">
-                      <h3 className="text-lg font-semibold text-foreground">
-                        {step.headline}
-                      </h3>
-                      <p className="text-foreground-secondary text-sm leading-relaxed">
-                        {step.description}
-                      </p>
-                    </div>
-
-                    <div className="md:col-span-6 bg-background-surface p-6 rounded-xl border border-border/60">
-                      <h4 className="text-xs font-mono uppercase tracking-wider text-foreground-muted mb-4 font-semibold">
-                        Key Deliverables
-                      </h4>
-                      <ul className="space-y-2.5">
-                        {step.deliverables.map((item) => (
-                          <li
-                            key={item}
-                            className="flex items-start gap-2.5 text-xs sm:text-sm text-foreground-secondary"
-                          >
-                            <CheckCircle2 className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
+                {/* Vertical Circuit Connector between steps */}
+                {idx < PROCESS_STEPS.length - 1 && (
+                  <div className="flex flex-col items-center justify-center py-1" aria-hidden="true">
+                    <div className="w-[2px] h-7 bg-gradient-to-b from-accent/50 via-purple-500/30 to-border/40 relative">
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_rgba(139,92,246,0.9)]" />
                     </div>
                   </div>
-                </div>
-              </FadeUp>
+                )}
+              </React.Fragment>
             ))}
           </div>
         </Container>
       </section>
 
       {/* Collaboration Rules */}
-      <section className="py-20 md:py-28 bg-background-secondary/40 border-y border-border/60">
+      <section className="py-20 md:py-28 bg-background-secondary/30 border-y border-border/60 relative">
         <Container className="max-w-5xl">
           <FadeUp>
             <SectionHeading
-              eyebrow="TRANSPARENT COLLABORATION"
-              title="What Working With Us Looks Like"
+              eyebrow="ENGINEERING INTEGRITY"
+              title="Transparent Collaboration Protocol"
               description="We built PG Labs around how engineering teams should operate: transparently, directly, and with full accountability."
               align="center"
             />
           </FadeUp>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16">
             {COLLABORATION_RULES.map((rule, idx) => (
               <FadeUp key={rule.title} delay={idx * 0.08}>
-                <div className="p-8 rounded-xl bg-background-surface border border-border space-y-4 h-full">
-                  <div className="w-12 h-12 rounded-lg bg-background-secondary border border-border flex items-center justify-center text-accent">
-                    <rule.icon className="w-6 h-6" aria-hidden="true" />
+                <div className="relative p-7 sm:p-8 rounded-2xl bg-gradient-to-b from-[#141418] to-[#0c0c0f] border border-border/80 hover:border-accent/40 transition-all duration-300 shadow-md group overflow-hidden h-full flex flex-col justify-between">
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
+                  
+                  <div>
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent group-hover:scale-105 group-hover:border-accent/40 transition-all duration-300">
+                        <rule.icon className="w-5 h-5" aria-hidden="true" />
+                      </div>
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-accent font-semibold px-2 py-0.5 rounded bg-accent/10 border border-accent/20">
+                        RULE // 0{idx + 1}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg sm:text-xl font-bold text-foreground mb-3 group-hover:text-white transition-colors">
+                      {rule.title}
+                    </h3>
+                    <p className="text-foreground-secondary text-sm leading-relaxed">
+                      {rule.description}
+                    </p>
                   </div>
-                  <h3 className="text-xl font-bold text-foreground">
-                    {rule.title}
-                  </h3>
-                  <p className="text-foreground-secondary text-sm leading-relaxed">
-                    {rule.description}
-                  </p>
                 </div>
               </FadeUp>
             ))}
