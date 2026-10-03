@@ -48,9 +48,14 @@ export const Button: React.FC<ButtonProps> = ({
     lg: "text-base px-6 py-3.5 gap-2.5 min-h-[48px]",
   };
 
+  const sanitizedChildren =
+    showArrow && typeof children === "string"
+      ? children.replace(/\s*(?:→|->)\s*$/, "")
+      : children;
+
   const content = (
     <>
-      {children}
+      {sanitizedChildren}
       {showArrow && (
         <ArrowRight
           className="w-4 h-4 transition-transform duration-200 ease-out group-hover:translate-x-1 text-accent shrink-0"

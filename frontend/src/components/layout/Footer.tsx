@@ -137,11 +137,6 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/services/ui-ux-design" className="hover:text-foreground transition-colors py-0.5 inline-block">
-                  UI/UX Design
-                </Link>
-              </li>
-              <li>
                 <Link href="/services/seo" className="hover:text-foreground transition-colors py-0.5 inline-block">
                   SEO & Analytics
                 </Link>
@@ -178,11 +173,6 @@ export const Footer: React.FC = () => {
               <li>
                 <Link href="/services/automation" className="hover:text-foreground transition-colors py-0.5 inline-block">
                   Business Automation
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/backend-api-development" className="hover:text-foreground transition-colors py-0.5 inline-block">
-                  Backend & APIs
                 </Link>
               </li>
               <li>

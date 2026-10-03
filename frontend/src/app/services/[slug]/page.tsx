@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/animations/FadeUp";
@@ -65,7 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: SITE_CONFIG.name,
       images: [
         {
-          url: SITE_CONFIG.fullLogoUrl,
+          url: service.heroImage || SITE_CONFIG.fullLogoUrl,
           width: 1200,
           height: 630,
           alt: `${service.title} — PG Labs`,
@@ -76,7 +77,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title: `${service.seoTitle} | PG Labs`,
       description: service.metaDescription,
-      images: [SITE_CONFIG.fullLogoUrl],
+      images: [service.heroImage || SITE_CONFIG.fullLogoUrl],
     },
   };
 }
@@ -108,9 +109,13 @@ export default async function ServiceDetailPage({ params }: Props) {
 
       {/* ── 1. Hero & Breadcrumbs Section ───────────────────────────── */}
       <section className="pt-24 pb-16 md:pt-32 md:pb-24 bg-tech-grid border-b border-border/60 relative overflow-hidden">
-        {/* Ambient Glow */}
+        {/* Ambient Glows */}
         <div
-          className="pointer-events-none absolute left-1/2 top-1/4 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] rounded-full bg-accent/10 blur-[130px]"
+          className="pointer-events-none absolute left-1/4 top-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] rounded-full bg-accent/10 blur-[140px]"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute right-10 top-1/3 w-[500px] h-[350px] rounded-full bg-purple-600/10 blur-[130px]"
           aria-hidden="true"
         />
 
@@ -142,107 +147,237 @@ export default async function ServiceDetailPage({ params }: Props) {
             </ol>
           </nav>
 
-          {/* Hero Content */}
-          <div className="max-w-4xl space-y-6">
-            <FadeUp>
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-xs font-mono tracking-widest text-accent uppercase font-bold px-3 py-1 rounded-full border border-accent/40 bg-accent/10">
-                  {service.pillar} • {service.pillarLabel}
-                </span>
-                <span className="text-xs font-mono text-foreground-muted px-2.5 py-1 rounded-full border border-border bg-background-surface">
-                  SERVICE {service.number}
-                </span>
-                {service.startingPrice && (
-                  <span className="text-xs font-mono text-foreground-secondary px-2.5 py-1 rounded-full border border-border/80 bg-background-secondary">
-                    Starting from {service.startingPrice}
+          {/* Hero 2-Column Responsive Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 xl:gap-14 items-center">
+            {/* Left Column: Heading, Badges, Value, CTAs */}
+            <div className="lg:col-span-7 space-y-6 sm:space-y-7">
+              <FadeUp>
+                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                  <span className="text-xs font-mono tracking-widest text-accent uppercase font-bold px-3 py-1 rounded-full border border-accent/40 bg-accent/10">
+                    {service.pillar} • {service.pillarLabel}
                   </span>
-                )}
+                  <span className="text-xs font-mono text-foreground-muted px-2.5 py-1 rounded-full border border-border bg-background-surface">
+                    SERVICE {service.number}
+                  </span>
+                  {service.startingPrice && (
+                    <span className="text-xs font-mono text-foreground-secondary px-2.5 py-1 rounded-full border border-border/80 bg-background-secondary">
+                      Starting from {service.startingPrice}
+                    </span>
+                  )}
+                </div>
+              </FadeUp>
+
+              <FadeUp delay={0.08}>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-bold tracking-tight text-foreground leading-[1.12]">
+                  {service.h1}
+                </h1>
+              </FadeUp>
+
+              <FadeUp delay={0.16}>
+                <p className="text-foreground-secondary text-base sm:text-lg lg:text-xl leading-relaxed max-w-2xl">
+                  {service.intro}
+                </p>
+              </FadeUp>
+
+              <FadeUp delay={0.24} className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
+                <Button href="/contact" size="lg" showArrow className="min-h-[48px] justify-center">
+                  {service.ctaText}
+                </Button>
+                <Button href="/pricing" variant="outline" size="lg" className="min-h-[48px] justify-center">
+                  View Starting Pricing
+                </Button>
+              </FadeUp>
+
+              {/* Technical Trust Strip */}
+              <FadeUp delay={0.3}>
+                <div className="pt-3 border-t border-border/40 flex flex-wrap items-center gap-y-2 gap-x-5 text-xs font-mono text-foreground-muted">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
+                    <span>Production-ready code</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
+                    <span>Direct engineering lead</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
+                    <span>Transparent sprint pricing</span>
+                  </div>
+                </div>
+              </FadeUp>
+            </div>
+
+            {/* Right Column: Hero Visual Graphic in Studio Mockup Window */}
+            {service.heroImage && (
+              <div className="lg:col-span-5 w-full">
+                <FadeUp delay={0.18}>
+                  <div className="relative group mx-auto max-w-lg lg:max-w-none">
+                    {/* Ambient Glow */}
+                    <div
+                      className="absolute -inset-2 sm:-inset-3.5 rounded-3xl bg-gradient-to-tr from-accent/25 via-purple-600/15 to-transparent blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      aria-hidden="true"
+                    />
+
+                    {/* Window Container */}
+                    <div className="relative rounded-2xl sm:rounded-3xl border border-border/80 bg-background-secondary/85 backdrop-blur-md p-3 sm:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.6)] group-hover:border-accent/40 transition-all duration-300">
+                      {/* Window Header */}
+                      <div className="flex items-center justify-between pb-3 border-b border-border/60 px-1">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/50" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
+                          </div>
+                          <span className="text-[11px] font-mono text-foreground-muted ml-1.5 truncate max-w-[150px] sm:max-w-[200px]">
+                            pglabs.studio / {service.slug}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] font-mono text-accent font-semibold shrink-0">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span>SYSTEM SPEC</span>
+                        </div>
+                      </div>
+
+                      {/* Main Illustration Surface - NO black border, NO inner padding, scaled edge-to-edge */}
+                      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl mt-3 shadow-inner">
+                        <Image
+                          src={service.heroImage}
+                          alt={service.h1}
+                          fill
+                          priority
+                          unoptimized
+                          className="object-cover scale-[1.17] transition-transform duration-700 ease-out group-hover:scale-[1.21]"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
+                        />
+                      </div>
+
+                      {/* Window Footer / Metadata */}
+                      <div className="mt-3 pt-2.5 border-t border-border/50 flex items-center justify-between text-[11px] font-mono px-1">
+                        <span className="text-foreground-muted flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                          <span>PILLAR: {service.pillar}</span>
+                        </span>
+                        <span className="text-foreground-secondary truncate max-w-[180px] sm:max-w-none text-right">
+                          {service.technologies.slice(0, 3).map((t) => t.name).join(" • ")}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </FadeUp>
               </div>
-            </FadeUp>
-
-            <FadeUp delay={0.08}>
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-foreground leading-[1.1]">
-                {service.h1}
-              </h1>
-            </FadeUp>
-
-            <FadeUp delay={0.16}>
-              <p className="text-foreground-secondary text-base sm:text-xl leading-relaxed max-w-3xl">
-                {service.intro}
-              </p>
-            </FadeUp>
-
-            <FadeUp delay={0.24} className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-              <Button href="/contact" size="lg" showArrow>
-                {service.ctaText}
-              </Button>
-              <Button href="/pricing" variant="outline" size="lg">
-                View Starting Pricing
-              </Button>
-            </FadeUp>
+            )}
           </div>
         </Container>
       </section>
 
       {/* ── 2. Who It's For & Problems Solved ───────────────────────── */}
-      <section className="py-20 md:py-28 border-b border-border/60 bg-background-secondary/20">
+      <section className="py-20 md:py-28 border-b border-border/60 bg-gradient-to-b from-background via-background-secondary/20 to-background">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            {/* Who It Is For */}
-            <div className="lg:col-span-5 space-y-6">
+          <div className="space-y-20 md:space-y-24">
+            {/* 2A. Audience Fit */}
+            <div className="space-y-8">
               <FadeUp>
-                <div className="space-y-2">
-                  <span className="text-xs font-mono uppercase tracking-widest text-accent font-semibold">
+                <div className="max-w-2xl space-y-3">
+                  <span className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-accent font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                     AUDIENCE FIT
                   </span>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground tracking-tight">
                     Who this service is for.
                   </h2>
+                  <p className="text-sm sm:text-base text-foreground-secondary leading-relaxed">
+                    Designed for teams, founders, and businesses that require production-grade engineering, fast execution, and zero bloated templates.
+                  </p>
                 </div>
               </FadeUp>
 
-              <div className="space-y-3">
+              <div
+                className={`grid gap-4 sm:gap-5 ${
+                  service.whoIsItFor.length === 3
+                    ? "grid-cols-1 md:grid-cols-3"
+                    : service.whoIsItFor.length === 4
+                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                      : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                }`}
+              >
                 {service.whoIsItFor.map((item, idx) => (
-                  <FadeUp key={idx} delay={idx * 0.08}>
-                    <div className="p-4 rounded-xl bg-background-secondary border border-border/80 flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" aria-hidden="true" />
-                      <p className="text-sm text-foreground/90 leading-relaxed">{item}</p>
+                  <FadeUp key={idx} delay={idx * 0.06} className="h-full">
+                    <div className="h-full group p-5 sm:p-6 rounded-2xl bg-background-surface/50 border border-border/80 hover:border-accent/40 transition-all duration-300 flex flex-col justify-between space-y-4 hover:shadow-lg hover:shadow-accent/5">
+                      <div className="flex items-center justify-between">
+                        <div className="w-8 h-8 rounded-xl bg-accent/10 border border-accent/25 flex items-center justify-center text-accent shrink-0 group-hover:bg-accent/20 transition-colors">
+                          <CheckCircle2 className="w-4 h-4 text-accent" aria-hidden="true" />
+                        </div>
+                        <span className="text-[11px] font-mono uppercase tracking-wider text-foreground-muted font-medium">
+                          PROFILE 0{idx + 1}
+                        </span>
+                      </div>
+                      <p className="text-sm sm:text-[14.5px] font-medium text-foreground/90 group-hover:text-foreground leading-relaxed transition-colors">
+                        {item}
+                      </p>
                     </div>
                   </FadeUp>
                 ))}
               </div>
             </div>
 
-            {/* Problems Solved */}
-            <div className="lg:col-span-7 space-y-6">
+            {/* 2B. Operational Impact */}
+            <div className="space-y-8 pt-12 border-t border-border/40">
               <FadeUp>
-                <div className="space-y-2">
-                  <span className="text-xs font-mono uppercase tracking-widest text-accent font-semibold">
+                <div className="max-w-2xl space-y-3">
+                  <span className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-accent font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                     OPERATIONAL IMPACT
                   </span>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground tracking-tight">
                     Specific bottlenecks we solve.
                   </h2>
+                  <p className="text-sm sm:text-base text-foreground-secondary leading-relaxed">
+                    How PG Labs replaces common agency friction, technical debt, and fragile setups with disciplined software architecture.
+                  </p>
                 </div>
               </FadeUp>
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
                 {service.problemsSolved.map((item, idx) => (
-                  <FadeUp key={idx} delay={idx * 0.08}>
-                    <div className="p-5 sm:p-6 rounded-xl bg-background-secondary border border-border/80 space-y-3">
-                      <div className="flex items-start gap-2.5">
-                        <span className="text-xs font-mono font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20 shrink-0">
-                          PROBLEM
-                        </span>
-                        <p className="text-sm text-foreground-secondary font-medium leading-relaxed">
+                  <FadeUp key={idx} delay={idx * 0.08} className="h-full">
+                    <div className="h-full rounded-2xl bg-gradient-to-b from-background-surface/70 via-background-surface/30 to-background-secondary/60 border border-border/80 hover:border-accent/40 transition-all duration-300 p-6 flex flex-col justify-between group relative overflow-hidden shadow-sm hover:shadow-accent/5">
+                      {/* Ambient hover glow */}
+                      <div className="absolute -top-16 -right-16 w-32 h-32 bg-accent/5 rounded-full blur-3xl pointer-events-none group-hover:bg-accent/10 transition-colors" />
+
+                      {/* Problem Header & Text */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between pb-3 border-b border-border/60">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold tracking-wider uppercase text-rose-400">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                            THE FRICTION
+                          </span>
+                          <span className="text-xs font-mono text-foreground-muted">
+                            0{idx + 1} / 0{service.problemsSolved.length}
+                          </span>
+                        </div>
+                        <p className="text-sm text-foreground-secondary leading-relaxed">
                           {item.problem}
                         </p>
                       </div>
-                      <div className="flex items-start gap-2.5 pt-2 border-t border-border/50">
-                        <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 shrink-0">
-                          PG LABS FIX
+
+                      {/* Visual Divider / Connector */}
+                      <div className="py-4 my-2 flex items-center gap-3">
+                        <div className="h-px bg-border/60 flex-1" />
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-accent font-semibold px-2 py-0.5 rounded bg-accent/10 border border-accent/20">
+                          RESOLUTION
                         </span>
-                        <p className="text-sm text-foreground font-semibold leading-relaxed">
+                        <div className="h-px bg-border/60 flex-1" />
+                      </div>
+
+                      {/* Solution Panel */}
+                      <div className="space-y-2 rounded-xl bg-accent/[0.04] border border-accent/20 group-hover:border-accent/35 transition-colors p-4">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />
+                          <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
+                            PG Labs Engineering
+                          </span>
+                        </div>
+                        <p className="text-sm font-medium text-foreground leading-relaxed">
                           {item.solution}
                         </p>
                       </div>

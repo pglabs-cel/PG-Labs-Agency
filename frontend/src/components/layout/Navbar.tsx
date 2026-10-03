@@ -51,8 +51,6 @@ const PILLARS_NAV: PillarGroup[] = [
       { name: "WordPress Development", href: "/services/wordpress-development", shortDesc: "Clean, Fast CMS Websites" },
       { name: "Shopify Development", href: "/services/shopify-development", shortDesc: "E-Commerce Stores Built to Sell" },
       { name: "Custom Software", href: "/services/custom-software", shortDesc: "Portals & Operational Systems" },
-      { name: "UI/UX Design", href: "/services/ui-ux-design", shortDesc: "Product Interfaces & Systems" },
-      { name: "Backend & APIs", href: "/services/backend-api-development", shortDesc: "Scalable Server Architecture" },
     ],
   },
   {

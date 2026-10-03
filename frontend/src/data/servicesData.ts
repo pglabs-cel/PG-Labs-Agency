@@ -40,6 +40,7 @@ export interface ServiceData {
   h1: string;
   eyebrow: string;
   intro: string;
+  heroImage?: string;
   whoIsItFor: string[];
   problemsSolved: Array<{
     problem: string;
@@ -91,8 +92,6 @@ export const PILLARS_CONFIG: Record<
       "wordpress-development",
       "shopify-development",
       "custom-software",
-      "ui-ux-design",
-      "backend-api-development",
     ],
   },
   GROW: {
@@ -148,6 +147,7 @@ export const SERVICES_DATA: ServiceData[] = [
     h1: "Websites Built Around Your Business.",
     eyebrow: "CODED & CMS WEB ENGINEERING",
     intro: "We build websites end-to-end using either custom code or established platforms depending on what your business actually requires. Whether you need a lightning-fast marketing website, an interactive client portal, or a scalable SaaS platform, we engineer for speed, conversion, and long-term maintainability.",
+    heroImage: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791040839/coded_website_hero.svg",
     whoIsItFor: [
       "Growing businesses needing a fast, professional digital presence that converts visitors.",
       "Startups and SaaS companies building bespoke customer dashboards or web applications.",
@@ -253,7 +253,7 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     relatedServices: [
-      { slug: "ui-ux-design", title: "UI/UX Design", pillar: "BUILD" },
+      { slug: "custom-software", title: "Custom Software", pillar: "BUILD" },
       { slug: "seo", title: "SEO & Analytics", pillar: "GROW" },
       { slug: "automation", title: "Business Automation", pillar: "AUTOMATE" },
     ],
@@ -276,7 +276,7 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     startingPrice: "₹15,000+",
-    ctaText: "Start Your Website Project →",
+    ctaText: "Start Your Website Project",
     ctaSubtext: "Tell us about your project requirements and target timeline.",
   },
 
@@ -301,6 +301,7 @@ export const SERVICES_DATA: ServiceData[] = [
     h1: "WordPress Websites Without the Template Feel.",
     eyebrow: "CUSTOM THEMES & ROBUST CMS",
     intro: "WordPress powers over 40% of the web for a reason: it gives business teams complete editorial freedom. But off-the-shelf theme marketplace templates often ship with 50+ plugins, sluggish page speeds, and brittle layouts. PG Labs builds custom WordPress sites with clean code, minimal dependencies, and lightning-fast loading speeds.",
+    heroImage: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791040703/wordpress_hero.svg",
     whoIsItFor: [
       "Businesses that want their marketing team to edit pages, publish blogs, and update case studies without touching code.",
       "Companies moving away from brittle, slow site builders (Wix, Elementor bloat) to a streamlined, fast setup.",
@@ -384,7 +385,7 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     startingPrice: "₹10,000+",
-    ctaText: "Start Your WordPress Project →",
+    ctaText: "Start Your WordPress Project",
     ctaSubtext: "Clean, fast, and easy for your team to manage.",
   },
 
@@ -409,6 +410,7 @@ export const SERVICES_DATA: ServiceData[] = [
     h1: "Launch an E-commerce Store Built to Sell.",
     eyebrow: "E-COMMERCE STORE ENGINEERING",
     intro: "A successful online store is not just a digital catalog; it is a conversion engine. We design and launch Shopify stores built around buyer trust, friction-free checkout, lightning-fast product pages, and seamless payment and shipping integrations.",
+    heroImage: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791040766/shopify_hero.svg",
     whoIsItFor: [
       "D2C brands launching their first online store with modern visual identity.",
       "Established retailers migrating from legacy platforms or outdated WooCommerce stores.",
@@ -515,7 +517,7 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     startingPrice: "₹20,000+",
-    ctaText: "Launch Your Shopify Store →",
+    ctaText: "Launch Your Shopify Store",
     ctaSubtext: "Engineered for speed, trust, and frictionless checkout.",
   },
 
@@ -540,6 +542,7 @@ export const SERVICES_DATA: ServiceData[] = [
     h1: "Software Built Around How Your Business Works.",
     eyebrow: "BESPOKE OPERATIONAL PLATFORMS",
     intro: "Off-the-shelf software forces your team to bend its operational procedures around rigid software limitations. We take the reverse approach: we study your actual workflow, bottlenecks, and data flows, then engineer tailored web platforms, internal tools, and operational systems that fit your business like a glove.",
+    heroImage: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791040783/customwebsite_hero.svg",
     whoIsItFor: [
       "Companies that have outgrown Excel sheets, messy WhatsApp threads, and generic SaaS tools.",
       "Businesses with specialized industry workflows (manufacturing, logistics, spare parts, education, trade).",
@@ -625,7 +628,7 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     relatedServices: [
-      { slug: "backend-api-development", title: "Backend & API Development", pillar: "BUILD" },
+      { slug: "web-development", title: "Web Development", pillar: "BUILD" },
       { slug: "automation", title: "Business Automation", pillar: "AUTOMATE" },
       { slug: "ai-solutions", title: "AI Solutions", pillar: "AUTOMATE" },
     ],
@@ -644,122 +647,16 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     startingPrice: "₹35,000+",
-    ctaText: "Discuss Your Custom Software →",
+    ctaText: "Discuss Your Custom Software",
     ctaSubtext: "Build software that fits your exact workflow.",
   },
 
-  // ── 05. UI/UX Design ──────────────────────────────────────────────
-  {
-    slug: "ui-ux-design",
-    pillar: "BUILD",
-    pillarLabel: "Digital Products & Technology",
-    number: "05",
-    title: "UI/UX Design",
-    navTitle: "UI/UX Design",
-    shortDescription: "Clean, responsive product interfaces and design systems that make complex software feel simple.",
-    seoTitle: "UI UX Design Services & Product Design Agency | PG Labs",
-    metaDescription: "Interfaces designed to make complex products simple. PG Labs provides UI/UX research, wireframing, high-fidelity prototypes, and developer-ready design systems.",
-    keywords: [
-      "UI UX Design Services",
-      "Website UI UX Design",
-      "Product Design Services",
-      "Figma UI UX Agency",
-      "Dashboard Design Agency",
-    ],
-    h1: "Interfaces Designed to Make Complex Products Simple.",
-    eyebrow: "PRODUCT EXPERIENCE & DESIGN SYSTEMS",
-    intro: "Great digital product design is not about superficial decoration or trendy gradients. It is about cognitive clarity: understanding what the user needs to accomplish and removing every unnecessary obstacle. We design functional, elegant interfaces that turn first-time visitors into active users and streamline complex workflows into intuitive interactions.",
-    whoIsItFor: [
-      "Founders turning a software concept into a validated, high-fidelity interactive prototype.",
-      "Companies with powerful backend functionality that suffers from clunky, confusing interfaces.",
-      "Teams needing a unified, scalable design system before scaling their engineering team.",
-    ],
-    problemsSolved: [
-      {
-        problem: "Users dropping off because navigation and onboarding are confusing.",
-        solution: "Rigorous information architecture, intuitive visual hierarchy, and progressive disclosure patterns.",
-      },
-      {
-        problem: "Developers guessing spacing, colors, and responsive behavior during implementation.",
-        solution: "Pixel-perfect Figma files with design tokens, responsive auto-layout, interactive states, and component variants.",
-      },
-      {
-        problem: "Interfaces that look pretty on Dribbble but fail accessibility and real-world data constraints.",
-        solution: "Design grounded in real content, WCAG 2.1 contrast standards, clear typography scales, and keyboard accessibility.",
-      },
-    ],
-    whatWeProvide: [
-      "User research, persona definition, and user journey mapping.",
-      "Information architecture, user flow diagrams, and low-fidelity wireframing.",
-      "High-fidelity UI design in Figma with dark and light surface exploration.",
-      "Interactive clickable prototypes for user testing and stakeholder presentations.",
-      "Scalable design systems with tokens (colors, typography, spacing, components).",
-    ],
-    deliverables: [
-      "Complete Figma project file with structured pages and auto-layout",
-      "Interactive clickable prototype for testing and demos",
-      "Design system component library with hover, active, and disabled states",
-      "Exportable SVG icon assets and optimized media guidelines",
-      "Developer handoff documentation with spacing specs and micro-interaction notes",
-    ],
-    technologies: [
-      { name: "Figma", category: "Design Tool" },
-      { name: "Design Tokens", category: "Architecture" },
-      { name: "Tailwind UI Tokens", category: "System" },
-      { name: "WCAG 2.1", category: "Accessibility" },
-    ],
-    serviceProcess: [
-      {
-        step: "01",
-        title: "User Journey & Architecture Mapping",
-        description: "We map out core user flows, primary actions, and information hierarchies before creating visual screens.",
-      },
-      {
-        step: "02",
-        title: "Low-Fidelity Wireframes",
-        description: "We test layout compositions, content density, and user pathways rapidly in black-and-white wireframes.",
-      },
-      {
-        step: "03",
-        title: "High-Fidelity Visual Design",
-        description: "We apply typography, color palettes, elevation surfaces, and micro-interactions to create polished, tactile UI.",
-      },
-      {
-        step: "04",
-        title: "Design System & Developer Specs",
-        description: "We document reusable components, responsive breakpoints, and interaction rules so engineers build without friction.",
-      },
-    ],
-    relatedServices: [
-      { slug: "web-development", title: "Web Development", pillar: "BUILD" },
-      { slug: "custom-software", title: "Custom Software", pillar: "BUILD" },
-      { slug: "branding", title: "Brand Identity", pillar: "BRAND" },
-    ],
-    faqs: [
-      {
-        question: "Can you redesign our existing application without rebuilding it from scratch?",
-        answer: "Yes. We frequently conduct UI/UX audits and redesign specific flows (e.g. checkout, onboarding, dashboard navigation) so your developers can improve the interface incrementally.",
-      },
-      {
-        question: "Do you design for both mobile and desktop?",
-        answer: "Always. Every screen is designed with responsive auto-layout specifications for 375px mobile, tablet, and 1440px desktop screens.",
-      },
-      {
-        question: "What files do we receive at the end?",
-        answer: "You receive the complete, organized Figma file with component libraries, variables/tokens, assets, and prototype links ready for handoff to any development team.",
-      },
-    ],
-    startingPrice: "₹18,000+",
-    ctaText: "Start UI/UX Design Project →",
-    ctaSubtext: "Make complex products feel effortless and intuitive.",
-  },
-
-  // ── 06. SEO & Analytics ───────────────────────────────────────────
+  // ── 05. SEO & Analytics ───────────────────────────────────────────
   {
     slug: "seo",
     pillar: "GROW",
     pillarLabel: "SEO & Performance Marketing",
-    number: "06",
+    number: "05",
     title: "SEO & Analytics",
     navTitle: "SEO & Analytics",
     shortDescription: "Turn your website into a searchable organic growth channel with technical SEO and clean tracking.",
@@ -776,6 +673,7 @@ export const SERVICES_DATA: ServiceData[] = [
     h1: "Turn Your Website Into a Searchable Growth Channel.",
     eyebrow: "ORGANIC SEARCH & TECHNICAL DISCOVERY",
     intro: "A beautiful website produces zero business value if nobody can find it. We help businesses earn sustainable organic search traffic by fixing deep technical SEO issues, structuring pages around buyer intent, optimizing Core Web Vitals, and establishing transparent analytics reporting.",
+    heroImage: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791040901/seo_hero.svg",
     whoIsItFor: [
       "Businesses whose websites currently receive little to no organic search traffic.",
       "Companies launching a new site who want to build search authority correctly from day one.",
@@ -861,16 +759,16 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     startingPrice: "₹5,000/month",
-    ctaText: "Audit Your Website SEO →",
+    ctaText: "Audit Your Website SEO",
     ctaSubtext: "Discover what is holding your website back from ranking.",
   },
 
-  // ── 07. Performance Marketing ─────────────────────────────────────
+  // ── 06. Performance Marketing ─────────────────────────────────────
   {
     slug: "performance-marketing",
     pillar: "GROW",
     pillarLabel: "SEO & Performance Marketing",
-    number: "07",
+    number: "06",
     title: "Performance Marketing",
     navTitle: "Performance Marketing",
     shortDescription: "Turn ad spend into measurable growth with targeted Google Ads and Meta Ads campaigns.",
@@ -887,6 +785,7 @@ export const SERVICES_DATA: ServiceData[] = [
     h1: "Turn Ad Spend Into Measurable Growth.",
     eyebrow: "PAID ACQUISITION & CONVERSION FUNNELS",
     intro: "Paid advertising should never be a lottery. We engineer data-driven paid advertising campaigns across Google and Meta (Facebook & Instagram) anchored in clear conversion tracking, compelling creative messaging, and continuous optimization.",
+    heroImage: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791040916/performance_marketing_hero.svg",
     whoIsItFor: [
       "Businesses ready to scale beyond organic word-of-mouth with predictable paid acquisition.",
       "B2B and service companies needing qualified inbound phone calls, WhatsApp leads, and form inquiries.",
@@ -972,16 +871,16 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     startingPrice: "Custom",
-    ctaText: "Discuss Performance Marketing →",
+    ctaText: "Discuss Performance Marketing",
     ctaSubtext: "Scale customer acquisition with disciplined paid ads.",
   },
 
-  // ── 08. Social Media Management ───────────────────────────────────
+  // ── 07. Social Media Management ───────────────────────────────────
   {
     slug: "social-media-management",
     pillar: "MANAGE",
     pillarLabel: "Social Media & Digital Presence",
-    number: "08",
+    number: "07",
     title: "Social Media Management",
     navTitle: "Social Media",
     shortDescription: "Build a consistent, professional digital presence that keeps your brand top of mind.",
@@ -997,6 +896,7 @@ export const SERVICES_DATA: ServiceData[] = [
     h1: "Build a Digital Presence People Remember.",
     eyebrow: "BRAND CONTENT & COMMUNITY PRESENCE",
     intro: "Modern customers research your social media profiles before they ever contact your sales team. An inactive or amateurish profile erodes credibility. We manage your social media presence with structured content planning, high-craft graphic design, engaging copywriting, and consistent publishing across Instagram, LinkedIn, and Facebook.",
+    heroImage: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791041050/social_media_management.svg",
     whoIsItFor: [
       "Businesses whose social media profiles haven't posted in weeks or months.",
       "Founders and B2B companies looking to build organic credibility on LinkedIn.",
@@ -1081,16 +981,16 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     startingPrice: "Custom",
-    ctaText: "Build Your Digital Presence →",
+    ctaText: "Build Your Digital Presence",
     ctaSubtext: "Consistent, polished content that builds brand authority.",
   },
 
-  // ── 09. Brand Identity ────────────────────────────────────────────
+  // ── 08. Brand Identity ────────────────────────────────────────────
   {
     slug: "branding",
     pillar: "BRAND",
     pillarLabel: "Identity & Creative",
-    number: "09",
+    number: "08",
     title: "Logo & Brand Identity",
     navTitle: "Logo & Branding",
     shortDescription: "Distinctive logo design, typography scales, and brand identity systems for ambitious businesses.",
@@ -1106,6 +1006,7 @@ export const SERVICES_DATA: ServiceData[] = [
     h1: "Give Your Business a Consistent Identity.",
     eyebrow: "VISUAL IDENTITY & LOGO SYSTEMS",
     intro: "A logo alone is not a brand. A brand is the cohesive visual system—your typography, color palette, spacing, and iconography—that makes your business instantly recognizable. We build clean, modern visual identity systems that give startups and established businesses an authentic, professional voice.",
+    heroImage: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791041493/logo_hero.svg",
     whoIsItFor: [
       "New businesses and startups launching without an established visual identity.",
       "Companies with outdated, low-resolution logos that look fuzzy and unprofessional.",
@@ -1186,16 +1087,16 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     startingPrice: "₹8,000+",
-    ctaText: "Start Brand Identity Project →",
+    ctaText: "Start Brand Identity Project",
     ctaSubtext: "Give your business an authentic, enduring identity.",
   },
 
-  // ── 10. Business Collateral ───────────────────────────────────────
+  // ── 09. Business Collateral ───────────────────────────────────────
   {
     slug: "business-collateral",
     pillar: "BRAND",
     pillarLabel: "Identity & Creative",
-    number: "10",
+    number: "09",
     title: "Business Collateral",
     navTitle: "Business Collateral",
     shortDescription: "Turn your brand into professional brochures, company profiles, and presentation materials.",
@@ -1211,6 +1112,7 @@ export const SERVICES_DATA: ServiceData[] = [
     h1: "Turn Your Brand Into Professional Business Materials.",
     eyebrow: "PRINT & DIGITAL MARKETING MATERIALS",
     intro: "Whether presenting to high-value enterprise clients, attending an industry trade show, or emailing an executive proposal, the quality of your business collateral reflects the quality of your work. We design clean, editorial marketing materials that make your business look established, credible, and impressive.",
+    heroImage: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791041493/logo_hero.svg",
     whoIsItFor: [
       "B2B companies pitching enterprise clients who require an authoritative PDF company profile.",
       "Businesses attending trade expos, conferences, or customer meetings needing print brochures.",
@@ -1290,16 +1192,16 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     startingPrice: "₹6,000+",
-    ctaText: "Design Business Collateral →",
+    ctaText: "Design Business Collateral",
     ctaSubtext: "Make every client touchpoint look professional and credible.",
   },
 
-  // ── 11. Business Automation ───────────────────────────────────────
+  // ── 10. Business Automation ───────────────────────────────────────
   {
     slug: "automation",
     pillar: "AUTOMATE",
     pillarLabel: "Workflows & Practical AI",
-    number: "11",
+    number: "10",
     title: "Business Automation",
     navTitle: "Business Automation",
     shortDescription: "Practical workflow automation connecting your forms, CRMs, WhatsApp notifications, and tools.",
@@ -1316,6 +1218,7 @@ export const SERVICES_DATA: ServiceData[] = [
     h1: "Automate the Work That Shouldn't Be Manual.",
     eyebrow: "WORKFLOWS, APIS & DATA PIPELINES",
     intro: "Small inefficiencies compound into hundreds of wasted hours each month. If your team is manually copying customer form inquiries into spreadsheets, hand-typing WhatsApp alerts, or re-entering data between tools, that is friction holding back your growth. We build practical, reliable automations that quietly do the heavy lifting in the background.",
+    heroImage: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791041141/automation_hero.svg",
     whoIsItFor: [
       "Businesses losing leads because nobody followed up within the critical first 15 minutes.",
       "Operations teams spending hours weekly copying numbers between software tools.",
@@ -1384,7 +1287,7 @@ export const SERVICES_DATA: ServiceData[] = [
       "We focus on practical, dependable automation that solves immediate operational friction. We avoid brittle, over-engineered gimmicks that break the moment a third-party tool changes a button.",
     relatedServices: [
       { slug: "custom-software", title: "Custom Software", pillar: "BUILD" },
-      { slug: "backend-api-development", title: "Backend & API Development", pillar: "BUILD" },
+      { slug: "web-development", title: "Web Development", pillar: "BUILD" },
       { slug: "ai-solutions", title: "AI Solutions", pillar: "AUTOMATE" },
     ],
     faqs: [
@@ -1402,126 +1305,16 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     startingPrice: "₹12,000+",
-    ctaText: "Automate Your Workflows →",
+    ctaText: "Automate Your Workflows",
     ctaSubtext: "Stop wasting hours on manual tasks that software does better.",
   },
 
-  // ── 12. Backend & API Development ─────────────────────────────────
-  {
-    slug: "backend-api-development",
-    pillar: "BUILD",
-    pillarLabel: "Digital Products & Technology",
-    number: "12",
-    title: "Backend & API Development",
-    navTitle: "Backend & APIs",
-    shortDescription: "Secure, scalable backend systems, database architectures, and RESTful APIs powering modern applications.",
-    seoTitle: "Backend Development Services & Custom API Development | PG Labs",
-    metaDescription: "The systems behind the interface. PG Labs builds secure REST APIs, scalable database architectures, authentication systems, and cloud infrastructure using Node.js, Express, and Python.",
-    keywords: [
-      "Backend Development Services",
-      "API Development",
-      "Custom API Development",
-      "Node.js Backend Agency",
-      "FastAPI Development Services",
-      "Database Architecture Services",
-    ],
-    h1: "The Systems Behind the Interface.",
-    eyebrow: "API ARCHITECTURE & DATABASE SYSTEMS",
-    intro: "A sleek frontend is only as reliable as the backend engines driving it. We engineer robust, secure server architectures, high-throughput REST APIs, and scalable database schemas that process data with low latency, rock-solid security, and zero downtime.",
-    whoIsItFor: [
-      "Frontend teams needing a reliable, well-documented backend to power their mobile or web application.",
-      "Companies modernizing legacy monolithic servers into modular microservices or clean serverless functions.",
-      "Businesses needing custom third-party integrations, webhook processors, or secure data pipelines.",
-    ],
-    problemsSolved: [
-      {
-        problem: "Unoptimized database queries slowing down application response times to multiple seconds.",
-        solution: "Indexed, normalized database design (PostgreSQL / MongoDB) with query optimization and caching layers.",
-      },
-      {
-        problem: "Insecure endpoints vulnerable to data leaks, unauthorized access, and rate abuse.",
-        solution: "JWT / OAuth2 authentication, role-based authorization, rate limiting, and strict input sanitization.",
-      },
-      {
-        problem: "Poorly documented APIs that make frontend integration frustrating and error-prone.",
-        solution: "Strict TypeScript types, automated OpenAPI / Swagger documentation, and predictable JSON response structures.",
-      },
-    ],
-    whatWeProvide: [
-      "Custom RESTful API engineering with clean separation of controllers, services, and models.",
-      "Authentication and authorization systems (JWT, session tokens, OAuth, role permissions).",
-      "Relational and document database modeling (PostgreSQL, MongoDB, Redis).",
-      "Third-party API integrations (Payment gateways, CRMs, Cloudinary, AWS S3).",
-      "Server deployment, Docker containerization, and automated environment configuration.",
-    ],
-    deliverables: [
-      "Complete backend codebase with TypeScript / Python type safety",
-      "Comprehensive OpenAPI / Swagger interactive API documentation",
-      "Database migration scripts and seed datasets",
-      "Automated unit and integration test suites",
-      "Dockerized container setup with CI/CD deployment pipeline",
-      "Logging and health-check monitoring endpoints",
-    ],
-    technologies: [
-      { name: "Node.js / Express", category: "Runtime" },
-      { name: "Python / FastAPI", category: "High-Perf API" },
-      { name: "TypeScript", category: "Type System" },
-      { name: "PostgreSQL", category: "Relational DB" },
-      { name: "MongoDB / Mongoose", category: "Document DB" },
-      { name: "Docker", category: "Infrastructure" },
-    ],
-    serviceProcess: [
-      {
-        step: "01",
-        title: "Data Modeling & Contract Definition",
-        description: "We map out database entity relationships, query patterns, and define strict API request/response contracts.",
-      },
-      {
-        step: "02",
-        title: "Secure Business Logic Implementation",
-        description: "We engineer modular controllers and services, enforcing input validation, rate limits, and encryption.",
-      },
-      {
-        step: "03",
-        title: "Database Indexing & Performance Tuning",
-        description: "We audit slow queries, configure connection pooling, and establish Redis caching where appropriate.",
-      },
-      {
-        step: "04",
-        title: "Testing, Containerization & Cloud Deploy",
-        description: "We run integration test suites, bundle Docker containers, and deploy to production cloud infrastructure.",
-      },
-    ],
-    relatedServices: [
-      { slug: "custom-software", title: "Custom Software", pillar: "BUILD" },
-      { slug: "web-development", title: "Web Development", pillar: "BUILD" },
-      { slug: "automation", title: "Business Automation", pillar: "AUTOMATE" },
-    ],
-    faqs: [
-      {
-        question: "Do you use Node.js or Python for backend development?",
-        answer: "We choose the best tool for your workload: Node.js (Express / Nest) is ideal for I/O-heavy real-time applications and JavaScript full-stack parity; Python (FastAPI) is optimal for high-performance data processing and AI/ML pipelines.",
-      },
-      {
-        question: "How do you protect endpoints against spam or DDoS?",
-        answer: "We implement Helmet security headers, IP-based rate limiting middleware, CORS strict whitelisting, payload size limits, and cryptographic input sanitization.",
-      },
-      {
-        question: "Do you provide API documentation for frontend teams?",
-        answer: "Always. We provide interactive OpenAPI/Swagger documentation with request samples, query parameters, error response formats, and status codes.",
-      },
-    ],
-    startingPrice: "₹25,000+",
-    ctaText: "Engineer Your Backend Systems →",
-    ctaSubtext: "Reliable, secure APIs built for scalability.",
-  },
-
-  // ── 13. AI & Machine Learning ─────────────────────────────────────
+  // ── 11. AI & Machine Learning ─────────────────────────────────────
   {
     slug: "ai-solutions",
     pillar: "AUTOMATE",
     pillarLabel: "Workflows & Practical AI",
-    number: "13",
+    number: "11",
     title: "AI & Machine Learning",
     navTitle: "AI & ML",
     shortDescription: "Practical AI for real business problems: computer vision, data extraction, and custom LLM workflows.",
@@ -1538,6 +1331,7 @@ export const SERVICES_DATA: ServiceData[] = [
     h1: "Practical AI for Real Business Problems.",
     eyebrow: "APPLIED MACHINE LEARNING & COMPUTER VISION",
     intro: "We do not chase AI hype, nor do we build generic chatbot wrappers that hallucinate. We apply machine learning and computer vision to solved business bottlenecks: automated part identification, document data extraction, optical character recognition (OCR), and intelligent workflow decision-making.",
+    heroImage: "https://res.cloudinary.com/y20gw7iu/image/upload/v1791041671/ai_hero.svg",
     whoIsItFor: [
       "Companies with visual inspection or physical inventory identification bottlenecks.",
       "Businesses processing hundreds of physical invoices, bills, or PDFs daily that need automated extraction.",
@@ -1614,7 +1408,7 @@ export const SERVICES_DATA: ServiceData[] = [
     relatedServices: [
       { slug: "custom-software", title: "Custom Software", pillar: "BUILD" },
       { slug: "automation", title: "Business Automation", pillar: "AUTOMATE" },
-      { slug: "backend-api-development", title: "Backend & API Development", pillar: "BUILD" },
+      { slug: "web-development", title: "Web Development", pillar: "BUILD" },
     ],
     faqs: [
       {
@@ -1631,7 +1425,7 @@ export const SERVICES_DATA: ServiceData[] = [
       },
     ],
     startingPrice: "₹40,000+",
-    ctaText: "Discuss Your AI Project →",
+    ctaText: "Discuss Your AI Project",
     ctaSubtext: "Practical machine learning that solves genuine business friction.",
   },
 ];

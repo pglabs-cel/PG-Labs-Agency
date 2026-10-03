@@ -101,42 +101,44 @@ export default function PricingPage() {
       </section>
 
       {/* ── 2. Category Filter Pills ───────────────────────────────── */}
-      <section className="py-6 border-b border-border/60 bg-background-secondary/40 sticky top-[64px] sm:top-[72px] z-30 backdrop-blur-md">
-        <Container>
-          <div
-            className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto no-scrollbar py-1"
-            role="tablist"
-            aria-label="Filter Pricing by Discipline"
-          >
-            <button
-              role="tab"
-              aria-selected={activeCategory === "all"}
-              onClick={() => setActiveCategory("all")}
-              className={cn(
-                "px-4 py-2 rounded-xl text-xs sm:text-sm font-mono font-medium transition-all duration-200 cursor-pointer shrink-0 min-h-[44px] border",
-                activeCategory === "all"
-                  ? "bg-accent text-white border-accent shadow-[0_0_20px_rgba(139,92,246,0.35)] font-semibold"
-                  : "bg-background-secondary border-border text-foreground-secondary hover:text-white hover:bg-background-surface"
-              )}
+      <section className="py-3.5 sm:py-4 border-b border-border/60 bg-background/95 sm:bg-background-secondary/80 sticky top-[64px] sm:top-[72px] z-30 backdrop-blur-md">
+        <Container className="px-0 sm:px-6 lg:px-8">
+          <div className="w-full overflow-x-auto md:overflow-x-visible no-scrollbar py-1">
+            <div
+              className="flex items-center justify-start md:justify-center md:flex-wrap gap-2 sm:gap-2.5 min-w-max md:min-w-0 px-4 sm:px-0"
+              role="tablist"
+              aria-label="Filter Pricing by Discipline"
             >
-              All Packages ({PRICING_CATEGORIES.reduce((acc, c) => acc + c.tiers.length, 0)})
-            </button>
-            {PRICING_CATEGORIES.map((cat) => (
               <button
-                key={cat.id}
                 role="tab"
-                aria-selected={activeCategory === cat.id}
-                onClick={() => setActiveCategory(cat.id)}
+                aria-selected={activeCategory === "all"}
+                onClick={() => setActiveCategory("all")}
                 className={cn(
-                  "px-4 py-2 rounded-xl text-xs sm:text-sm font-mono font-medium transition-all duration-200 cursor-pointer shrink-0 min-h-[44px] border",
-                  activeCategory === cat.id
+                  "px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer shrink-0 min-h-[42px] border select-none",
+                  activeCategory === "all"
                     ? "bg-accent text-white border-accent shadow-[0_0_20px_rgba(139,92,246,0.35)] font-semibold"
-                    : "bg-background-secondary border-border text-foreground-secondary hover:text-white hover:bg-background-surface"
+                    : "bg-background-secondary border-border text-foreground-secondary hover:text-white hover:bg-background-surface hover:border-zinc-500"
                 )}
               >
-                {cat.title}
+                All Packages ({PRICING_CATEGORIES.reduce((acc, c) => acc + c.tiers.length, 0)})
               </button>
-            ))}
+              {PRICING_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  role="tab"
+                  aria-selected={activeCategory === cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer shrink-0 min-h-[42px] border select-none",
+                    activeCategory === cat.id
+                      ? "bg-accent text-white border-accent shadow-[0_0_20px_rgba(139,92,246,0.35)] font-semibold"
+                      : "bg-background-secondary border-border text-foreground-secondary hover:text-white hover:bg-background-surface hover:border-zinc-500"
+                  )}
+                >
+                  {cat.title}
+                </button>
+              ))}
+            </div>
           </div>
         </Container>
       </section>

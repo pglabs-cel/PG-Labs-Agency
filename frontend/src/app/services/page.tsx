@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { FadeUp } from "@/components/animations/FadeUp";
@@ -168,6 +169,19 @@ export default function ServicesPage() {
                           <PillarIcon className="w-4 h-4" aria-hidden="true" />
                         </div>
                       </div>
+
+                      {service.heroImage && (
+                        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl shadow-md">
+                          <Image
+                            src={service.heroImage}
+                            alt={service.title}
+                            fill
+                            unoptimized
+                            className="object-cover scale-[1.17] transition-transform duration-500 ease-out group-hover:scale-[1.22]"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                        </div>
+                      )}
 
                       <div>
                         <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground group-hover:text-white transition-colors">

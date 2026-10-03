@@ -28,7 +28,6 @@ const PROJECT_TYPE_OPTIONS = [
   { value: "Website", label: "Custom Website" },
   { value: "WordPress", label: "WordPress" },
   { value: "Shopify", label: "Shopify Store" },
-  { value: "UI/UX Design", label: "UI / UX Design" },
   { value: "SEO & Analytics", label: "SEO & Analytics" },
   { value: "Performance Marketing", label: "Paid Ads (Google / Meta)" },
   { value: "Social Media Management", label: "Social Media" },
