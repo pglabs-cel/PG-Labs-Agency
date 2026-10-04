@@ -82,6 +82,71 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+function ServiceHeroMockup({
+  service,
+  priority = false,
+}: {
+  service: ServiceData;
+  priority?: boolean;
+}) {
+  if (!service.heroImage) return null;
+
+  return (
+    <div className="relative group mx-auto max-w-lg lg:max-w-none w-full">
+      {/* Ambient Glow */}
+      <div
+        className="absolute -inset-2 sm:-inset-3.5 rounded-3xl bg-gradient-to-tr from-accent/25 via-purple-600/15 to-transparent blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        aria-hidden="true"
+      />
+
+      {/* Window Container */}
+      <div className="relative rounded-2xl sm:rounded-3xl border border-border/80 bg-background-secondary/85 backdrop-blur-md p-3 sm:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.6)] group-hover:border-accent/40 transition-all duration-300">
+        {/* Window Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-border/60 px-1">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/50" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
+            </div>
+            <span className="text-[11px] font-mono text-foreground-muted ml-1.5 truncate max-w-[150px] sm:max-w-[200px]">
+              pglabs.studio / {service.slug}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] font-mono text-accent font-semibold shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>SYSTEM SPEC</span>
+          </div>
+        </div>
+
+        {/* Main Illustration Surface */}
+        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl mt-3 shadow-inner">
+          <Image
+            src={service.heroImage}
+            alt={service.h1}
+            fill
+            priority={priority}
+            unoptimized
+            className="object-cover scale-[1.17] transition-transform duration-700 ease-out group-hover:scale-[1.21]"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
+          />
+        </div>
+
+        {/* Window Footer / Metadata */}
+        <div className="mt-3 pt-2.5 border-t border-border/50 flex items-center justify-between text-[11px] font-mono px-1">
+          <span className="text-foreground-muted flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+            <span>PILLAR: {service.pillar}</span>
+          </span>
+          <span className="text-foreground-secondary truncate max-w-[180px] sm:max-w-none text-right">
+            {service.technologies.slice(0, 3).map((t) => t.name).join(" • ")}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default async function ServiceDetailPage({ params }: Props) {
   const service = getServiceBySlug(params.slug);
   if (!service) {
@@ -151,6 +216,15 @@ export default async function ServiceDetailPage({ params }: Props) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 xl:gap-14 items-center">
             {/* Left Column: Heading, Badges, Value, CTAs */}
             <div className="lg:col-span-7 space-y-6 sm:space-y-7">
+              {/* Mobile Hero Visual Graphic (Displays directly above the badge on mobile only) */}
+              {service.heroImage && (
+                <div className="block lg:hidden w-full pb-2">
+                  <FadeUp delay={0.04}>
+                    <ServiceHeroMockup service={service} priority />
+                  </FadeUp>
+                </div>
+              )}
+
               <FadeUp>
                 <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                   <span className="text-xs font-mono tracking-widest text-accent uppercase font-bold px-3 py-1 rounded-full border border-accent/40 bg-accent/10">
@@ -207,62 +281,11 @@ export default async function ServiceDetailPage({ params }: Props) {
               </FadeUp>
             </div>
 
-            {/* Right Column: Hero Visual Graphic in Studio Mockup Window */}
+            {/* Right Column: Hero Visual Graphic in Studio Mockup Window (Laptop / Desktop only) */}
             {service.heroImage && (
-              <div className="lg:col-span-5 w-full">
+              <div className="hidden lg:block lg:col-span-5 w-full">
                 <FadeUp delay={0.18}>
-                  <div className="relative group mx-auto max-w-lg lg:max-w-none">
-                    {/* Ambient Glow */}
-                    <div
-                      className="absolute -inset-2 sm:-inset-3.5 rounded-3xl bg-gradient-to-tr from-accent/25 via-purple-600/15 to-transparent blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                      aria-hidden="true"
-                    />
-
-                    {/* Window Container */}
-                    <div className="relative rounded-2xl sm:rounded-3xl border border-border/80 bg-background-secondary/85 backdrop-blur-md p-3 sm:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.6)] group-hover:border-accent/40 transition-all duration-300">
-                      {/* Window Header */}
-                      <div className="flex items-center justify-between pb-3 border-b border-border/60 px-1">
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1.5">
-                            <span className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
-                            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/50" />
-                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
-                          </div>
-                          <span className="text-[11px] font-mono text-foreground-muted ml-1.5 truncate max-w-[150px] sm:max-w-[200px]">
-                            pglabs.studio / {service.slug}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] font-mono text-accent font-semibold shrink-0">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          <span>SYSTEM SPEC</span>
-                        </div>
-                      </div>
-
-                      {/* Main Illustration Surface - NO black border, NO inner padding, scaled edge-to-edge */}
-                      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl mt-3 shadow-inner">
-                        <Image
-                          src={service.heroImage}
-                          alt={service.h1}
-                          fill
-                          priority
-                          unoptimized
-                          className="object-cover scale-[1.17] transition-transform duration-700 ease-out group-hover:scale-[1.21]"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
-                        />
-                      </div>
-
-                      {/* Window Footer / Metadata */}
-                      <div className="mt-3 pt-2.5 border-t border-border/50 flex items-center justify-between text-[11px] font-mono px-1">
-                        <span className="text-foreground-muted flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                          <span>PILLAR: {service.pillar}</span>
-                        </span>
-                        <span className="text-foreground-secondary truncate max-w-[180px] sm:max-w-none text-right">
-                          {service.technologies.slice(0, 3).map((t) => t.name).join(" • ")}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                  <ServiceHeroMockup service={service} />
                 </FadeUp>
               </div>
             )}

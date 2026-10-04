@@ -39,7 +39,7 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
           </div>
         </div>
       )}
-      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.15] bg-clip-text text-transparent bg-gradient-to-b from-white via-white/95 to-white/75">
+      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.25] pb-2 sm:pb-3 bg-clip-text text-transparent bg-gradient-to-b from-white via-white/95 to-white/75">
         {title}
       </h2>
       {description && (

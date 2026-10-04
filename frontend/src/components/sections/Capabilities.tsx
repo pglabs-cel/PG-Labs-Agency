@@ -7,16 +7,22 @@ import { TechIcon } from "@/components/ui/TechIcon";
 const CAPABILITIES = [
   "React",
   "Next.js",
+  "WordPress",
+  "Shopify",
+  "Meta Ads",
+  "Google Ads",
+  "Google Analytics",
   "Node.js",
   "Python",
   "FastAPI",
   "MongoDB",
   "PostgreSQL",
   "Docker",
-  "AI/ML",
-  "REST APIs",
-  "Express",
+  "Tailwind CSS",
   "Framer Motion",
+  "AI/ML",
+  "Figma",
+  "REST APIs",
 ];
 
 // Duplicate for seamless infinite marquee
@@ -26,7 +32,7 @@ export const Capabilities: React.FC = () => {
   return (
     <section
       className="py-10 border-y border-border/60 bg-background-secondary/40 overflow-hidden"
-      aria-label="Technology capabilities"
+      aria-label="Technology capabilities and platforms"
     >
       <Container className="mb-6">
         <p className="text-xs sm:text-sm text-foreground-muted font-mono text-center tracking-widest uppercase">
@@ -39,12 +45,12 @@ export const Capabilities: React.FC = () => {
         {/* Edge fades */}
         <div
           className="pointer-events-none absolute left-0 top-0 h-full w-16 sm:w-32
-            bg-gradient-to-r from-background-secondary/90 to-transparent z-10"
+            bg-gradient-to-r from-background to-transparent z-10"
           aria-hidden="true"
         />
         <div
           className="pointer-events-none absolute right-0 top-0 h-full w-16 sm:w-32
-            bg-gradient-to-l from-background-secondary/90 to-transparent z-10"
+            bg-gradient-to-l from-background to-transparent z-10"
           aria-hidden="true"
         />
 
@@ -53,7 +59,7 @@ export const Capabilities: React.FC = () => {
           {DOUBLED.map((tech, idx) => (
             <span
               key={idx}
-              className="inline-flex items-center gap-2.5 mx-2.5 px-4 py-2 rounded-full
+              className="inline-flex items-center gap-2.5 mx-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full
                 border border-border/70 bg-background-surface/80 backdrop-blur-md
                 text-xs sm:text-sm font-medium text-foreground
                 hover:border-accent/60 hover:text-white hover:bg-background-surface
